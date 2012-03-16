@@ -1,0 +1,1549 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML//EN">
+<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="description" content="A powerful new method for analyzing time ordered data to detect changes.  Able to detect multiple changes for any type of data.">
+<meta name="keywords" content="change, point, analysis, change point, change-point, change point analysis, change-point analysis, detect, multiple, trend, problem solving, control chart, CUSUM, CUSUM chart">
+<meta name="GENERATOR" content="Microsoft FrontPage 12.0">
+<meta name="verify-v1" content="nxCsGPyyrm9VpubNP74hFhiIl5PZUvwAgVN5jnlUAjE=">
+<title>Change-Point Analysis: A Powerful New Tool For Detecting Changes</title>
+<style type="text/css">
+.style7 {
+	text-align: left;
+	border: 0 solid #000080;
+	background-color: #000080;
+}
+.style14 {
+	background-color: #FFFFFF;
+}
+</style>
+
+<style type="text/css">
+@import url('../../topsidestyle.css');
+.style19 {
+	border-style: solid;
+	border-color: #FFFFFF;
+}
+</style>
+<style>
+<!--
+ 
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{
+	margin:0in;
+	margin-bottom:.0001pt;
+	font-size:10.0pt;
+	font-family:"Times New Roman";}
+p.MsoFootnoteText, li.MsoFootnoteText, div.MsoFootnoteText
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:10.0pt;
+	font-family:"Times New Roman";}
+p.MsoFooter, li.MsoFooter, div.MsoFooter
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:10.0pt;
+	font-family:"Times New Roman";}
+span.MsoFootnoteReference
+	{vertical-align:super;}
+ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+-->
+</style>
+
+
+</head>
+
+<body style="background-color: rgb(255, 255, 255);" alink="#FF0000" link="#0000FF" text="#000000" vlink="#800080">
+
+<!--webbot bot="Include" tag="BODY" u-include="../../top.html" startspan -->
+
+<p>
+<a href="http://www.variation.com/" target="_self">
+	</a><table style="width: 100%;">
+<tbody><tr>
+		<td class="topstyle1" style="width: 132px;">
+        <strong><span class="topstyle2">T</span><span class="topstyle3">E</span></strong></td>
+		<td class="topstyle4" style="width: 720px;"><strong>Taylor Enterprises, Inc.<br>
+		<span class="topstyle5">www.variation.com</span></strong></td>
+		<td class="topstyle6">Quality and Statistics<br>
+		Books, Software, Training and Consulting</td>
+	</tr>
+
+</tbody></table>
+</p>
+<!--webbot bot="Include" i-checksum="5881" endspan --><h2 align="center"><a href="http://www.variation.com/cpa/index.html" target="_self">Return to Change-Point Analyzer Main Page</a></h2>
+<hr color="#000080" size="5">
+
+<table style="width: 100%;" cellpadding="0" cellspacing="10">
+	<tbody><tr>
+		<td style="width: 270px;" class="style19" valign="top">
+		<!--webbot bot="Include" tag="BODY" u-include="../../side.html" startspan -->
+<h2 class="sidestyle1">Search variation.com</h2>
+<p>
+</p><form action="http://www.variation.com/cgi-bin/search.cgi" method="POST" target="_self">
+<center><b>Enter keywords:&nbsp;</b><input size="30" name="keywords" maxlength="80" type="text"></center>
+<p>
+</p><center><input name="exact_match" type="checkbox"> Exact Match Search</center>
+<p>
+</p><center><input value="Perform Search" type="SUBMIT"></center>
+</form>
+
+<p>&nbsp;</p>
+
+<h2 class="sidestyle1">
+
+<strong>Site Map</strong></h2>
+		<p class="sidestyle2"><strong><a href="http://www.variation.com/index.html" target="_self">Products</a></strong><br></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/index.html#books" target="_self">Books</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/index.html#software" target="_self">Software</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/index.html#courses" target="_self">Courses</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/index.html#consulting" target="_self">Consulting</a></p>
+		<br>
+		<p class="sidestyle2"><strong><a href="http://www.variation.com/expertise.html" target="_self">Expertise</a></strong><br></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/expertise.html#Acceptance_Sampling" target="_self">Acceptance Sampling</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/expertise.html#Process_Validation" target="_self">Process Validation</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/expertise.html#CAPAs_and_Trending_of_Quality_Data" target="_self">CAPAs and Trending of Quality Data</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/expertise.html#FMEA" target="_self">FMEA</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/expertise.html#Measurement_Systems_Analysis" target="_self">Measurement Systems Analysis</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/expertise.html#Robust_Tolerance_Analysis" target="_self">Spec Setting, Tolerance Analysis and Robust Design</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/expertise.html#General_Statistics" target="_self">General Statistics</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/expertise.html#Statistical_Process_Control" target="_self">Statistical Process Control</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/expertise.html#Design_of_Experiments" target="_self">Design of Experiments</a></p>
+		<p class="sidestyle3"><a href="http://www.variation.com/expertise.html#Six_Sigma" target="_self">Six Sigma</a></p>
+		<br>
+		<strong><a href="http://www.variation.com/news.html" target="_self">What's New</a></strong><br>
+		<br>
+		<strong><a href="http://www.variation.com/library.html" target="_self">Technical Library</a></strong><br>
+		<br>
+		<strong><a href="http://www.variation.com/FAQs.html" target="_self">FAQ</a></strong><br>
+		<br>
+		<br>
+		
+
+<h2 class="sidestyle1">&nbsp;&nbsp;Contact Info</h2>
+
+<dl>
+  <dt><strong>Chairman</strong></dt>
+  <dd><a href="http://www.variation.com/wayne.html" target="_self">Dr. Wayne A. Taylor</a></dd>
+  <dt><strong>President</strong></dt>
+  <dd>Ann B. Taylor</dd>
+  <dt><strong>Telephone</strong> </dt>
+  <dd>1 (847) 367-1032</dd>
+  <dt><strong>FAX</strong> </dt>
+  <dd>1 (847) 367-1037</dd>
+  <dt><strong>Postal address</strong> </dt>
+  <dd>5510 Fairmont Rd.<br>
+	Libertyville, IL 60048<br>
+	USA</dd>
+  <dt><strong>Electronic mail</strong> </dt>
+  <dd>
+	<a info@variation.com<="" a="" target="_self" href="mailto:info@variation.com">
+	info@variation.com</a></dd>
+  <dt><strong>Web</strong></dt>
+  <dd><a href="http://www.variation.com/" target="_self">www.variation.com</a></dd>
+</dl>
+
+<p>&nbsp;</p>
+<h2 class="sidestyle1">Subscribe to our Web Site</h2>
+
+<p>By entering your e-mail address and clicking the <strong>Subscribe</strong> button, you
+will automatically be added to our mailing list.&nbsp; You will receive an e-mail
+when new versions of our software or books are available as well as other
+significant announcements.&nbsp; (<a href="http://www.variation.com/privacy.html" target="_self">privacy policy</a>).</p>
+
+<form method="POST" action="http://www.variation.com/cgi-bin/cgiemail/forms/subscribe.txt" target="_self">
+  <input name="success" value="http://www.variation.com/confirm-subscribe.html" type="hidden">
+	<p>E-mail address to send notifications to:</p>
+	<p>
+	<input name="required-address" size="25" style="width: 232px;" type="text">&nbsp; &nbsp;&nbsp;</p>
+	<p> <input value="Subscribe" name="Subscribe" type="submit"></p>
+	<p> <input value="Unsubscribe" name="Unsubscribe" type="submit"></p>
+</form>
+
+<!--webbot bot="Include" i-checksum="57143" endspan --></td>
+		<td class="style7" style="width: 0pt;" valign="top">&nbsp;</td>
+		<td class="style14" valign="top">
+
+<b>
+
+<p align="center"><font size="6">Change-Point Analysis:<br>
+A Powerful New Tool For Detecting Changes</font></p>
+
+<p align="center"><a href="http://www.variation.com/wayne.html" target="_self"><font face="Helvetica" size="4">
+Dr. Wayne A. Taylor</font></a></p>
+</b>
+
+<p class="MsoNormal" align="left">&nbsp;<span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-top:0in;margin-right:.5in;margin-bottom:0in;
+margin-left:.5in;margin-bottom:.0001pt;text-align:justify">Change-point analysis 
+is a powerful new tool for determining whether a change has taken place.&nbsp; 
+It is capable of detecting subtle changes missed by control charts.&nbsp; 
+Further, it better characterizes the changes detected by providing confidence 
+levels and confidence intervals.&nbsp; When collecting online data, a 
+change-point analysis is not a replacement for control charting.&nbsp; But, 
+because a change-point analysis can provide further information, the two methods 
+can be used in a complementary fashion.&nbsp; When analyzing historical data, 
+especially when dealing with large data sets, change-point analysis is 
+preferable to control charting.&nbsp; A change-point analysis is more powerful, 
+better characterizes the changes, controls the overall error rate, is robust to 
+outliers, is more flexible and is simpler to use.&nbsp; This article describes 
+how to perform a change-point analysis and demonstrates its capabilities through 
+a number of examples.</p>
+
+<p class="MsoNormal"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<font size="4">
+
+<b>
+
+<p align="center">Table of Contents</p>
+</b>
+
+</font><p align="center"><font size="3"><a href="#Introduction" target="_self">
+Introduction</a><br>
+<a href="#Example%201" target="_self">Example 1: US Trade Deficit Data</a><br>
+<a href="#Change-Point%20Analysis" target="_self">Change-Point Analysis</a><br>
+<a href="#Procedure" target="_self">Procedure for Performing a Change-Point 
+Analysis</a><br>
+<a href="#Detecting%20Changes%20in%20the%20Variation" target="_self">Detecting Changes 
+in the Variation and Other Characteristics</a><br>
+<a href="#Handling%20Outliers" target="_self">Handling Outliers</a><br>
+<a href="#Example%202" target="_self">Example 2: Complaint Data</a><br>
+<a href="#Example%203" target="_self">Example 3: Part Strength</a><br>
+<a href="#Conclusion" target="_self">Conclusion</a><br>
+<a href="#References" target="_self">References</a><br>
+</font></p>
+
+<p class="MsoNormal"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal"><b><span style="font-size:14.0pt;"><a name="Introduction" target="_self"></a>Introduction</span></b></p>
+
+<p class="MsoNormal"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Did a change occur?&nbsp; Did more than one change occur?&nbsp; When did the 
+changes occur?&nbsp; With what confidence did the changes occur?&nbsp; All these 
+questions and more can be answered by performing a change-point analysis.&nbsp; 
+A change-point analysis is capable of detecting multiple changes.&nbsp; For each 
+change it provides detailed information including a confidence level indicating 
+the likelihood that a change occurred and a confidence interval indicating when 
+the change occurred.&nbsp; The change-point analysis procedure provided is 
+extremely flexible.&nbsp; It can be performed on all types of time ordered data 
+including attribute data, data from nonnormal distributions, ill-behaved data 
+such as particle counts and complaint data, and data with outliers.&nbsp; This 
+article describes how to perform a change-point analysis and highlights its 
+potential applications through a number of examples.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Traditionally, control charts are used to detect changes.&nbsp; The major 
+difference between change-point analysis and control charting is that control 
+charts can be updated following the collection of each data point while a 
+change-point analysis can only be performed once all the data is collected.&nbsp; 
+Control charts are generally better at detecting isolated abnormal points and at 
+detecting a major change quickly while a change-point analysis can detect subtle 
+changes frequently missed by control charts.&nbsp; The two methods can be used 
+in a complementary fashion.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+When analyzing historical data, especially when such data sets are large, a 
+change-point analysis is preferable to control charting the data.&nbsp; One 
+benefit of a change-point analysis is that it controls the change-wise error 
+rate.&nbsp; As a result, each change detected is likely to be real.&nbsp; 
+Control charts control the point-wise error rate.&nbsp; When there are thousands 
+of data points, numerous points can exceed the control limits even when no 
+change has occurred.&nbsp; Change-point analysis offers many other benefits as 
+well.&nbsp; This article also compares and contrasts these two methods of 
+detecting change.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><b><span style="font-size:14.0pt;"><a name="Example 1" target="_self"></a>
+Example 1:&nbsp; US Trade Deficit Data</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Before providing the details on how to perform a change-point analysis, we will 
+start with an example.&nbsp; Table 1 shows US trade deficit data from 1987 to 
+1988 in billions of dollars.&nbsp; This data is from Wheeler (1993).</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Table 1:&nbsp; US Trade Deficits 1987-1988 ($ billions)</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<table style="margin-left: 18.9pt; border-collapse: collapse; border: medium none;" border="1" cellpadding="0" cellspacing="0">
+ <tbody><tr>
+  <td style="width: 31.8pt; border: 0.5pt solid windowtext; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">&nbsp;</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">Jan</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">Feb</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">Mar</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">Apr</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">May</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">Jun</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">Jul</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">Aug</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">Sep</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">Oct</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">Nov</p>
+  </td>
+  <td style="width: 31.85pt; border-width: 0.5pt 0.5pt 0.5pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">Dec</p>
+  </td>
+ </tr>
+ <tr>
+  <td style="width: 31.8pt; border-right: 0.5pt solid windowtext; border-width: medium 0.5pt 0.5pt; border-style: none solid solid; border-color: -moz-use-text-color windowtext windowtext; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">1987</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">10.7</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">13.0</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">11.4</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">11.5</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">12.5</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">14.1</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">14.8</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">14.1</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">12.6</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">16.0</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">11.7</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">10.6</p>
+  </td>
+ </tr>
+ <tr>
+  <td style="width: 31.8pt; border-right: 0.5pt solid windowtext; border-width: medium 0.5pt 0.5pt; border-style: none solid solid; border-color: -moz-use-text-color windowtext windowtext; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; -moz-border-image: none; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">1988</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">10.0</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">11.4</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">7.9</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">9.5</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">8.0</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">11.8</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">10.5</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">11.2</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">9.2</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">10.1</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">10.4</p>
+  </td>
+  <td style="width: 31.85pt; border-width: medium 0.5pt 0.5pt medium; border-style: none solid solid none; border-color: -moz-use-text-color windowtext windowtext -moz-use-text-color; padding: 0in 5.4pt;" valign="top" width="42">
+  <p class="MsoNormal" style="text-align:justify">10.5</p>
+  </td>
+ </tr>
+</tbody></table>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">A 
+plot of this data is shown in Figure 1.&nbsp; Take a moment and determine what 
+patterns you detect in the plot.&nbsp; Did the trade deficit change during this 
+period of time?&nbsp; How did it change?&nbsp; When did it change?</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image002.gif" alt="Figure 1" height="196" width="402"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 1:&nbsp; Plot of US Trade Deficit Data</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+The trade deficit appears to be lower in 1988 than in 1987.&nbsp; To confirm 
+that this is the case, a control chart of the data can be constructed.&nbsp; The 
+correct type of control chart to use for this data is an individuals control 
+chart.&nbsp; An individuals control chart of the trade deficit data is shown in 
+Figure 2.&nbsp; The two lines added to the individuals chart are called control 
+limits.&nbsp; They represent the maximum range that the values are expected to 
+vary over assuming no change has occurred.&nbsp; Points outside the control 
+limits indicate a change has occurred.&nbsp; The fact that the October 1987 
+point is above the upper control limit indicates that a change has occurred.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image004.gif" alt="Figure 2" height="196" width="402"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 2:&nbsp; Individuals Control Chart of US Trade Deficit Data</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+But what type of change occurred?&nbsp; Look at Figure 2 and decide how you 
+would describe the change.&nbsp; Was October 1987 an abnormally high month?&nbsp; 
+Did the trade deficit gradually decrease during this two-year period?&nbsp; Or 
+did the trade deficit suddenly shift downward at the end of 1987 or beginning of 
+1988?&nbsp; While control charts can be used to detect changes, interpreting 
+these changes can still be difficult.&nbsp; To shed further light on the nature 
+of the change, a change-point analysis can be performed.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><b><span style="font-size:14.0pt;"><a name="Change-Point Analysis" target="_self"></a>
+Change-Point Analysis</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+There are numerous approaches to performing a change-point analysis.&nbsp; The 
+one used in this paper has been implemented in Taylor (2000a).&nbsp; This 
+software was used to perform the analyses in this paper.&nbsp; The details of 
+this procedure are provided later.&nbsp; First we will look at the results of 
+performing this analysis.&nbsp; Table 2 shows the results of a change-point 
+analysis for the trade deficit data in Table 1.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Table 2:&nbsp; Results of Change-Point Analysis on US Trade Deficit Data</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image006.gif" height="141" width="561"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;
+mso-bidi-font-size:10.0pt">The analysis detects two changes.<span style="mso-spacerun: yes">&nbsp;
+</span>The first change is estimated to have occurred around June 1987.<span style="mso-spacerun: yes">&nbsp;
+</span>This date represents the first month following the change.<span style="mso-spacerun:
+yes">&nbsp; </span>The second change is estimated to have occurred around 
+November 1987.<span style="mso-spacerun: yes">&nbsp;&nbsp; </span>Associated 
+with each change is a confidence level indicating how confident the analysis is 
+that the change actually occurred.<span style="mso-spacerun: yes">&nbsp; </span>
+The first change occurred with 91% confidence.<span style="mso-spacerun: yes">&nbsp;
+</span>The second change occurred with 100% confidence.<span style="mso-spacerun: yes">&nbsp;
+</span>We are much more confident about the second change.</span></p>
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;
+mso-bidi-font-size:10.0pt">&nbsp;</span></p>
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;
+mso-bidi-font-size:10.0pt">Also associated with each change is a confidence 
+interval for the time of the change indicating how well the time of the change 
+has been pinpointed.<span style="mso-spacerun: yes">&nbsp; 95% confidence is 
+used for all confidence intervals.&nbsp;
+</span>With 95% confidence, the first change occurred between May and July of 
+1987.<span style="mso-spacerun: yes">&nbsp;
+</span>With 95% confidence, the second change occurred in November 1987.<span style="mso-spacerun: yes">&nbsp;
+</span>The fact that the confidence interval for the first change is wider 
+indicates that the time of the first change cannot be as accurately pinpointed 
+as the second change.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Table 2 also gives additional information about each change.&nbsp; The table 
+indicates that prior to the first change the average trade deficit was 11.82 
+billion dollars while after the first change it was 14.32 billion dollars.&nbsp; 
+Table 2 also gives a level associated with each change.&nbsp; The level is an 
+indication of the importance of the change.&nbsp; The level 1 change is the 
+first change detected and that which is most visibly apparent in the plot in 
+Figure 1.&nbsp; Level 2 changes are detected on a second pass through the data.&nbsp; 
+Any number of levels can exist dependent on the number of changes found.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Figure 3 shows a graphical presentation of the results of the change-point 
+analysis.&nbsp; The two changes are represented by the shifts in the shaded 
+background.&nbsp; The shaded background represents a region expected to contain 
+all the values based on the current model that two changes occurred.&nbsp; Since 
+all points fall within this region, this model fully explains the variation in 
+the data.&nbsp; The control limits for the individuals chart are also displayed 
+in Figure 3.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image008.gif" alt="Figure 3" height="196" width="402"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 3:&nbsp; Plot of US Trade Deficit Data Showing Changes in Background</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+While the control chart barely detected any change had occurred (one point 
+barely out), the change-point analysis detected two changes.&nbsp; It also 
+provided additional details including confidence levels and confidence 
+intervals.&nbsp; This example illustrates two of the benefits of a change-point 
+analysis: it is more powerful at detecting smaller sustained changes and it 
+better characterizes such changes.&nbsp; When used to analyze historical data 
+for trends and changes, a change-point analysis provides far more useful 
+information than a control chart.&nbsp; For such data, the best approach is to 
+perform a change-point analysis.&nbsp; However, this does not prevent one from 
+also control charting the data.&nbsp; The results of both approaches can be 
+displayed in a simple plot like Figure 3.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><b><span style="font-size:14.0pt;"><a name="Procedure" target="_self"></a>
+Procedure for Performing a Change-Point Analysis</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+The procedure used by Taylor (2000a) for performing a change-point analysis 
+iteratively uses a combination of cumulative sum charts (CUSUM) and 
+bootstrapping to detect the changes.&nbsp; The analysis begins with the 
+construction of the CUSUM chart shown in Figure 4.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image010.gif" alt="Figure 4" height="195" width="407"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 4:&nbsp; CUSUM Chart of US Trade Deficit Data</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+CUSUM charts are constructed by calculating and plotting a cumulative sum based 
+on the data.&nbsp; Let X<sub>1</sub>, X<sub>2</sub>, &#8230;, X<sub>24</sub> represent 
+the 24 data points.&nbsp; From this, the cumulative sums S<sub>0</sub>, S<sub>1</sub>, 
+&#8230;, S<sub>24</sub> are calculated.&nbsp; The cumulative sums are calculated as 
+follows:</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">1.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>First calculate the average <sub><img src="cusum_files/image012.gif" height="41" width="155"></sub></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">2.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Start the cumulative sum at zero by setting S<sub>0</sub> = 0.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">3.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Calculate the other cumulative sums by adding the difference between 
+current value and the average to the previous sum, i.e., <sub><img src="cusum_files/image014.gif" height="24" width="125"></sub>&nbsp;for <br>
+i = 1, 2, &#8230;, 24.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+For the Trade Deficit data:</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <sub><img src="cusum_files/image016.gif" height="21" width="92"></sub></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+S<sub>0</sub>
+= 0</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <sub><img src="cusum_files/image018.gif" height="25" width="333"></sub></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <sub><img src="cusum_files/image020.gif" height="24" width="389"></sub></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <sub><img src="cusum_files/image022.gif" height="20" width="8"></sub></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <sub><img src="cusum_files/image024.gif" height="25" width="351"></sub></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+This is the series plotted in Figure 4.&nbsp; The cumulative sums are not the 
+cumulative sums of the values.&nbsp; Instead they are the cumulative sums of 
+differences between the values and the average.&nbsp; These differences sum to 
+zero so the cumulative sum always ends at zero (S<sub>24</sub>=0).</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Interpreting a CUSUM chart requires some practice.&nbsp; Suppose that during a 
+period of time the values tend to be above the overall average.&nbsp; Most of 
+the values added to the cumulative sum will be positive and the sum will 
+steadily increase.&nbsp; A segment of the CUSUM chart with an upward slope 
+indicates a period where the values tend to be above the overall average.&nbsp; 
+Likewise a segment with a downward slope indicates a period of time where the 
+values tend to be below the overall average.&nbsp; A sudden change in direction 
+of the CUSUM indicates a sudden shift or change in the average.&nbsp; Periods 
+where the CUSUM chart follows a relatively straight path indicate a period where 
+the average did not change.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Looking at Figure 4, the CUSUM chart takes a sudden turn in direction around 
+November 1987.&nbsp; This indicates that around this time, the average shifted.&nbsp; 
+Before the change in direction, the CUSUM slopes upwards indicating that 
+initially the trade deficits are above the two-year average.&nbsp; After the 
+change in direction, the CUSUM slopes downwards indicating that the trade 
+deficits are below the two-year average.&nbsp; After the change, the CUSUM is 
+relatively straight indicating no subsequent change occurred.&nbsp; However, 
+before the change, the CUSUM is bowed.&nbsp; It could be broken into two 
+separate line segments.&nbsp; This gives an indication that a second change 
+might have occurred.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+The CUSUM chart in Figure 4 appears to indicate that at least one and possibly 
+two changes took place.&nbsp; The problem with CUSUM charts is that they require 
+considerable skill to properly interpret.&nbsp; How can we be sure that these 
+changes took place?&nbsp; A confidence level can be determined for the apparent 
+change by performing a bootstrap analysis.&nbsp; Before performing the bootstrap 
+analysis, an estimator of the magnitude of the change is required.&nbsp; One 
+choice, which works well regardless of the distribution and despite multiple 
+changes, is S<sub>diff</sub>
+defined as:</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+S<sub>diff</sub>&nbsp; =&nbsp; S<sub>max</sub>&nbsp; -&nbsp; S<sub>min</sub>
+where</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ 
+S<sub>max</sub>&nbsp; =&nbsp; <sub><img src="cusum_files/image026.gif" height="32" width="59"></sub></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ 
+S<sub>min</sub>&nbsp; =&nbsp; <sub><img src="cusum_files/image028.gif" height="32" width="59"></sub></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+For the trade deficit data, S<sub>min</sub> = <span style="color:black;layout-grid-mode:line">-0.69583</span>, S<sub>max</sub> = 
+17.04583 making S<sub>diff</sub> = 17.74167.&nbsp; Once the estimator of the 
+magnitude of the change has been selected, the bootstrap analysis can be 
+performed.&nbsp; A single bootstrap is performed by:</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">1.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Generate a bootstrap sample of 24 units, denoted X<sup>0</sup><sub>1</sub>, 
+X<sup>0</sup><sub>2</sub>, &#8230;, X<sup>0</sup><sub>24</sub>, by randomly reordering 
+the original 24 values.&nbsp; This is called sampling without replacement.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">2.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Based on the bootstrap sample, calculate the bootstrap CUSUM, denoted S<sup>0</sup><sub>0</sub>, 
+S<sup>0</sup><sub>1</sub>, &#8230;, S<sup>0</sup><sub>24</sub>.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">3.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Calculate the maximum, minimum and difference of the bootstrap CUSUM, 
+denoted S<sup>0</sup><sub>max</sub>, S<sup>0</sup><sub>min</sub>, and S<sup>0</sup><sub>diff</sub>.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">4.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Determine whether the bootstrap difference S<sup>0</sup><sub>diff</sub> 
+is less than the original difference S<sub>diff</sub>.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+The idea behind bootstrapping is that the bootstrap samples represent random 
+reorderings of the data that mimic the behavior of the CUSUM if no change has 
+occurred.&nbsp; By performing a large number of bootstrap samples, you can 
+estimate how much S<sub>diff</sub>
+would vary if no change took place.&nbsp; You can then compare this with the S<sub>diff</sub> 
+value calculated from the data is its original order to determine if this value 
+is consistent with what you would expect if no change occurred.&nbsp; Figure 5 
+shows the CUSUM chart in Figure 4 of the data in its original order overlaid 
+with the CUSUM charts from 5 different bootstrap samples.&nbsp; The bootstrap 
+CUSUM charts tend to stay closer to zero than the CUSUM of the data in its 
+original order.&nbsp; This leads one to suspect that a change must have 
+occurred.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><img src="cusum_files/image030.gif" alt="Figure 5" height="231" width="535"></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 5:&nbsp; CUSUM Charts of Data In Original Order Plus 5 Bootstrap Samples</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">A 
+bootstrap analysis consists of performing a large number of bootstraps and 
+counting the number of bootstraps for which S<sup>0</sup><sub>diff</sub>
+is less than S<sub>diff</sub>.&nbsp; Let N be the number of bootstrap samples 
+performed and let X be the number of bootstraps for which S<sup>0</sup><sub>diff</sub> 
+&lt; S<sub>diff</sub>.&nbsp; Then the confidence level that a change occurred as a 
+percentage is calculated as follows:</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+Confidence Level&nbsp; =&nbsp; <sub><img src="cusum_files/image032.gif" height="41" width="44"></sub>&nbsp;%</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Typically 90%, or 95% confidence is required before one states that a 
+significant change has been detected.&nbsp; For the five bootstraps shown in 
+Figure 5, the values of S<sup>0</sup><sub>diff</sub> are 7.0, 14.917, 7.975, 
+7.938 and 9.15 respectively.&nbsp; All of these values are below S<sub>diff</sub> 
+= 17.74167.&nbsp; Figure 6 shows a histogram of S<sup>0</sup><sub>diff</sub> 
+based on 1000 bootstrap samples.&nbsp; Out of 1,000 bootstraps, 995 had S<sup>0</sup><sub>diff</sub> 
+&lt; S<sub>diff</sub>.&nbsp; This gives a confidence level of:</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+Confidence Level&nbsp; =&nbsp; <sub><img src="cusum_files/image034.gif" height="41" width="63"></sub>&nbsp;&nbsp;=&nbsp; 
+99.5%</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+This is strong evidence that a change did in fact occur.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><img src="cusum_files/image036.gif" alt="Figure 6" height="241" width="322"></p>
+
+<p class="MsoNormal" style="margin-top:3.0pt;text-align:center" align="center"><b><span style="font-family:Arial">&nbsp;&nbsp;&nbsp; </span></b><span style="font-size:12.0pt;">
+&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 6:&nbsp; Histogram of S<sup>0</sup><sub>diff</sub>for 1000 Bootstrap 
+Samples</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Ideally, rather than bootstrapping, one would like to determine the distribution 
+of S<sup>0</sup><sub>diff</sub> based on all possible reorderings of the data.&nbsp; 
+However, this is generally not feasible.&nbsp; The trade deficit data consists 
+of 24 values.&nbsp; The total number of possible reorderings is 24! = 6.2 10<sup>23</sup>.&nbsp; 
+This is more samples than could reasonably be generated.&nbsp; The bootstrap 
+analysis randomly selected 1000 of these possible reorderings and used them to 
+estimate the distribution of S<sup>0</sup><sub>diff</sub>.&nbsp; A better 
+estimate can be obtained by increasing the number of bootstrap samples.&nbsp; 
+However, 1000 bootstraps is sufficient for most purposes.&nbsp; Repeating the 
+above analysis 10 times resulted in the following confidence levels: 99.6%, 
+99.2%, 99.3%, 99.2%, 99.4%, 99.7%, 99.2%, 99.7%, 99.5% and 99.2%.&nbsp; All the 
+analysis performed in this article are based on 1,000 bootstrap samples.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Bootstrapping results in a distribution free approach with only a single 
+assumption, that of an independent error structure.&nbsp; Both control charting 
+and change-point analysis are based on the mean-shift model.&nbsp; Let X<sub>1</sub>, 
+X<sub>2</sub>, ... represent the data in time order.&nbsp; The mean-shift model 
+can be written as</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+X<sub>i</sub>
+= </span><span style="font-size:12.0pt;font-family:
+Symbol;">m</span><sub><span style="font-size:12.0pt;">i</span></sub><span style="font-size:12.0pt;"> + </span><span style="font-size:12.0pt;font-family:Symbol;">e</span><sub><span style="font-size:12.0pt;">i</span></sub></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+where </span><span style="font-size:12.0pt;font-family:Symbol;">m</span><sub><span style="font-size:12.0pt;">i</span></sub><span style="font-size:12.0pt;"> is the average at time i.&nbsp; Generally </span><span style="font-size:12.0pt;font-family:Symbol;">m</span><sub><span style="font-size:12.0pt;">i</span></sub><span style="font-size:12.0pt;"> = </span><span style="font-size:12.0pt;font-family:Symbol;">m</span><sub><span style="font-size:12.0pt;">i-1</span></sub><span style="font-size:12.0pt;"> except for a small number of values of i called the 
+change-points.&nbsp;
+</span><span style="font-size:12.0pt;
+font-family:Symbol;">e</span><sub><span style="font-size:12.0pt;">i</span></sub><span style="font-size:12.0pt;"> is the random error associated with the i-th value.&nbsp; 
+It is assumed that the </span><span style="font-size:12.0pt;
+font-family:Symbol;">e</span><sub><span style="font-size:12.0pt;">i</span></sub><span style="font-size:12.0pt;"> are independent with means of zero.&nbsp; Taylor 
+(2000b) provides a procedure for detecting a departure from this assumption.&nbsp; 
+Data not appropriate for a change-point analysis and control charting include 
+autoregressive time series data such as stock prices.&nbsp; Control charts also 
+make the assumption that the </span><span style="font-size:12.0pt;font-family:Symbol;">
+e</span><sub><span style="font-size:12.0pt;">i</span></sub><span style="font-size:12.0pt;"> are identically distributed.&nbsp; They frequently 
+make additional assumptions as well, for example, that the </span><span style="font-size:12.0pt;font-family:Symbol;">e</span><sub><span style="font-size:12.0pt;">i</span></sub><span style="font-size:12.0pt;"> are normally distributed.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Once a change has been detected, an estimate of when the change occurred can be 
+made.&nbsp; One such estimator is the CUSUM estimator.&nbsp; Let m be such that:</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+|S<sub>m</sub>|&nbsp; =&nbsp; <sub><img src="cusum_files/image038.gif" height="32" width="75"></sub></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">S<sub>m</sub> 
+is the point furthest from zero in the CUSUM chart.&nbsp; The point m estimates 
+last point before the change occurred.&nbsp; The point m+1 estimates the first 
+point after the change.&nbsp; For the trade deficit data, the most extreme point 
+on the CUSUM chart is the November 1987 (S<sub>11</sub>).&nbsp; The best 
+estimate of when the change occurred is between November 1987 and December 1987.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">A 
+second estimator of when the change occurred is the mean square error (MSE) 
+estimator.&nbsp; Let MSE(m) be defined as:</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <sub><img src="cusum_files/image040.gif" height="45" width="268"></sub></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ 
+where&nbsp; <sub><img src="cusum_files/image042.gif" height="64" width="77"></sub>&nbsp;&nbsp;and&nbsp; <sub><img src="cusum_files/image044.gif" height="64" width="87"></sub></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+The MSE error estimator is based on the idea of splitting the data into two 
+segments, 1 to m and m+1 to 24, estimating the average of each segment, and then 
+seeing how well the data fits the two estimated averages.&nbsp; The value of m 
+that minimizes MSE(m) is the best estimator of the last point before the change.&nbsp; 
+As before, the point m+1 estimates the first point after the change.&nbsp; For 
+the trade deficit data, the value of m minimizing MSE(m) is 10.&nbsp; The best 
+estimate of when the change occurred is between October 1987 and November 1987.&nbsp; 
+This is one month earlier than predicted by the CUSUM estimator.&nbsp; In Table 
+2, the MSE estimator was used to estimate the times of the changes and the 
+months reported are the first months following the change, i.e., m+1.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Once a change has been detected, the data can be broken into two segments, one 
+each side of the change-point, and the analysis repeated for each segment.&nbsp; 
+For each additional significant change found, continue to split the segments in 
+two.&nbsp; In this manner multiple changes can be detected.&nbsp; For the trade 
+deficit data, the initial change splits the data into two segments, January 1987 
+through October 1987 and November 1987 through December 1988.&nbsp; Repeating 
+the analysis on each segment results in the detection of a second change 
+predicted to have occurred between May 1987 and June 1987.&nbsp; This changed 
+occurred with only 91.0% confidence so is not as likely to have occurred as the 
+first change.&nbsp; However, there is still strong evidence that a second change 
+occurred.&nbsp; Figure 7 shows the CUSUM chart from Figure 4 with the 
+significant changes shown in the background.&nbsp; It appears that the slope of 
+the CUSUM chart changed twice.&nbsp; These correspond to the two changes of the 
+background color.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+While the above procedure generally works well, it can be improved.&nbsp; Taylor 
+(2000a) treats the changes detected by the above procedure as a set of candidate 
+change-points.&nbsp; Once this set is generated, all the change-points and their 
+confidence levels are reestimated.&nbsp; A backward elimination procedure is 
+then use to eliminate those points that no longer test significant.&nbsp; When a 
+point is eliminated, the surrounding change-points are reestimated along with 
+their significance levels.&nbsp; This reduces the rate of false detections.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image046.gif" alt="Figure 7" height="196" width="407"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 7:&nbsp; CUSUM Chart of US Trade Deficit Data With <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+Significant Changes Shown in the Background</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Table 2 also gives confidence intervals for the time of the change.&nbsp; 
+Methods of obtaining bootstrap confidence intervals are provided in Efron and 
+Tibshirani (1993).&nbsp; Change-point analysis has a long history.&nbsp; The 
+problem was originally stated in Page (1955, 1957).&nbsp; Hinkley (1971) and 
+Pettitt (1980) suggest the application of CUSUM charts.&nbsp; Hinkley and 
+Schechtman, (1987) suggest the application of bootstrapping.&nbsp; The procedure 
+in this article combines these two approaches in a novel fashion.&nbsp; It also 
+adds an iterative approach that allows multiple changes to be detected.&nbsp; 
+All the above references are restricted to the problem of detecting a single 
+change.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><b><span style="font-size:14.0pt;"><a name="Detecting Changes in the Variation" target="_self"></a>
+Detecting Changes in the Variation and Other Characteristics</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+The change-point analysis procedure can be applied to any characteristic for 
+which data is collected over time.&nbsp; In the trade deficit example, it was 
+applied to individual values.&nbsp; It can also be applied to averages, standard 
+deviations, ranges, defect levels, counts and many other types of data.&nbsp; 
+Taylor (2000b) shows how a change-point analysis can be used to detect a change 
+in the autocorrelation structure of a set of chemical data.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+For the trade deficit data we would also like to determine if the variation 
+changed.&nbsp; This presents a special problem because we have only a single 
+observation per month so we cannot calculate a range or standard deviation.&nbsp; 
+In this case, it is still possible to analyze the variation by performing the 
+change-point analysis on the differences between consecutive points.&nbsp; Let X<sub>1</sub>, 
+X<sub>2</sub>, &#8230;, X<sub>24</sub> represent the 24 data points.&nbsp; From this, 
+12 consecutive difference D<sub>1</sub>, D<sub>2</sub>, &#8230;, D<sub>12</sub> are 
+calculated as follows:</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal"><span style="font-size:12.0pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+D<sub>i</sub> = | X<sub>2i</sub> &#8211; X<sub>2i-1</sub>
+|&nbsp; for&nbsp; i=1,2,&#8230;,12</span></p>
+
+<p class="MsoNormal"><span style="font-size:8.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Figure 8 shows a CUSUM chart of the trade deficit variation (differences).&nbsp; 
+Performing a bootstrap analysis on this chart indicates that no significant 
+change in the trade deficit variation occurred.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image048.gif" alt="Figure 8" height="194" width="408"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 8:&nbsp; CUSUM Chart of US Trade Deficit Variation</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">It 
+is important to only use differences that do not have points in common.&nbsp; 
+For example, |X<sub>2</sub>
+&#8211; X<sub>1</sub>| and |X<sub>3</sub> &#8211; X<sub>2</sub>| have the point X<sub>2</sub>
+in common and are therefore correlated.&nbsp; This violates the assumption of 
+independent errors required by a change-point analysis.&nbsp; While the 
+difference between consecutive points will frequently provide a good estimate of 
+the short-term variation in the process, at least some of these differences 
+might be contaminated by shifts or changes in the average.&nbsp; Such shifts can 
+create outlier or extreme values in the data.&nbsp; As we will see in the next 
+section, the change-point analysis procedure is robust to such outliers.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><b><span style="font-size:14.0pt;"><a name="Handling Outliers" target="_self"></a>
+Handling Outliers</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal"><span style="font-size:12.0pt;">What if the data contains an 
+outlier?&nbsp; As an example of what can happen, the June 1987 trade deficit 
+value was changed to 25.&nbsp; Figure 9 shows an individuals control chart for 
+this modified set of data with the results of the change-point analysis shown in 
+the background.&nbsp; The outlier is clearly evident.&nbsp; The outlier creates 
+additional variation in the data making it more difficult to detect a change.&nbsp; 
+Despite this, the change-point analysis still detects the second change, which 
+was the change with the greatest effect.</span></p>
+
+<p class="MsoNormal"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image050.gif" alt="Figure 9" height="195" width="416"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 9:&nbsp; Individuals Chart of US Trade Deficit Data With Outlier</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+The change-point analysis procedure is reasonably robust to such outliers.&nbsp; 
+It can be made even more robust by analyzing the ranks of the values instead of 
+the values themselves.&nbsp; For the trade deficit data, there are 24 data 
+points.&nbsp; The largest value is given a rank of 24, the second largest value 
+is given a rank of 23, and the smallest value is given a rank of 1.&nbsp; 
+Analyzing the ranks instead of the actual values results in a procedure that is 
+almost unaffected by outliers.&nbsp; Table 3 and Figure 10 show the results of 
+performing a change-point analysis on the ranks.&nbsp; The same results are 
+obtained as before without the outlier including identical confidence levels.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Table 3:&nbsp; Results of Change-Point Analysis on Ranks When Data Contains 
+Outlier</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image052.gif" height="141" width="561"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+The outlier in Figure 10 falls outside the shaded region indicating it still 
+doesn&#8217;t fit the results of the change-point analysis and should be treated as an 
+isolated abnormal point.&nbsp; This example suggests that a change-point 
+analysis should be supplemented with an individuals chart (or other control 
+chart) to detect the presence of outliers or abnormal points.&nbsp; If such 
+points exist, the change-point analysis should be performed on the ranks.&nbsp; 
+When the ranks are analyzed, the change-point analysis can detect smaller 
+sustained changes with little interference from the outliers.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image054.gif" alt="Figure 10" height="195" width="416"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 10:&nbsp; Plot of US Trade Deficit Data With Outlier Showing Changes</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><b><span style="font-size:14.0pt;"><a name="Example 2" target="_self"></a>
+Example 2:&nbsp; Complaint Data</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">To 
+further illustrate the benefits of a change-point analysis, two more examples 
+will be presented.&nbsp; The first example involves a set of complaint data.&nbsp; 
+The complaint rate had increased triggering an investigation into its cause.&nbsp; 
+Figure 11 shows the number of complaints for the last eight months.&nbsp; 
+Historically, the complaint rate was close to zero as in the first month.&nbsp; 
+It appears that the complaint rate steadily increased over a three-month period 
+and then gradually started to decline.&nbsp; A team was put together to identify 
+what had happened over these three months to cause the increase in complaints.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><img src="cusum_files/image056.gif" alt="Figure 11" height="206" width="387"></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 11:&nbsp; Plot of Number of Complaints Per Month</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Complaints are recorded by lot number.&nbsp; There were approximately 30 lots 
+each month.&nbsp; Lots 1-30 correspond to January, lots 31-60 correspond to 
+February 2 and so on.&nbsp; The lots are all of similar sizes.&nbsp; Figure 12 
+shows a control chart of the number of complaints by lot number.&nbsp; Only an 
+upper control limit is shown since the counts are bounded below by zero.&nbsp; 
+There are 24 points above the control limit indicating a change has taken place.&nbsp; 
+Did more than one change occur?&nbsp; One way of answering this question using 
+controls charts is to recalculate the control limits each time a change is 
+detected.&nbsp; When did the first change occur?&nbsp; The first point outside 
+the control limits is lot 75 (middle of March).&nbsp; Is this the best guess of 
+when the change occurred?&nbsp; Using a control chart to determine how many 
+changes occurred and when each change occurred is a difficult and error-prone 
+process.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image058.gif" alt="Figure 12" height="194" width="415"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 12:&nbsp; Control Chart of Number of Complaints Per Lot</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">To 
+get a better understanding of the number and timing of the changes, a 
+change-point analysis was performed.&nbsp; The results are shown in Table 4.&nbsp; 
+The level 1 change occurred around lot 74 (middle of March).&nbsp; Previous to 
+this a level 2 change occurred around lot 42 (middle of February).&nbsp; The 
+number of complaints per lot jumps from 0 to 6.6 during the first change and 
+then up to 27.7 following the second change.&nbsp; The second change is over 
+three times the magnitude of the first change.&nbsp; Complaints are still being 
+received for lots produced during the last three months.&nbsp; The other four 
+changes all occur toward the end of the data set, where the complaint data is 
+incomplete, and may be caused by the fact that complaints are still being 
+received.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Table 4:&nbsp; Results of Change-Point Analysis on Complaint Data</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image060.gif" height="252" width="561"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Figure 13 shows the CUSUM chart of complaints with the changes shown in the 
+background.&nbsp; The first two changes represent the onset of the problem.&nbsp; 
+The relative straightness of the line segments before and after these changes 
+indicates the changes were fairly sudden.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image062.gif" alt="Figure 13" height="195" width="425"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 13:&nbsp; CUSUM of Number of Complaints</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+The change-point analysis has yielded several important clues.&nbsp; The 
+problem, rather than developing gradually over a 3-month period, seems to be the 
+result of two changes, the second change being the greater of the two and 
+occurred around lot 74.&nbsp; The confidence interval indicates that with 95% 
+confidence the second change occurred between lots 72 and 86.&nbsp; This 
+corresponds to 2-week period of time.&nbsp; Further, something had occurred 
+previous to this to cause a smaller number of complaints.&nbsp; Since the 
+process has 5 lines, maybe the process change responsible for the complaint 
+problem was piloted on one line around lot 42 (first change) and then 
+implemented across the other 4 lines around lot 74 (second change).&nbsp; This 
+led to the identification of a change in material handling that fit the clues 
+and proved to be the cause of the problem.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+This example illustrates several of the benefits of change-point analysis.&nbsp; 
+First, notice how the change point analysis provided much more detailed 
+information about the number and timing of the changes than either the monthly 
+summary in Figure 11 or the control chart in Figure 12.&nbsp; Determining the 
+exact time of the changes was key to solving the problem.&nbsp; Second, the 
+change point analysis determined that the first change occurred around lot 45.&nbsp; 
+This change was missed by the control chart, which didn&#8217;t have a point outside 
+the control limits until lot 75 (second change).&nbsp; Change-point analysis can 
+detect changes missed by control charts.&nbsp; Third, the change-point analysis 
+is more flexible.&nbsp; The same analysis worked on the complaint data as the 
+trade deficit data.&nbsp; However, a different type of control chart was 
+required.&nbsp; An individuals control chart was used for the trade deficit data 
+in Figure 2 while a u-chart was used in Figure 12 for the complaint data.&nbsp; 
+This makes it easier to teach others to perform a change-point analysis.&nbsp; 
+Finally, a change-point analysis is simpler to use when dealing with large data 
+sets with multiple changes.&nbsp; Using a control chart requires calculation of 
+new limits following each change in order to detect further changes.&nbsp; This 
+is complicated by the need to estimate the time of the changes to determine what 
+data should be used to calculate the new control limits.&nbsp; Change-point 
+analysis automates this difficult process, again making it easier to train 
+others to do the analysis.&nbsp; When analyzing large sets of historical data, 
+clearly a change-point analysis is preferable to control charting.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><b><span style="font-size:14.0pt;"><a name="Example 3" target="_self"></a>
+Example 3:&nbsp; Part Strength</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+The next example involves the online collection of data on part strength.&nbsp; 
+When charting online, it is best to use a control chart.&nbsp; Control limits 
+were calculated using historical data.&nbsp; Every hour a new sample was 
+selected and the results immediately added to the control chart.&nbsp; Figure 14 
+shows the results of the first 25 inspections.&nbsp; The last point plotted 
+falls outside the control limits.&nbsp; At this point the operator should begin 
+a root cause investigation to determine the cause of the problem as well as take 
+whatever interim actions are necessary to continue making good product.&nbsp; 
+Generally, this investigation focuses on what occurred between the 24 and 25 
+points to cause the problem.&nbsp; A change-point analysis of the first 25 
+points might provide further insight into the problem, helping the operator to 
+determine the root cause.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image064.gif" alt="Figure 14" height="182" width="402"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 14:&nbsp; Control Chart of Part Strengths</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Table 5 shows the results of performing a change-point analysis on the data in 
+Figure 14.&nbsp; The change-point analysis indicates two changes in fact 
+occurred.&nbsp; The first change occurred around point 13.&nbsp; The second 
+change occurred between the points 22 and 23.&nbsp; This is several points 
+before the control chart went outside the control limits.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Table 5:&nbsp; Results of Change-Point Analysis on Strength Data</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image066.gif" height="141" width="561"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">An 
+investigation into what events occurred around points 13 and 23 determined that 
+these two times corresponded to roll changes of the raw material.&nbsp; This 
+lead to a change in the roll change procedure that improved the process 
+stability.&nbsp; Figure 15 summarizes the results of the change-point analysis.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><span style="font-size:12.0pt;"><img src="cusum_files/image068.gif" alt="Figure 15" height="195" width="430"></span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:center" align="center"><b><span style="font-size:12.0pt;">
+Figure 15:&nbsp; Plot of Part Strengths Showing Results of Change-Point Analysis</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+This third example illustrates how change-point analysis can complement online 
+control charts.&nbsp; Change-point analysis is a powerful problem investigation 
+tool.&nbsp; It can detect changes missed by the control chart and can provide 
+better estimates as to the timing of the changes.&nbsp; It just might provide 
+the extra insight that leads to the solution of a problem that would otherwise 
+go unsolved.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><b><span style="font-size:14.0pt;"><a name="Conclusion" target="_self"></a>
+Conclusion</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Change-point analysis is not a replacement for control charting.&nbsp; Control 
+charts are the preferred approach when data is collected and plotted on an 
+hour-by-hour basis such as on a production line.&nbsp; In this case, a 
+change-point analysis can be use to complement the control charts.&nbsp; First, 
+a change-point analysis can be performed on the cumulated data once a week to 
+try and detect more subtle changes missed by the control charts.&nbsp; Second, 
+when a control chart detects a change or problem, a change-point analysis can be 
+performed to better characterize the timing and nature of the change as part of 
+the problem solving process.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+When performing a one-time analysis on historical data, a change-point analysis 
+is preferred to control charting, especially when you are dealing with large 
+data sets.&nbsp; Sometimes, such analyses are triggered by an event such as an 
+increase in complaints.&nbsp; This could trigger the review of the complaint 
+history for the last 3 years to determine when the problem started.&nbsp; Other 
+times such analyses are done to gain understanding.&nbsp; For example, a manager 
+might decide to review accident data to determine if there are any trends.&nbsp; 
+Still other times, data might be periodically reviewed to gain the big picture.&nbsp; 
+Each year as part of the annual report an analysis might be performed on 
+inventory turns to see whether there has been an improvement.&nbsp; When 
+performing such analyses, a change-point analysis has numerous advantages over a 
+control chart including:</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">1.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>It is more powerful at detecting smaller sustained changes.&nbsp; This is 
+especially true when compared to an individuals control chart.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">2.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>It better characterizes such changes including detection of multiple 
+changes, providing associated confidence levels, and providing confidence 
+intervals for the times of the changes.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">3.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>It reduces the number of false detections by controlling the change-wise 
+error rate.&nbsp; As a result, for each change detected there is high confidence 
+that it is real.&nbsp; Control charts control the point-wise error rate and, 
+when used with large data sets, can produce numerous false detections.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">4.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>It is robust to outliers and can be made even more robust by performing a 
+change-point analysis on the ranks.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">5.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>It is more flexible.&nbsp; The same procedure works for all types of data 
+including attribute data, individual values, counts, averages and standard 
+deviations.&nbsp; Control charts require different types of charts for each type 
+of data.&nbsp; Further, a change-point analysis can be performed on ill-behaved 
+data like particle counts and complaint data, which do not follow any of the 
+traditional control charting distributions and may contain numerous outliers.&nbsp; 
+Only one assumption is made which can easily be tested for.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left:.75in;text-align:justify;text-indent:
+-.25in;"><span style="font-size:12.0pt;">6.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>It is simpler to use and interpret, especially for large data sets and 
+when multiple changes have occurred.&nbsp; On a control chart, a single change 
+can cause numerous points to fall outside the control limits.&nbsp; Determining 
+the number of changes and exactly when the changes occurred is still a difficult 
+task.&nbsp; One way of accomplishing this with control charts is to establish 
+new control limits following each change in order to be able to detect further 
+changes.&nbsp; This is complicated by the need to estimate the time of the 
+changes to determine what data should be used to establish new control limits.&nbsp; 
+Change-point analysis automates this difficult process.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Despite its numerous advantages, change-point analysis has two shortcomings.&nbsp; 
+First, it does not detect isolated abnormal points.&nbsp; A change-point 
+analysis should be supplemented with a Shewhart control chart when such points 
+are of concern.&nbsp; Box and Luceño (1997) demonstrate that Shewhart control 
+charts are optimal at detecting isolated abnormal points while CUSUM charts are 
+optimal at detecting shifts of the mean.&nbsp; If one is concerned with both 
+types of changes, both procedures can be used to complement each other.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Second, the bootstrapping approach will not produce identical results each time 
+it is performed.&nbsp; This is because of the random selection of the bootstrap 
+samples.&nbsp; This last shortcoming is largely a matter of analysis time 
+because increasing the number of bootstraps results in increasingly more precise 
+results.&nbsp; The 1000 bootstraps used in the examples are recommended as the 
+minimum number.&nbsp; For small data sets, 10,000 and even 100,000 bootstraps 
+can be performed in a reasonable amount of time.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Change-point analysis represents a powerful new tool that complements online 
+control charts and is preferable to control charts when analyzing historical 
+data.&nbsp; However, possibly the greatest benefit of the given procedure is its 
+flexibility and simplicity.&nbsp; When implemented in a software package, the 
+user does not have to be concerned with attribute versus variables data, 
+normality assumptions, distributions, and selecting the appropriate type of 
+control chart.&nbsp; This can result in software that is easier to use than are 
+most control charting packages.&nbsp; Such software could automatically verify 
+the assumption of independent errors and check for outliers.&nbsp; If either was 
+found, the software could notify the user of the problem and guide them on what 
+to do.&nbsp; This would make a change-point analysis an extremely safe approach, 
+even for a novice.&nbsp; Hopefully, this type of software will help make the 
+formal analysis of time ordered data a much more common practice.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><b><span style="font-size:14.0pt;"><a name="References" target="_self"></a>
+References</span></b></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Box, George and Luceño, Alberto (1997), Statistical Control by Monitoring and 
+Feedback Adjustment, Wiley, NewYork.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Efron, Bradley and Tibshirani, Robert (1993), An introduction to the Bootstrap, 
+Chapman &amp; Hall, New York.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Hinkley, D. V. (1971), &#8220;Inference about the change-point from cumulative sum 
+tests,&#8221; Biometrika, 58 3, 509-523.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Hinkley, David and Schechtman, Edna (1987), &#8220;Conditional bootstrap methods in 
+the mean-shift model,&#8221; Biometrika, 74 1, 85-93.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Page, E. S. (1955), &#8220;A test for a change in a parameter occurring at an unknown 
+point,&#8221; Biometrika, 42, 523-527.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Page, E. S. (1957), &#8220;On problems in which a change in parameter occurs at an 
+unknown point,&#8221; Biometrika, 44, 248-252.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Pettitt, A. N. (1980), &#8220;A simple cumulative sum type statistic for the 
+change-point problem with zero-one observations,&#8221; Biometrika, 67 1, 79-84.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Taylor, Wayne (2000a), Change-Point Analyzer 2.0 shareware program, Taylor&nbsp; 
+Enterprises, Libertyville, Illinois.&nbsp; Web: http://www.variation.com/cpa</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Taylor, Wayne (2000b), &#8220;A Pattern Test for Distinguishing Between Autoregressive 
+and Mean-Shift Data,&#8221; submitted to Journal of Quality Technologies.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">
+Wheeler, Donald (1993), Understanding Variation &#8211; The Key to Managing Chaos, SPC 
+Press, Knoxville, Tennessee.</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size: 12.0pt">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size: 12.0pt">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><b><span style="font-size:12.0pt;">
+Key Words:&nbsp; </span></b><span style="font-size:12.0pt;">Change-Point Analysis, Control Chart, Individuals 
+Chart, Mean-Shift Model</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size:12.0pt;"><b>
+Citation:</b>&nbsp; Taylor, Wayne A. (2000), "Change-Point Analysis: A Powerful 
+New Tool For Detecting Changes," WEB: <a href="http://www.variation.com/cpa/tech/pattern.html" target="_self">
+http://www.variation.com/cpa/tech/changepoint.html</a>.&nbsp;&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size: 12.0pt">&nbsp;</span></p>
+
+<p class="MsoNormal" style="text-align:justify"><span style="font-size: 12.0pt">&nbsp;</span></p>
+
+
+		</td>
+	</tr>
+</tbody></table>
+
+<!--webbot bot="Include" u-include="../../bottom.html" tag="BODY" startspan -->
+
+<hr align="left" color="#000080" size="5">
+
+<p>Copyright © 1997-2011 Taylor Enterprises, Inc.
+<br>
+Last modified: 
+March 15, 2011 </p>
+
+<!--webbot bot="Include" i-checksum="13240" endspan -->
+
+
+
+</body></html>

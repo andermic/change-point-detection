@@ -1,0 +1,84 @@
+Change-point detection is the problem of discovering time points at which properties of time-series data change. Possible approaches:
+
+-Singular-spectrum analysis
+	-Evaluates degree of changes between sequences using a distance function defined by "singular spectrums."
+
+-Change finder
+	-2002, 2006
+	-Application of AR
+
+-Subspace identification
+	-2003
+	-Distance-based
+
+-One-class support vector machine
+	-2005
+	-Model free
+	-Compare the support of densities of reference data to test interval data
+
+-AR (Autoregressive model)
+	-Parametric modeling
+
+-KDE (Kernel Density Estimation)
+	-Non-parametric
+	-Generic density estimation approach
+
+-Direct density-ratio estimation (online)
+	-Avoids the computationally expensive non-parametric density estimation
+	-Fast, because it estimates the ratio of densities instead of the densities themselves.
+
+-CUSUM (Cumulative Sum) (online algorithm)
+	-Model free
+	-Provides a confidence interval that a change occurred.
+	-Cannot localize the exact moment of the change, only approximate it.
+	-O(n) time algorithm, where n is the number of data points so far observed.
+
+-GLR (Generalized Likelihood Ratio) (online algorithm)
+	-Parametric Model based
+	-Efficient
+
+-Shewhart (online algorithm)
+
+-Geometric moving average (online algorithm)
+
+-For off-line change detection: Can view it as constrained clustering. Need homogenous clusters. Choose change-points such that variance between clusters is smaller than variance between...?
+	-Adjusted sum of squares measures homogeneity within a cluster
+	-Computational complexity of finding an optimal k-partition is C(n,k)
+
+Resources:
+-Downey. A Novel Changepoint Detection Algorithm. 2008. (Describes the foundations of change-point detection in terms of Bayesian statistics. Compares GLR to the author's new algorithm.)
+
+-Hellerstein and Zhang. An Introduction to Change-Point Detection. 1998.
+
+-Kawahara and Sugiyama. Change-Point Detection in Time-Series Data by Direct Density-Ratio Estimation. 2009. SIAM: Society for Industrial and Applied Mathematics.(Briefly mentions and references other change-point detection approaches. Proposes a model-free non-parametric method.)
+
+-Taylor. Change-Point Analysis: A Powerful New Tool For Detecting Changes. http://www.variation.com/cpa/tech/changepoint.html. (Proposes and describes in detail the CUSUM method)
+
+General notes:
+-Change-point detection is used in control theory to figure out how to restore homeostasis to a dynamic system. In the control theory context, the algorithm is online and must detect changes as quickly as possible, to restore homeostasis as quickly as possible. Our problem is offline (??), so we do not need to detect changes in real time, and can use algorithms that are more computationally expensive.
+-One data point collected per second in some data sets, 60 data points collected in others.
+
+Questions for Dr. Wong:
+-Why are we looking for online algorithms rather than offline?
+
+
+
+-Is including a segmentation step a new insight or have you already tried other segmentation methods?
+
+
+
+-What can we say about this data that would make one change-point detection approach better than another? (Parametric vs. nonparametric modeling, model-based vs. model-free, distance-based)
+
+
+
+-Why will Yonglei not have time to do the part I'm doing? Do I not understand the project? Won't he need the time series segmented before he can do his classification? (Maybe he's using a sliding window approach right now.)
+
+
+
+-Code in C++?
+
+
+-Can you run through the list of Journals/Conferences again?
+
+
+-What do I need to take next term?
