@@ -55,30 +55,5 @@ Resources:
 -Taylor. Change-Point Analysis: A Powerful New Tool For Detecting Changes. http://www.variation.com/cpa/tech/changepoint.html. (Proposes and describes in detail the CUSUM method)
 
 General notes:
--Change-point detection is used in control theory to figure out how to restore homeostasis to a dynamic system. In the control theory context, the algorithm is online and must detect changes as quickly as possible, to restore homeostasis as quickly as possible. Our problem is offline (??), so we do not need to detect changes in real time, and can use algorithms that are more computationally expensive.
+-Change-point detection is used in control theory to figure out how to restore homeostasis to a dynamic system. In the control theory context, the algorithm is online and must detect changes as quickly as possible, to restore homeostasis as quickly as possible.
 -One data point collected per second in some data sets, 60 data points collected in others.
-
-Questions for Dr. Wong:
--Why are we looking for online algorithms rather than offline?
-
-
-
--Is including a segmentation step a new insight or have you already tried other segmentation methods?
-
-
-
--What can we say about this data that would make one change-point detection approach better than another? (Parametric vs. nonparametric modeling, model-based vs. model-free, distance-based)
-
-
-
--Why will Yonglei not have time to do the part I'm doing? Do I not understand the project? Won't he need the time series segmented before he can do his classification? (Maybe he's using a sliding window approach right now.)
-
-
-
--Code in C++?
-
-
--Can you run through the list of Journals/Conferences again?
-
-
--What do I need to take next term?
