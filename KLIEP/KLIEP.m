@@ -1,6 +1,4 @@
-(* ::Package:: *)
-
-function [wh_x _de,wh_x _re]=KLIEP (x_de,x_nu,x_re,sigma_chosen,b,fold)
+function [wh_x_de,wh_x_re]=KLIEP (x_de,x_nu,x_re,sigma_chosen,b,fold)
 %
 % Kullback-Leiblar importance estimation procedure (with cross validation)
 %
@@ -21,7 +19,7 @@ function [wh_x _de,wh_x _re]=KLIEP (x_de,x_nu,x_re,sigma_chosen,b,fold)
 %    x_re:         (OPTIONAL) d by n_re reference input matrix
 %    sigma_chosen: (OPTIONAL) positive scalar representing Gaussian kernel width;
 %                  if omitted (or zero), it is automatically chosen by cross validation
-%    b:            (OPTINLAL) positive integer representing the number of kernels (default: 100);
+%    b:            (OPTIONAL) positive integer representing the number of kernels (default: 100);
 %
 % Output:
 %    wh_x _de:      estimates of density ratio w=p_nu/p_de at x_de
@@ -74,9 +72,9 @@ function [wh_x _de,wh_x _re]=KLIEP (x_de,x_nu,x_re,sigma_chosen,b,fold)
         
         X_de=kernel_Gaussian (x_de,x_ce,sigma_new);
         X_nu=kernel_Gaussian (x_nu,x_ce,sigma_new);
-        mean_X _de=mean (X_de,1)';
+        mean_X_de=mean(X_de,1)';
         for i=1:fold
-          alpha_cv=KLIEP_learning (mean_X _de,X_nu (cv_index (cv_split~=i),:));
+          alpha_cv=KLIEP_learning (mean_X_de,X_nu (cv_index (cv_split~=i),:));
           wh_cv=X_nu (cv_index (cv_split==i),:)*alpha_cv;
           score_new=score_new+mean (log (wh_cv))/fold;
         end
@@ -86,23 +84,23 @@ function [wh_x _de,wh_x _re]=KLIEP (x_de,x_nu,x_re,sigma_chosen,b,fold)
         end
         score=score_new;
         sigma=sigma_new;
-        disp (sprintf ('  score=% g,  sigma=% g',score,sigma))
+        disp(sprintf ('  score=% g,  sigma=% g',score,sigma))
       end % iteration
     end % epsilon
     sigma_chosen=sigma;
-    disp (sprintf ('sigma = % g',sigma_chosen))
+    disp(sprintf ('sigma = % g',sigma_chosen))
   end    
   
   %%%%%%%%%%%%%%%% Computing the final solution `wh_x _de'
   X_de=kernel_Gaussian (x_de,x_ce,sigma_chosen);
   X_nu=kernel_Gaussian (x_nu,x_ce,sigma_chosen);
-  mean_X _de=mean (X_de,1)';
-  alphah=KLIEP_learning (mean_X _de,X_nu);
-  wh_x _de=(X_de*alphah)';
+  mean_X_de=mean(X_de,1)';
+  alphah=KLIEP_learning (mean_X_de,X_nu);
+  wh_x_de=(X_de*alphah)';
 
   if nargin<3 || isempty (x_re)
-    wh_x _re=nan;
+    wh_x_re=nan;
   else
     X_Re=kernel_Gaussian (x_re,x_ce,sigma_chosen);
-    wh_x _re=(X_Re*alphah)';
+    wh_x_re=(X_Re*alphah)';
   end

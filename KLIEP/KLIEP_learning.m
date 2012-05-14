@@ -3,7 +3,7 @@ function [alpha,score]=KLIEP_learning(mean_X_de,X_nu)
   [n_nu,nc]=size(X_nu);
   
   max_iteration=100;
-  epsilon_list=10.^[3:-1:-3];
+  epsilon_list=10.^(3:-1:-3);
   c=sum(mean_X_de.^2);
   alpha=ones(nc,1);
   [alpha,X_nu_alpha,score]=KLIEP_projection(alpha,X_nu,mean_X_de,c);
