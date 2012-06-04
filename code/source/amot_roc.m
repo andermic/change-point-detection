@@ -6,7 +6,7 @@ sc = scores';
 assert(size(sc,1) == 1);
 
 %thresholds = sort(unique(sc),'descend');
-thresholds = logspace(log(min(sc))/log(10)+eps,log(max(sc))/log(10)-eps,500);
+thresholds = logspace(log(min(sc)+eps)/log(10)+eps,log(max(sc))/log(10)-eps,200);
 thresholds = sort(thresholds,'descend');
 
 % Each row is a test on all scores for some fixed threshold
@@ -28,8 +28,8 @@ for i=1:size(thresholds,2)
         end
     end
     detection_times(i) = mean(true_positives(:,2));
-    false_positive_rates(i) = (size(alarms,2) - size(true_positives,1))/size(scores,1);
-    accuracy_rates(i) = size(true_positives,1) / (size(true_changes,2) - 1);
+    false_positive_rates(i) = (size(alarms,2) - size(true_positives,1))/size(sc,2);
+    accuracy_rates(i) = size(true_positives,1) / (size(true_changes,1) - 1);
 end
 
 end
