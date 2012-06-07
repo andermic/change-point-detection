@@ -5,8 +5,8 @@ function [false_positive_rates, accuracy_rates, detection_times  ] = amot_roc( s
 sc = scores';
 assert(size(sc,1) == 1);
 
-%thresholds = sort(unique(sc),'descend');
-thresholds = logspace(log(min(sc)+eps)/log(10)+eps,log(max(sc))/log(10)-eps,200);
+% .99999 factor is to correct a numerical stability issue
+thresholds = logspace(log(min(sc)+eps)/log(10),log(max(sc)*.99999)/log(10),200);
 thresholds = sort(thresholds,'descend');
 
 % Each row is a test on all scores for some fixed threshold

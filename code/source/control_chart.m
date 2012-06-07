@@ -1,6 +1,5 @@
 function[sigma_scores] = control_chart(kpre, data)
 
-assert(mod(kpre,2)==0);
 accel = data(:,2:4);
 n = size(accel,1);
 sigmas = zeros(n-kpre,3);
