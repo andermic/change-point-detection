@@ -1,7 +1,6 @@
-function [ fprs, ag_ars, ag_dts, cc_ars_01, cc_ars_05, cc_ars_1, cc_dts_01, cc_dts_05, cc_dts_1 ] = cc_aggregate(kpre)
+function [ fprs, ag_ars, ag_dts, cc_ars_01, cc_ars_05, cc_ars_1, cc_dts_01, cc_dts_05, cc_dts_1 ] = cc_aggregate(kpre, fpr_split)
 % For each data instance, run a control chart and aggregate results
 
-% Calculate amot and roc curves for each data instance
 addpath('../../../cpd_data');
 load data_names.mat;
 
@@ -16,7 +15,14 @@ cc_ars_1 = [];
 cc_dts_01 = [];
 cc_dts_05 = [];
 cc_dts_1 = [];
+PC_FOLDER_NAME = 'predicted_changes';
 
+if fpr_split ~= 0
+    mkdir(PC_FOLDER_NAME);
+    mkdir(strcat(PC_FOLDER_NAME,'/',num2str(fpr_split)));
+end
+
+% Calculate amot and roc curves for each data instance
 for i = 1:size(data_names,1)
     i
     % Get scores and data for one of the 91 instances
@@ -25,7 +31,7 @@ for i = 1:size(data_names,1)
     
     % Calculate fpr, ar, and dt for this data instance
     true_changes = changes(data) - kpre;
-    [fprs, ars, dts] = amot_roc(cc_scores, true_changes);
+    [fprs, ars, dts, predictions] = amot_roc(cc_scores, true_changes, kpre, fpr_split);
     fprs = round(fprs*fpr_gran)+1;
     
     % Store ars and dts for 0.01, 0.05, and 0.1
@@ -44,6 +50,11 @@ for i = 1:size(data_names,1)
         ag_dts(fpr) = ag_dts(fpr) * ct_dts(fpr) + dts(j);
         ct_dts(fpr) = ct_dts(fpr) + 1;
         ag_dts(fpr) = ag_dts(fpr) / ct_dts(fpr);
+    end
+
+    % Write predicted changes for this data instance 
+    if fpr_split ~= 0
+        csvwrite(strcat(PC_FOLDER_NAME,'/',num2str(fpr_split),'/',data_names(i,:)), predictions);
     end
 end
 fprs = (0:(1/fpr_gran):1)';
