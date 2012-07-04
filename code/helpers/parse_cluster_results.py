@@ -3,7 +3,7 @@
 from os import listdir
 
 files = listdir('.')
-files.remove('temp.py')
+files.remove('parse_cluster_results.py')
 for i in range(len(files)):
  print '%d/%d' % (i,len(files))
  lines = open(files[i], 'r').readlines()
