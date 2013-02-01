@@ -1,5 +1,3 @@
-(* ::Package:: *)
-
 function[sigma_scores] = control_chart(kpre, data)
 
 accel = data(:,2:4);
