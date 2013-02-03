@@ -68,7 +68,15 @@ for i = 1:size(data_names,1)
 
     % Write predicted changes for this data instance to file
     if fpr_split ~= 0
-        csvwrite(strcat(PC_FOLDER_NAME,'/',num2str(fpr_split),'/',data_names(i,:)), predictions);
+        filepath = strcat(PC_FOLDER_NAME,'/',num2str(fpr_split),'/',data_names(i,:));
+        fid = fopen(filepath, 'w');
+        fprintf(fid, 'ChangePointPredictions\n')
+        for pred = predictions
+            fprintf(fid, '%d\n', pred)
+        end
+        fclose(fid);
+        %csvwrite(filepath, predictions');
+        %system(strcat('./add_label.py ', filepath, ' ChangePointPredictions')) % Worst hack ever in history
     end
 end
 fprs = (0:(1/fpr_gran):1)';
