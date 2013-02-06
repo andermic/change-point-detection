@@ -21,6 +21,175 @@ public class FeaturizeData extends TaskDef {
 	protected FeaturizeData() {
 	}
 
+	private void featurizeGroundTruth(Var featurizeFunctionScriptPath,
+			Var callingScriptPath, String clusterWorkspace, 
+			Var timestampedData, Var frequency, Var featurizeDataPath)
+			throws Exception {
+		logStep("Featurize data using 120 second ground truth windows");
+		ExecutorBuilder featurizeGroundTruth = rScript(
+				featurizeFunctionScriptPath,
+				callingScriptPath,
+				var("featurizeCPD"),
+				execConfig().setParallelizable(false).setNumJobs(100)
+						.setOnCluster(true)
+						.setClusterWorkspace(clusterWorkspace));
+		featurizeGroundTruth.addParam("rawDataFilePath", String.class,
+				timestampedData);
+		featurizeGroundTruth.addParam("frequency", Integer.class, frequency);
+		featurizeGroundTruth
+				.addParam("changePointsPath", String.class, "");
+		featurizeGroundTruth.addParam("savePath", String.class, featurizeDataPath);
+		// add verification
+		featurizeGroundTruth.before(timestampedData);
+		featurizeGroundTruth.after(featurizeDataPath);
+		// set mode and start
+		featurizeGroundTruth.prodMode();
+		featurizeGroundTruth.execute();
+	}		
+	
+	private void featurizeValidateTest(Var featurePath, Array fileNames, 
+			Array cpdAlgorithm, Array cpdFPR, Var cpdPath, Var featurizedFileExt,
+			Var featurizeFunctionScriptPath, Var callingScriptPath, 
+			String clusterWorkspace, Var timestampedData, Var frequency, 
+			Var featurizeDataPath) throws Exception {
+		logStep("Featurize data using predicted change points from the given algorithm");
+		callingScriptPath = featurePath.fileSep().cat(fileNames)
+				.cat("PureTrial.featurize.").cat(cpdAlgorithm).dot().cat(cpdFPR).dot().cat("R");
+		featurizedFileExt = var("PureTrial.featurized.").cat(cpdAlgorithm).dot().cat(cpdFPR).dot().cat("csv");
+		ExecutorBuilder featurizeChangePoints = rScript(
+				featurizeFunctionScriptPath,
+				callingScriptPath,
+				var("featurizeCPD"),
+				execConfig().setParallelizable(false).setNumJobs(100)
+						.setOnCluster(true)
+						.setClusterWorkspace(clusterWorkspace));
+		featurizeChangePoints.addParam("rawDataFilePath", String.class,
+				timestampedData);
+		featurizeChangePoints.addParam("frequency", Integer.class, frequency);
+		Var changePointsPath = cpdPath.fileSep().cat(fileNames).cat(".csv");
+		featurizeChangePoints
+				.addParam("changePointsPath", String.class, changePointsPath);
+		featurizeDataPath = featurePath.fileSep().cat(fileNames)
+				.cat(featurizedFileExt);
+		featurizeChangePoints.addParam("savePath", String.class, featurizeDataPath);
+		// add verification
+		featurizeChangePoints.before(timestampedData);
+		featurizeChangePoints.after(featurizeDataPath);
+		// set mode and start
+		featurizeChangePoints.prodMode();
+		featurizeChangePoints.execute();
+	}
+
+
+	private void splitData(String tvtDataAssignmentPath, Array splitId,
+			int numSplits, Array fileNames) throws Exception {
+		logStep("Split dataset into three subsets");
+		Var dataSetAssignmentPath = var(tvtDataAssignmentPath);
+		// Randomly assign training and validation data
+		Array subsetId = array("[0:1:3]");
+		Var assignmentTablePath = dataSetAssignmentPath.fileSep().cat("split")
+				.cat(splitId).cat(".part").cat(subsetId).cat(".csv");
+		if (!all(fileExists(assignmentTablePath))) {
+			logStep("Randomly assign training, validating and testing data");
+			for (int i = 0; i < numSplits; ++i) {
+				Var part1AssignmentTablePath = dataSetAssignmentPath.fileSep()
+						.cat("split").cat(String.valueOf(i)).cat(".part0.csv");
+				Var part2AssignmentTablePath = dataSetAssignmentPath.fileSep()
+						.cat("split").cat(String.valueOf(i)).cat(".part1.csv");
+				Var part3AssignmentTablePath = dataSetAssignmentPath.fileSep()
+						.cat("split").cat(String.valueOf(i)).cat(".part2.csv");
+				splitDataSetInto3Parts(fileNames, part1AssignmentTablePath,
+						part2AssignmentTablePath, part3AssignmentTablePath);
+			}
+		}
+	}
+	
+	private void mergeGroundTruth(Array dataSets, Array splitId, 
+			String tvtDataPath, String tvtDataAssignmentPath, 
+			String clusterWorkspace, Var featurePath,
+			String featurizedFileExtStr) throws Exception {
+		logStep("Merge featurized ground truth data to train, validate and test data set files");
+		Array dataSetFileExtension = array(Arrays.asList(featurizedFileExtStr,
+				featurizedFileExtStr, featurizedFileExtStr));
+		Array assignment = array(Arrays.asList("0", "1", "2"));
+		bind(dataSets, dataSetFileExtension, assignment);
+	
+		Var iterationId = var("split").cat(splitId);
+		Var mergeDataFunctionScriptPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/merge.data.R");
+		Var trainValidateTestDataPath = var(tvtDataPath);
+		Var mergeTrainDataCallingPath = trainValidateTestDataPath.fileSep()
+				.cat(iterationId).fileSep().cat("merge.").cat(dataSets)
+				.cat(".120.data.R");
+		Var saveDataPath = trainValidateTestDataPath.fileSep().cat(iterationId)
+				.fileSep().cat(dataSets).cat(".120.data.csv");
+		Var dataAssignmentTablePath = var(tvtDataAssignmentPath).fileSep()
+				.cat("split").cat(splitId).cat(".part").cat(assignment)
+				.cat(".csv");
+		ExecutorBuilder createTrainData = rScript(
+				mergeDataFunctionScriptPath,
+				mergeTrainDataCallingPath,
+				var("mergeData"),
+				execConfig().setParallelizable(false).setNumJobs(100)
+						.setOnCluster(true)
+						.setClusterWorkspace(clusterWorkspace));
+		createTrainData.addParam("dataFileFolder", String.class, featurePath);
+		createTrainData.addParam("dataNameFilePath", String.class,
+				dataAssignmentTablePath, VerificationType.Before);
+		createTrainData.addParam("dataFileExtension", String.class,
+				var(dataSetFileExtension));
+		createTrainData.addParam("savePath", String.class, saveDataPath,
+				VerificationType.After);
+		createTrainData.addParam("columns", List.class,
+				var("c(\"WindowId\",\"File\")"));
+		createTrainData.prodMode();
+		createTrainData.execute();
+	}
+
+	private void mergeValidateTest(Array cpdAlgorithm, Array cpdFPR, 
+			String tvtDataPath, String tvtDataAssignmentPath, 
+			String featurizedFileExtStr, Array dataSets, Array splitId, 
+			String clusterWorkspace, Var featurePath) throws Exception {
+		logStep("Merge featurized cpd algorithm data");
+		//Var featurizedFileExt = var("PureTrial.featurized.").
+		//		cat(cpdAlgorithm).dot().cat(cpdFPR).dot()
+		//		.cat("csv");
+		Array dataSetFileExtension = array(Arrays.asList(featurizedFileExtStr,
+				featurizedFileExtStr, featurizedFileExtStr));
+		Array assignment = array(Arrays.asList("0", "1", "2"));
+		bind(dataSets, dataSetFileExtension, assignment);
+	
+		Var iterationId = var("split").cat(splitId);
+		Var mergeDataFunctionScriptPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/merge.data.R");
+		Var trainValidateTestDataPath = var(tvtDataPath);
+		Var mergeTrainDataCallingPath = trainValidateTestDataPath.fileSep()
+				.cat(iterationId).fileSep().cat("merge.").cat(dataSets)
+				.dot().cat(cpdAlgorithm).dot().cat(cpdFPR).cat(".data.R");
+		Var saveDataPath = trainValidateTestDataPath.fileSep().cat(iterationId)
+				.fileSep().cat(dataSets).dot().cat(cpdAlgorithm).dot()
+				.cat(cpdFPR).cat(".data.csv");
+		Var dataAssignmentTablePath = var(tvtDataAssignmentPath).fileSep()
+				.cat("split").cat(splitId).cat(".part").cat(assignment)
+				.cat(".csv");
+		ExecutorBuilder createValidateTestData = rScript(
+				mergeDataFunctionScriptPath,
+				mergeTrainDataCallingPath,
+				var("mergeData"),
+				execConfig().setParallelizable(false).setNumJobs(100)
+						.setOnCluster(true)
+						.setClusterWorkspace(clusterWorkspace));
+		createValidateTestData.addParam("dataFileFolder", String.class, featurePath);
+		createValidateTestData.addParam("dataNameFilePath", String.class,
+				dataAssignmentTablePath, VerificationType.Before);
+		createValidateTestData.addParam("dataFileExtension", String.class,
+				var(dataSetFileExtension));
+		createValidateTestData.addParam("savePath", String.class, saveDataPath,
+				VerificationType.After);
+		createValidateTestData.addParam("columns", List.class,
+				var("c(\"WindowId\",\"File\")"));
+		createValidateTestData.prodMode();
+		createValidateTestData.execute();
+	}
+	
 	private void featurizeOSUData(String expRootPath, String datasetStr,
 			String frequencyStr, String trialTimeFilePathStr,
 			String rawDataPathStr, String rawDataExt,
@@ -54,157 +223,21 @@ public class FeaturizeData extends TaskDef {
 		int numSplits = 30;
 		Array splitId = array("[0:1:" + numSplits + "]");
 		Array dataSets = array(Arrays.asList("train", "validate", "test"));
-		
-		logStep("Featurize data using 120 second ground truth windows");
+
 		Var callingScriptPath = featurePath.fileSep().cat(fileNames)
 				.cat("PureTrial.featurize.120.R");
 		Var featurizedFileExt = var("PureTrial.featurized.120.csv");
-		ExecutorBuilder featurizeGroundTruth = rScript(
-				featurizeFunctionScriptPath,
-				callingScriptPath,
-				var("featurizeCPD"),
-				execConfig().setParallelizable(false).setNumJobs(100)
-						.setOnCluster(true)
-						.setClusterWorkspace(clusterWorkspace));
-		featurizeGroundTruth.addParam("rawDataFilePath", String.class,
-				timestampedData);
-		featurizeGroundTruth.addParam("frequency", Integer.class, frequency);
-		featurizeGroundTruth
-				.addParam("changePointsPath", String.class, "");
 		Var featurizeDataPath = featurePath.fileSep().cat(fileNames)
 				.cat(featurizedFileExt);
-		featurizeGroundTruth.addParam("savePath", String.class, featurizeDataPath);
-		// add verification
-		featurizeGroundTruth.before(timestampedData);
-		featurizeGroundTruth.after(featurizeDataPath);
-		// set mode and start
-		featurizeGroundTruth.prodMode();
-		featurizeGroundTruth.execute();
-
-		logStep("Featurize data using predicted change points from the given algorithm");
-		callingScriptPath = featurePath.fileSep().cat(fileNames)
-				.cat("PureTrial.featurize.").cat(cpdAlgorithm).dot().cat(cpdFPR).dot().cat("R");
-		featurizedFileExt = var("PureTrial.featurized.").cat(cpdAlgorithm).dot().cat(cpdFPR).dot().cat("csv");
-		ExecutorBuilder featurizeChangePoints = rScript(
-				featurizeFunctionScriptPath,
-				callingScriptPath,
-				var("featurizeCPD"),
-				execConfig().setParallelizable(false).setNumJobs(100)
-						.setOnCluster(true)
-						.setClusterWorkspace(clusterWorkspace));
-		featurizeChangePoints.addParam("rawDataFilePath", String.class,
-				timestampedData);
-		featurizeChangePoints.addParam("frequency", Integer.class, frequency);
-		Var changePointsPath = cpdPath.fileSep().cat(fileNames).cat(".csv");
-		featurizeChangePoints
-				.addParam("changePointsPath", String.class, changePointsPath);
-		featurizeDataPath = featurePath.fileSep().cat(fileNames)
-				.cat(featurizedFileExt);
-		featurizeChangePoints.addParam("savePath", String.class, featurizeDataPath);
-		// add verification
-		featurizeChangePoints.before(timestampedData);
-		featurizeChangePoints.after(featurizeDataPath);
-		// set mode and start
-		featurizeChangePoints.prodMode();
-		featurizeChangePoints.execute();
 		
-		// Assign train-validate-test datasets
-		logStep("Split dataset into three subsets");
-		Var dataSetAssignmentPath = var(tvtDataAssignmentPath);
-		// Randomly assign training and validation data
-		Array subsetId = array("[0:1:3]");
-		Var assignmentTablePath = dataSetAssignmentPath.fileSep().cat("split")
-				.cat(splitId).cat(".part").cat(subsetId).cat(".csv");
-		if (!all(fileExists(assignmentTablePath))) {
-			logStep("Randomly assign training, validating and testing data");
-			for (int i = 0; i < numSplits; ++i) {
-				Var part1AssignmentTablePath = dataSetAssignmentPath.fileSep()
-						.cat("split").cat(String.valueOf(i)).cat(".part0.csv");
-				Var part2AssignmentTablePath = dataSetAssignmentPath.fileSep()
-						.cat("split").cat(String.valueOf(i)).cat(".part1.csv");
-				Var part3AssignmentTablePath = dataSetAssignmentPath.fileSep()
-						.cat("split").cat(String.valueOf(i)).cat(".part2.csv");
-				splitDataSetInto3Parts(fileNames, part1AssignmentTablePath,
-						part2AssignmentTablePath, part3AssignmentTablePath);
-			}
-		}
-		
-		logStep("Merge featurized ground truth data to train, validate and test data set files");
 		String featurizedFileExtStr = "PureTrial.featurized.120.csv";
-		Array dataSetFileExtension = array(Arrays.asList(featurizedFileExtStr,
-				featurizedFileExtStr, featurizedFileExtStr));
-		Array assignment = array(Arrays.asList("0", "1", "2"));
-		bind(dataSets, dataSetFileExtension, assignment);
 
-		Var iterationId = var("split").cat(splitId);
-		Var mergeDataFunctionScriptPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/merge.data.R");
-		Var trainValidateTestDataPath = var(tvtDataPath);
-		Var mergeTrainDataCallingPath = trainValidateTestDataPath.fileSep()
-				.cat(iterationId).fileSep().cat("merge.").cat(dataSets)
-				.cat(".120.data.R");
-		Var saveDataPath = trainValidateTestDataPath.fileSep().cat(iterationId)
-				.fileSep().cat(dataSets).cat(".120.data.csv");
-		Var dataAssignmentTablePath = var(tvtDataAssignmentPath).fileSep()
-				.cat("split").cat(splitId).cat(".part").cat(assignment)
-				.cat(".csv");
-		ExecutorBuilder createTrainData = rScript(
-				mergeDataFunctionScriptPath,
-				mergeTrainDataCallingPath,
-				var("mergeData"),
-				execConfig().setParallelizable(false).setNumJobs(100)
-						.setOnCluster(true)
-						.setClusterWorkspace(clusterWorkspace));
-		createTrainData.addParam("dataFileFolder", String.class, featurePath);
-		createTrainData.addParam("dataNameFilePath", String.class,
-				dataAssignmentTablePath, VerificationType.Before);
-		createTrainData.addParam("dataFileExtension", String.class,
-				var(dataSetFileExtension));
-		createTrainData.addParam("savePath", String.class, saveDataPath,
-				VerificationType.After);
-		createTrainData.addParam("columns", List.class,
-				var("c(\"WindowId\",\"File\")"));
-		createTrainData.prodMode();
-		createTrainData.execute();
-		
-		logStep("Merge featurized cpd algorithm data to train, validate and test data set files");
-		featurizedFileExt = var("PureTrial.featurized.").
-				cat(cpdAlgorithm).dot().cat(cpdFPR).dot()
-				.cat("csv");
-		dataSetFileExtension = array(Arrays.asList(featurizedFileExtStr,
-				featurizedFileExtStr, featurizedFileExtStr));
-		assignment = array(Arrays.asList("0", "1", "2"));
-		bind(dataSets, dataSetFileExtension, assignment);
-
-		iterationId = var("split").cat(splitId);
-		mergeDataFunctionScriptPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/merge.data.R");
-		trainValidateTestDataPath = var(tvtDataPath);
-		mergeTrainDataCallingPath = trainValidateTestDataPath.fileSep()
-				.cat(iterationId).fileSep().cat("merge.").cat(dataSets)
-				.dot().cat(cpdAlgorithm).dot().cat(cpdFPR).cat(".data.R");
-		saveDataPath = trainValidateTestDataPath.fileSep().cat(iterationId)
-				.fileSep().cat(dataSets).dot().cat(cpdAlgorithm).dot()
-				.cat(cpdFPR).cat(".data.csv");
-		dataAssignmentTablePath = var(tvtDataAssignmentPath).fileSep()
-				.cat("split").cat(splitId).cat(".part").cat(assignment)
-				.cat(".csv");
-		ExecutorBuilder createValidateTestData = rScript(
-				mergeDataFunctionScriptPath,
-				mergeTrainDataCallingPath,
-				var("mergeData"),
-				execConfig().setParallelizable(false).setNumJobs(100)
-						.setOnCluster(true)
-						.setClusterWorkspace(clusterWorkspace));
-		createValidateTestData.addParam("dataFileFolder", String.class, featurePath);
-		createValidateTestData.addParam("dataNameFilePath", String.class,
-				dataAssignmentTablePath, VerificationType.Before);
-		createValidateTestData.addParam("dataFileExtension", String.class,
-				var(dataSetFileExtension));
-		createValidateTestData.addParam("savePath", String.class, saveDataPath,
-				VerificationType.After);
-		createValidateTestData.addParam("columns", List.class,
-				var("c(\"WindowId\",\"File\")"));
-		createValidateTestData.prodMode();
-		createValidateTestData.execute();
+		// This is where the action happens
+		featurizeGroundTruth(featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
+		featurizeValidateTest(featurePath, fileNames, cpdAlgorithm, cpdFPR, cpdPath, featurizedFileExt, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
+		splitData(tvtDataAssignmentPath, splitId, numSplits, fileNames);
+		mergeGroundTruth(dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr);
+		mergeValidateTest(cpdAlgorithm, cpdFPR, tvtDataPath, tvtDataAssignmentPath, featurizedFileExtStr, dataSets, splitId, clusterWorkspace, featurePath);
 	}
 
 	//@SuppressWarnings("unused")
