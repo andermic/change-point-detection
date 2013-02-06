@@ -1,5 +1,7 @@
 #! /usr/bin/python
 
+# THIS CODE IS PROBABLY WORTHLESS AND DEFUNCT
+
 from os import listdir
 
 #SWEM or SVM
