@@ -75,8 +75,6 @@ for i = 1:size(data_names,1)
             fprintf(fid, '%d\n', pred)
         end
         fclose(fid);
-        %csvwrite(filepath, predictions');
-        %system(strcat('./add_label.py ', filepath, ' ChangePointPredictions')) % Worst hack ever in history
     end
 end
 fprs = (0:(1/fpr_gran):1)';
