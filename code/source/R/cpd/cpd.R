@@ -100,7 +100,6 @@ featurizeWindowCPD <- function(frequency, window) {
 	return(row)
 }
 
-
 # Modified from....
 classificationAccuracyCPD <- function(real, pred) {
 	dataSize = sum(real$Scale)
@@ -117,15 +116,49 @@ classificationAccuracyCPD <- function(real, pred) {
 
 
 # Calculate detection times for the given set of predicted and real values
-#detectionTime <- function(real, pred) {
-#	TRUE_CHANGES <- (1:5) * 3600 + 1
-#	ENDING_ROW <- 21600
-#	
-#	pred_changepoints = NULL;
-#	detection_times = NULL;
-#	for (i : length(TRUE_CHANGES) - 1) {
-#	}
-#}
+detectionTime <- function(real, pred) {
+	last_activity <- ''
+	cur_time_tick <- 1
+	real_activities <- NULL
+	real_time_ticks <- NULL
+	for (i in 1:nrow(real)) {
+		cur_activities <- unlist(strsplit(as.character(real$ActivityClass[i]), " "))
+		ratios <- unlist(strsplit(as.character(real$ActivityRatios[i]), " "))
+		for (j in 1:length(cur_activities)) {
+			if (cur_activities[j] != last_activity) {
+				real_activities <- c(real_activities, cur_activities[j])
+				real_time_ticks <- c(real_time_ticks, cur_time_tick)  
+				last_activity <- cur_activities[j]				
+			} 
+			cur_time_tick <- cur_time_tick + as.numeric(ratios[j]) * real$Scale[i]
+		}
+	}
+
+	total_detection_time <- 0
+	pred_time_tick <- 1
+	cur_pred_index <- 1
+	for (i in 1:length(real_activities)) {
+		did_detect <- TRUE
+		while((pred_time_tick < real_time_ticks[i]) || (real_activities[i] != pred[cur_pred_index])) {
+			print(pred_time_tick)
+			pred_time_tick <- pred_time_tick + real$Scale[cur_pred_index]
+			cur_pred_index <- cur_pred_index + 1
+			if (cur_pred_index == length(real_activities) + 1) {
+				total_detection_time <- total_detection_time + 3600
+				did_detect <- FALSE
+				break
+			}
+			if (pred_time_tick >= real_time_ticks[i+1]) {
+				total_detection_time <- total_detection_time + real_time_ticks[i+1] - real_time_ticks[i]
+				did_detect <- FALSE
+				break
+			}
+		}
+		if (did_detect) {
+			total_detection_time <- total_detection_time + pred_time_tick - real_time_ticks[i]
+		}
+	}
+}
 
 
 # Modified from quickTrainValidate in ms.osu/svm.exp.R
