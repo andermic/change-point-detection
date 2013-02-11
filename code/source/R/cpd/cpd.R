@@ -6,7 +6,7 @@ library('e1071', lib.loc='/nfs/guille/wong/wonglab3/obesity/2012/cpd')
 
 # Modified from featurizeMstmData in mstm/mstm.featurize.data.R
 featurizeCPD <- function(rawDataFilePath, frequency, changePointsPath, savePath) {
-	MINIMUM_SIZE <- 4
+	MINIMUM_SIZE <- 1
 	rawData <- read.csv(rawDataFilePath)
 
 	# Featurize using either ground truth or predicted change points
@@ -114,50 +114,52 @@ classificationAccuracyCPD <- function(real, pred) {
 	return(accuracy)
 }
 
-
 # Calculate detection times for the given set of predicted and real values
 detectionTime <- function(real, pred) {
-	last_activity <- ''
-	cur_time_tick <- 1
-	real_activities <- NULL
-	real_time_ticks <- NULL
+	lastActivity <- ''
+	curTimeTick <- 1
+	realActivities <- NULL
+	realTimeTicks <- NULL
 	for (i in 1:nrow(real)) {
-		cur_activities <- unlist(strsplit(as.character(real$ActivityClass[i]), " "))
+		curActivities <- unlist(strsplit(as.character(real$ActivityClass[i]), " "))
 		ratios <- unlist(strsplit(as.character(real$ActivityRatios[i]), " "))
-		for (j in 1:length(cur_activities)) {
-			if (cur_activities[j] != last_activity) {
-				real_activities <- c(real_activities, cur_activities[j])
-				real_time_ticks <- c(real_time_ticks, cur_time_tick)  
-				last_activity <- cur_activities[j]				
+		for (j in 1:length(curActivities)) {
+			if (curActivities[j] != lastActivity) {
+				realActivities <- c(realActivities, curActivities[j])
+				realTimeTicks <- c(realTimeTicks, curTimeTick)  
+				lastActivity <- curActivities[j]				
 			} 
-			cur_time_tick <- cur_time_tick + as.numeric(ratios[j]) * real$Scale[i]
+			curTimeTick <- curTimeTick + as.numeric(ratios[j]) * real$Scale[i]
 		}
 	}
 
-	total_detection_time <- 0
-	pred_time_tick <- 1
-	cur_pred_index <- 1
-	for (i in 1:length(real_activities)) {
-		did_detect <- TRUE
-		while((pred_time_tick < real_time_ticks[i]) || (real_activities[i] != pred[cur_pred_index])) {
-			print(pred_time_tick)
-			pred_time_tick <- pred_time_tick + real$Scale[cur_pred_index]
-			cur_pred_index <- cur_pred_index + 1
-			if (cur_pred_index == length(real_activities) + 1) {
-				total_detection_time <- total_detection_time + 3600
-				did_detect <- FALSE
-				break
-			}
-			if (pred_time_tick >= real_time_ticks[i+1]) {
-				total_detection_time <- total_detection_time + real_time_ticks[i+1] - real_time_ticks[i]
-				did_detect <- FALSE
+	predTimeTicks <- 1
+	for (i in 1:nrow(real)) {
+		predTimeTicks <- c(predTimeTicks, predTimeTicks[length(predTimeTicks)] + real$Scale[i])
+	}
+	realTimeTicks <- c(realTimeTicks, predTimeTicks[length(predTimeTicks)] + 1)
+
+	totalDetectionTime <- 0	
+	for (i in 1:(length(realTimeTicks) - 1)) {
+		#print(sprintf('%d - %s', realTimeTicks[i], realActivities[i]))
+		didDetect <- FALSE
+		for (j in 1:(length(predTimeTicks) - 1)) {
+			if ((predTimeTicks[j] >= realTimeTicks[i]) && (predTimeTicks[j] < realTimeTicks[i+1]) && (pred[j] == realActivities[i])) {
+				#print('  Found change')
+				#print(sprintf('  %d - +%d', predTimeTicks[j], predTimeTicks[j] - realTimeTicks[i]))
+				didDetect <- TRUE
+				totalDetectionTime <- totalDetectionTime + predTimeTicks[j] - realTimeTicks[i]
 				break
 			}
 		}
-		if (did_detect) {
-			total_detection_time <- total_detection_time + pred_time_tick - real_time_ticks[i]
+		if (!didDetect) {
+			#print('  Did not find change')
+			#print(sprintf('  +%d', realTimeTicks[i+1] - realTimeTicks[i]))
+			totalDetectionTime <- totalDetectionTime + realTimeTicks[i+1] - realTimeTicks[i]
 		}
 	}
+
+	return(data.frame(TotalDetectionTime=totalDetectionTime, DataSize=predTimeTicks[length(predTimeTicks)]))
 }
 
 
@@ -286,5 +288,85 @@ summarizeCPD <- function(labels, predictionReportPath, confusionMatrixPath, pctC
 	write.csv(cm, confusionMatrixPath, row.names = TRUE)
 	confusionMatrixNumToPct(confusionMatrixPath, pctConsufionMatrixPath)
 	accuracy <- classificationAccuracyCPD(real, pred)
-	write.csv(data.frame(Accuracy=accuracy), summaryPath, row.names = FALSE)
+	detectionTime <-DetectionTime(real, pred)
+	#write.csv(data.frame(Accuracy=accuracy), summaryPath, row.names = FALSE)
+	write.csv(data.frame(Accuracy=accuracy, TotalDetectionTime=dt$TotalDetectionTime, DataSize=dt$DataSize), validateSummaryPath, row.names = FALSE)
+}
+
+# Modified from mergeSplitShuffle in function/merge.split.shuffle.R
+mergeSplitShuffle <- function(
+		bestModelResFilePath, 
+		windowSize=NA, trialGroup=NA, scale=NA, formula=NA, alpha=NA, additionalFilter=NA, 
+		testDataSet, expectedNumEntries, 
+		accuracySavePath, 
+		meanAccuracySavePath, 
+		confusionMatrixSavePath, 
+		pctConfusionMatrixSavePath,
+		reportSavePath=NA) {
+	
+	allRes <- read.csv(bestModelResFilePath)
+	filter <- data.frame(Formula=formula, TestDataSet=testDataSet, Alpha=alpha)
+	if (!is.na(windowSize)) {
+		filter <- cbind(filter, data.frame(WindowSize=windowSize))
+	}
+	if (!is.na(trialGroup)) {
+		filter <- cbind(filter, data.frame(TrialGroup=trialGroup))
+	}
+	if (!is.na(scale)) {
+		filter <- cbind(filter, data.frame(Scale=scale))
+	}
+	filter <- cbind(filter, additionalFilter)
+	#print(filter)
+	res <- df.match(allRes, filter)
+	#res <- allRes[which(allRes$WindowSize==windowSize & allRes$TrialGroup==trialGroup & allRes$Formula==formula & allRes$TestDataSet==testDataSet),]
+	#if (!is.na(alpha)) {
+	#	res <- res[which(res$Alpha==alpha),]
+	#}
+	#if (!is.na(scale)) {
+	#	res <- res[which(res$Scale==scale),]
+	#}
+	#print(nrow(res))
+	print(res)
+	print(expectedNumEntries)
+	stopifnot(nrow(res) == expectedNumEntries)
+	allAcc <- data.frame(Accuracy=NULL,TotalDetectionTime=NULL,DataSize=NULL)
+	allCm <- NA
+	testReport <- data.frame()
+	for (i in 1 : nrow(res)) {
+		#print(i)
+		accuracyFile <- as.character(res$TestAccuracyFile[i])
+		#if (file.exists(accuracyFile)) {
+		print(accuracyFile)
+		accuracyData <- read.csv(accuracyFile)
+		#accuracy <- accuracyData$Accuracy[1]
+		allAcc <- rbind(allAcc, accuracyData)
+		
+		confusionMatrixFile  <- as.character(res$TestConfusionMatrixFile[i])
+		#print(confusionMatrixFile)
+		confusionMatrixData <- read.csv(confusionMatrixFile)
+		labels <- as.character(confusionMatrixData[,1])
+		confusionMatrixData <- data.frame(confusionMatrixData[,2:length(confusionMatrixData)], row.names=labels)
+		if (is.na(allCm)) {
+			allCm <- confusionMatrixData
+		} else {
+			allCm <- allCm + confusionMatrixData
+		}
+		
+		if (!is.na(reportSavePath)) {
+			testReport <- rbind(testReport, read.csv(as.character(res$TestReportFile)))
+		}
+		#}
+	}
+	
+	write.csv(allAcc, accuracySavePath, row.names = FALSE)
+	
+	averageAccuray <- data.frame(MeanAccuracy=mean(allAcc$Accuracy), SDAccuracy=sd(allAcc$Accuracy), DetectionTime=(sum(allAcc$TotalDetectionTime)/sum(allAcc$DataSize))
+	write.csv(averageAccuray, meanAccuracySavePath, row.names = FALSE)
+	
+	write.csv(allCm, confusionMatrixSavePath, row.names = TRUE)
+	confusionMatrixNumToPct(confusionMatrixSavePath, pctConfusionMatrixSavePath)
+	
+	if (!is.na(reportSavePath)) {
+		write.csv(testReport, reportSavePath, row.names = FALSE)
+	}
 }
