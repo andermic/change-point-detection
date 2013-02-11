@@ -96,7 +96,7 @@ featurizeWindowCPD <- function(frequency, window) {
 		print(row)
 		print(axis1)
 	}
-	stopifnot(length(which(!complete.cases(row))) == 0)
+	stopifnot(length(which(!complete.cases(row))) <= 6) # Not using the two FFT features per axis anyway. Works only for AllWoFFT formula.
 	return(row)
 }
 
@@ -193,11 +193,10 @@ quickTrainValidateCPD <- function(
 	#print(modelSavePath)
 	#save(model, file=modelSavePath)
 	#print("Model saved")
-	
+
 	validate.data <- readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt, scale)
 	#print(nrow(validate.data))
 	pred <- predict(model, featureMatrix(validate.data, formula))
-	print("")
 	real <- data.frame(ActivityClass=validate.data$ActivityClass, ActivityRatios=validate.data$ActivityRatio, Scale=validate.data$Scale)
 	#print(length(real))
 	accuracy <- classificationAccuracyCPD(real, pred)
@@ -288,7 +287,7 @@ summarizeCPD <- function(labels, predictionReportPath, confusionMatrixPath, pctC
 	write.csv(cm, confusionMatrixPath, row.names = TRUE)
 	confusionMatrixNumToPct(confusionMatrixPath, pctConsufionMatrixPath)
 	accuracy <- classificationAccuracyCPD(real, pred)
-	detectionTime <-DetectionTime(real, pred)
+	detectionTime <-detectionTime(real, pred)
 	#write.csv(data.frame(Accuracy=accuracy), summaryPath, row.names = FALSE)
 	write.csv(data.frame(Accuracy=accuracy, TotalDetectionTime=dt$TotalDetectionTime, DataSize=dt$DataSize), validateSummaryPath, row.names = FALSE)
 }
@@ -303,6 +302,9 @@ mergeSplitShuffle <- function(
 		confusionMatrixSavePath, 
 		pctConfusionMatrixSavePath,
 		reportSavePath=NA) {
+	
+	FREQUENCY <- 30
+	CHANGES_PER_SERIES <- 6
 	
 	allRes <- read.csv(bestModelResFilePath)
 	filter <- data.frame(Formula=formula, TestDataSet=testDataSet, Alpha=alpha)
@@ -360,7 +362,7 @@ mergeSplitShuffle <- function(
 	
 	write.csv(allAcc, accuracySavePath, row.names = FALSE)
 	
-	averageAccuray <- data.frame(MeanAccuracy=mean(allAcc$Accuracy), SDAccuracy=sd(allAcc$Accuracy), DetectionTime=(sum(allAcc$TotalDetectionTime)/sum(allAcc$DataSize))
+	averageAccuray <- data.frame(MeanAccuracy=mean(allAcc$Accuracy), SDAccuracy=sd(allAcc$Accuracy), MeanTotalDetectionTime=(mean(allAcc$TotalDetectionTime))/30/6)
 	write.csv(averageAccuray, meanAccuracySavePath, row.names = FALSE)
 	
 	write.csv(allCm, confusionMatrixSavePath, row.names = TRUE)
@@ -369,4 +371,8 @@ mergeSplitShuffle <- function(
 	if (!is.na(reportSavePath)) {
 		write.csv(testReport, reportSavePath, row.names = FALSE)
 	}
+}
+
+mergeAlgorithmResults <- function(meanAccuracyPath, fprsString, summarySavePath) {
+	fprs <- as.numeric(unlist(strsplit(fprsString, " ")))
 }

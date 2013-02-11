@@ -233,9 +233,9 @@ public class FeaturizeData extends TaskDef {
 		String featurizedFileExtStr = "PureTrial.featurized.120.csv";
 
 		// This is where the action happens
-		//featurizeGroundTruth(featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
+		featurizeGroundTruth(featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
 		featurizeValidateTest(featurePath, fileNames, cpdAlgorithm, cpdFPR, cpdPath, featurizedFileExt, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
-		//splitData(tvtDataAssignmentPath, splitId, numSplits, fileNames);
+		splitData(tvtDataAssignmentPath, splitId, numSplits, fileNames);
 		mergeGroundTruth(dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr);
 		mergeValidateTest(cpdAlgorithm, cpdFPR, tvtDataPath, tvtDataAssignmentPath, featurizedFileExtStr, dataSets, splitId, clusterWorkspace, featurePath);
 	}
@@ -278,7 +278,7 @@ public class FeaturizeData extends TaskDef {
 		String tvtDataAssignmentPath = tvtDataPath + "/splits";
 		String clusterWorkspace = "/nfs/guille/wong/wonglab3/obesity/2012/cpd/cluster";
 		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
-		Array cpdFPR = array(Arrays.asList("0.001", "0.002", "0.003", "0.004"));
+		Array cpdFPR = array(Arrays.asList("0.0005", "0.001", "0.002", "0.003", "0.004"));
 		
 		featurizeOSUData(expRootPath, datasetStr, frequencyStr,
 				trialTimeFilePathStr, rawDataPathStr, rawDataExt,

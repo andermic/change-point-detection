@@ -5,22 +5,23 @@
 
 from os import listdir, system
 
-#FPR_LIST = [0.0001,0.0005,0.001]
-FPR_LIST = [0.002,0.003,0.004]
+FPR_LIST = [0.0005,0.001,0.002,0.003,0.004]
 KPRE = 300
-ALGORITHM = 'cc'
-INPUT_FOLDER = '/nfs/stak/students/a/andermic/Windows.Documents/Desktop/change-point-detection/results/30hz/%s_kpre%d' % (ALGORITHM, KPRE)
+GRANULARITY = 3
+ALGORITHM = 'kliep'
+ROOT_FOLDER = '/nfs/stak/students/a/andermic/Windows.Documents/Desktop/change-point-detection/results/30hz'
+INPUT_PATH = ROOT_FOLDER + '/' + '%s_kpre%d' % (ALGORITHM, KPRE)
 OUTPUT_FOLDER = 'predicted_changes_' + ALGORITHM
-OUTPUT_PATH = INPUT_FOLDER + '/' + OUTPUT_FOLDER
-if OUTPUT_FOLDER in listdir(INPUT_FOLDER):
+OUTPUT_PATH = ROOT_FOLDER + '/' + OUTPUT_FOLDER
+if OUTPUT_FOLDER in listdir(ROOT_FOLDER):
     print 'There are existing results at %s.\n' % OUTPUT_PATH
     print 'These results will not be overwritten by this program, so delete them manually to continue.'
     exit()
 system('mkdir ' + OUTPUT_PATH)
 
-score_files = [i for i in listdir(INPUT_FOLDER) if i[:6] == 'scores']
+score_files = [i for i in listdir(INPUT_PATH) if i[:6] == 'scores']
 # Assume here that all score files contain the same number of entries
-score_size = len(open(INPUT_FOLDER + '/' + score_files[1], 'r').readlines())
+score_size = len(open(INPUT_PATH + '/' + score_files[1], 'r').readlines())
 
 count = 0
 
@@ -31,8 +32,9 @@ for fpr in FPR_LIST:
 
     fp_num = int(round(fpr*score_size))
     for score_file in score_files:
-        cur_scores = [float(i) for i in open(INPUT_FOLDER + '/' + score_file, 'r').read().split('\n') if i != '']
+        cur_scores = [float(i) for i in open(INPUT_PATH + '/' + score_file, 'r').read().split('\n') if i != '']
         cur_scores = list(enumerate(cur_scores))
+        cur_scores = [cur_scores[i] for i in range(len(cur_scores)) if i % GRANULARITY == 0]
         cur_scores.sort(key=lambda x:x[1], reverse=True)
         cur_scores = [(i[0] + KPRE + 1, i[1]) for i in cur_scores] #Add 1 to compensate for MATLAB's 1-based indexing
         cur_fps = 0

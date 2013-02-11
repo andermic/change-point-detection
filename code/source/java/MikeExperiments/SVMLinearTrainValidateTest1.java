@@ -4,6 +4,7 @@ package MikeExperiments;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -222,7 +223,7 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 			Array trialGroupId, Array formulaName, Array splitId)
 			throws Exception {
 		logStep("Merge splits results");
-		Var mergeFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/function/merge.split.shuffle.R");
+		Var mergeFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var mergeScript = modelPath.fileSep().cat("svm.merge.split.")
 				.cat(bestModelId).dot().cat(testDataSets).cat(".R");
 		Var accuracySavePath = modelPath.fileSep()
@@ -241,7 +242,7 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 		// .cat("svm.single.scale.model.").cat(modelId).dot()
 		// .cat(testDataSets).cat(".csv");
 		ExecutorBuilder merge = rScript(mergeFunction, mergeScript,
-				var("mergeSplitShuffle"));
+				var("mergeSplitShuffleCPD"));
 		Var bestSingleScaleModelResSavePathVar = modelPath.fileSep()
 				.cat("svm.model.").cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".res.csv");
@@ -268,6 +269,28 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 		merge.execute();
 	}
 
+	/*
+	private void mergeAlgorithmResults(Var modelPath, Array cpdAlgorithm, Array cpdFPR) throws Exception {
+		logStep("Merge results across algorithms");
+		Var mergeAlgorithmFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var mergeAlgorithmScript = modelPath.fileSep().cat("svm.merge.algorithms.")
+				.cat(bestModelId).dot().cat(testDataSets).cat(".R");
+		Var summarySavePath = modelPath.dot().cat(cpdAlgorithm).dot().cat("results.csv")
+		
+	    Iterator<String> iter = cpdFPR.getValues().iterator();
+	    StringBuilder builder = new StringBuilder(iter.next());
+	    while( iter.hasNext() ) {
+	    	builder.append(" ").append(iter.next());
+	    }
+	    String cpdFPRStr = builder.toString();
+	    
+		ExecutorBuilder mergeAlgorithm = rScript(mergeAlgorithmFunction, 
+				mergeAlgorithmScript, var("mergeAlgorithmResults"));
+		mergeAlgorithm.addParam();
+		mergeAlgorithm.addParam("fprsStr", String.class, cpdFPRStr);
+		mergeAlgorithm.addParam("summarySavePath", String.class, summarySavePath);
+	}*/
+	
 	private void singleScaleModel(String expRootPath, String datasetStr,
 			String tvtDataPath, String labVisitFileFolder,
 			String trainingLabVisitFileExt, Var valiTestLabVisitFileExt,
