@@ -2,7 +2,9 @@ source("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.
 source("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/featurize.data.R")
 source("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/svm.exp.R")
 library('e1071', lib.loc='/nfs/guille/wong/wonglab3/obesity/2012/cpd')
-
+#library(nnet)
+library(rpart)
+#library(glmnet)
 
 # Modified from featurizeMstmData in mstm/mstm.featurize.data.R
 featurizeCPD <- function(rawDataFilePath, frequency, changePointsPath, savePath) {
@@ -92,10 +94,6 @@ featurizeWindowCPD <- function(frequency, window) {
 	window$DateTime <- as.character(window$DateTime)
 	metaData <- data.frame(SubjectID=window$SubjectID[1], LabVisit=window$LabVisit[1], File=window$File[1], StartTime=window$DateTime[1], EndTime=window$DateTime[nrow(window)], TrialID=trialId, ActivityClass=activityClass, ActivityRatio=activityRatio)
 	row <- cbind(metaData, a1, a2, a3, data.frame(CorrelationAxis1Axis2=c12, CorrelationAxis1Axis3=c13, CorrelationAxis2Axis3=c23))
-	if (length(which(!complete.cases(row))) != 0) {
-		print(row)
-		print(axis1)
-	}
 	stopifnot(length(which(!complete.cases(row))) <= 6) # Not using the two FFT features per axis anyway. Works only for AllWoFFT formula.
 	return(row)
 }
@@ -216,6 +214,58 @@ testBestModelCPD <- function(
         trainingLabVisitFileExt,
 		valiTestLabVisitFileExt,
 		kernal,
+		bestModelInfo,
+		bestModelInfoSavePath,
+		bestModelSavePath,
+		trainReportPath, 
+		validateReportPath, 
+		testReportPath) {
+	validateSummary <- read.csv(validateSummaryFile)
+	validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=120))
+	bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
+	write.csv(bestModelInfo, bestModelInfoSavePath, row.names = FALSE)
+	
+	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt)
+	print("Training data read")
+	if (kernal=="radial") {
+		model <- svm(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, 
+				kernel=kernal, gamma=bestModelInfo$Gamma, cost=bestModelInfo$Cost)
+	} else if (kernal=="linear") {
+		model <- svm(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, 
+				kernel=kernal, cost=bestModelInfo$Cost)
+	} else {
+		stop(paste("Invalid kernal:", kernal))
+	}
+	
+	print("Model trained")
+	save(model, file=bestModelSavePath)
+	
+	print("Test model on training data")
+	summarizeModelCPD(model, formula, 120, training.data, trainReportPath)
+	
+	print("Test model on validation data")
+	summarizeModelCPD(model, formula, 120, 
+			readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
+			validateReportPath, bestModelInfo$ValidateAccuracy)
+	
+	print("Test model on testing data")
+	summarizeModelCPD(model, formula, 120, 
+			readData(testDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
+			testReportPath)
+}
+
+# Modified from testBestSingleScale in ms.osu/svm.exp.R
+testBestModelCPD <- function(
+		validateSummaryFile, 
+		formula, formulaName, labels, 
+		split,
+		trainDataInfoPath, 
+		validateDataInfoPath, 
+		testDataInfoPath, 
+		labVisitFileFolder,
+        trainingLabVisitFileExt,
+		valiTestLabVisitFileExt,
+		kernal,
 		bestModelInfoSavePath,
 		bestModelSavePath,
 		trainReportPath, 
@@ -256,11 +306,123 @@ testBestModelCPD <- function(
 			testReportPath)
 }
 
+# Modified from testBestSingleScale in ms.osu/svm.exp.R
+testBestModelNnetCPD <- function(
+		validateSummaryFile, 
+		formula, formulaName, labels, 
+		split,
+		trainDataInfoPath, 
+		validateDataInfoPath, 
+		testDataInfoPath, 
+		labVisitFileFolder,
+        trainingLabVisitFileExt,
+		valiTestLabVisitFileExt,
+		kernal,
+		bestModelInfoSavePath,
+		bestModelSavePath,
+		trainReportPath, 
+		validateReportPath, 
+		testReportPath) {
+	#validateSummary <- read.csv(validateSummaryFile)
+	#validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=120))
+	#bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
+	#print(bestModelInfo)
+	#write.csv(bestModelInfo, bestModelInfoSavePath, row.names = FALSE)
+	
+	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt)
+	#training.data$ActivityClass <- factor(training.data$ActivityClass)
+	print("Training data read")
+	#my_data <- data.frame(cbind(featureMatrix(training.data, formula), Class=training.data$ActivityClass))
+	my_data <- data.frame(as.data.frame(featureMatrix(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
+	
+	model <- nnet(formula=ActivityClass~., data=my_data, size=15)
+	#model <- glmnet(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, family="multinomial", alpha=1)
+	
+	print("Model trained")
+	save(model, file=bestModelSavePath)
+		
+	print("Test model on training data")
+	summarizeModelCPD(model, formula, 120, training.data, trainReportPath)
+	
+	print("Test model on validation data")
+	summarizeModelCPD(model, formula, 120, 
+			readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
+			validateReportPath)
+	
+	print("Test model on testing data")
+	summarizeModelCPD(model, formula, 120, 
+			readData(testDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
+			testReportPath)
+}
+
+# Modified from testBestSingleScale in ms.osu/svm.exp.R
+testBestModelDtCPD <- function(
+		validateSummaryFile, 
+		formula, formulaName, labels, 
+		split,
+		trainDataInfoPath, 
+		validateDataInfoPath, 
+		testDataInfoPath, 
+		labVisitFileFolder,
+        trainingLabVisitFileExt,
+		valiTestLabVisitFileExt,
+		kernal,
+		bestModelInfoSavePath,
+		bestModelSavePath,
+		trainReportPath, 
+		validateReportPath, 
+		testReportPath,
+		classAlg) {
+	#validateSummary <- read.csv(validateSummaryFile)
+	#validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=120))
+	#bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
+	#print(bestModelInfo)
+	#write.csv(bestModelInfo, bestModelInfoSavePath, row.names = FALSE)
+	
+	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt)
+	#training.data$ActivityClass <- factor(training.data$ActivityClass)
+	print("Training data read")
+	#my_data <- data.frame(cbind(featureMatrix(training.data, formula), Class=training.data$ActivityClass))
+	my_data <- data.frame(as.data.frame(featureMatrix(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
+	
+	model <- rpart(formula=ActivityClass~., data=my_data)
+	#model <- glmnet(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, family="multinomial", alpha=1)
+	
+	print("Model trained")
+	save(model, file=bestModelSavePath)
+		
+	print("Test model on training data")
+	summarizeModelCPD(model, formula, 120, training.data, trainReportPath)
+	
+	print("Test model on validation data")
+	summarizeModelCPD(model, formula, 120, 
+			readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
+			validateReportPath)
+	
+	print("Test model on testing data")
+	summarizeModelCPD(model, formula, 120, 
+			readData(testDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
+			testReportPath)
+}
 
 # Modified from summarizeSingleScaleModel in ms.osu/svm.exp.R
 summarizeModelCPD <- function(model, formula, scale, testData, predictionReportPath, expectedAccuracy=NA) {
 	real <- data.frame(ActivityClass=testData$ActivityClass, ActivityRatios=testData$ActivityRatio, Scale=testData$Scale)
-	pred <- as.character(predict(model, featureMatrix(testData, formula)))
+	pred <- as.character(predict(model, data.frame(featureMatrix(testData, formula)), type='class'))
+	
+	#WORST HACK EVAR!!!
+	#data <- data.frame(featureMatrix(testData, formula))
+	#my_data <- featureMatrix(testData, formula)
+	#print('my_data start:')
+	#print(my_data)
+	#print('my_data end:')
+	#write.csv(my_data, paste(predictionReportPath,'.tmp',sep=""))
+	#my_data <- read.csv(paste(predictionReportPath,'.tmp',sep=""))
+	#stopifnot(FALSE)
+	#pred <- as.character(predict(model, my_data, type='class'))
+
+	#print(pred)
+	#stopifnot(FALSE)
 	if (!is.na(expectedAccuracy)) {
 		accuracy <- classificationAccuracyCPD(real, pred)
 		#print(accuracy)
@@ -287,13 +449,13 @@ summarizeCPD <- function(labels, predictionReportPath, confusionMatrixPath, pctC
 	write.csv(cm, confusionMatrixPath, row.names = TRUE)
 	confusionMatrixNumToPct(confusionMatrixPath, pctConsufionMatrixPath)
 	accuracy <- classificationAccuracyCPD(real, pred)
-	detectionTime <-detectionTime(real, pred)
+	dt <-detectionTime(real, pred)
 	#write.csv(data.frame(Accuracy=accuracy), summaryPath, row.names = FALSE)
-	write.csv(data.frame(Accuracy=accuracy, TotalDetectionTime=dt$TotalDetectionTime, DataSize=dt$DataSize), validateSummaryPath, row.names = FALSE)
+	write.csv(data.frame(Accuracy=accuracy, TotalDetectionTime=dt$TotalDetectionTime, DataSize=dt$DataSize), summaryPath, row.names = FALSE)
 }
 
 # Modified from mergeSplitShuffle in function/merge.split.shuffle.R
-mergeSplitShuffle <- function(
+mergeSplitShuffleCPD <- function(
 		bestModelResFilePath, 
 		windowSize=NA, trialGroup=NA, scale=NA, formula=NA, alpha=NA, additionalFilter=NA, 
 		testDataSet, expectedNumEntries, 
@@ -302,9 +464,6 @@ mergeSplitShuffle <- function(
 		confusionMatrixSavePath, 
 		pctConfusionMatrixSavePath,
 		reportSavePath=NA) {
-	
-	FREQUENCY <- 30
-	CHANGES_PER_SERIES <- 6
 	
 	allRes <- read.csv(bestModelResFilePath)
 	filter <- data.frame(Formula=formula, TestDataSet=testDataSet, Alpha=alpha)
@@ -328,8 +487,6 @@ mergeSplitShuffle <- function(
 	#	res <- res[which(res$Scale==scale),]
 	#}
 	#print(nrow(res))
-	print(res)
-	print(expectedNumEntries)
 	stopifnot(nrow(res) == expectedNumEntries)
 	allAcc <- data.frame(Accuracy=NULL,TotalDetectionTime=NULL,DataSize=NULL)
 	allCm <- NA
@@ -362,7 +519,7 @@ mergeSplitShuffle <- function(
 	
 	write.csv(allAcc, accuracySavePath, row.names = FALSE)
 	
-	averageAccuray <- data.frame(MeanAccuracy=mean(allAcc$Accuracy), SDAccuracy=sd(allAcc$Accuracy), MeanTotalDetectionTime=(mean(allAcc$TotalDetectionTime))/30/6)
+	averageAccuray <- data.frame(MeanAccuracy=mean(allAcc$Accuracy), SDAccuracy=sd(allAcc$Accuracy), MeanTotalDetectionTime=(mean(allAcc$TotalDetectionTime/allAcc$DataSize)*120))
 	write.csv(averageAccuray, meanAccuracySavePath, row.names = FALSE)
 	
 	write.csv(allCm, confusionMatrixSavePath, row.names = TRUE)
@@ -373,6 +530,21 @@ mergeSplitShuffle <- function(
 	}
 }
 
+#TODO: Complete this sometime?
 mergeAlgorithmResults <- function(meanAccuracyPath, fprsString, summarySavePath) {
 	fprs <- as.numeric(unlist(strsplit(fprsString, " ")))
+}
+
+# Modified from ms.osu/common.R
+featureMatrixNoFFT <- function(data, formula) {
+	# Horrible hack to keep containSpecialCase check, while getting rid of FFT features
+	data$DominantFrequency_Axis1 <- NULL
+	data$DominantFrequency_Axis2 <- NULL
+	data$DominantFrequency_Axis3 <- NULL
+	data$DominantFrequencyAmplitude_Axis1 <- NULL
+	data$DominantFrequencyAmplitude_Axis2 <- NULL
+	data$DominantFrequencyAmplitude_Axis3 <- NULL
+	
+	stopifnot(!containSpecialCase(data))
+	return(data.matrix(data[attr(terms(as.formula(formula)), "term.labels")]))
 }
