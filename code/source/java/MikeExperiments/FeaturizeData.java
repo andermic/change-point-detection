@@ -174,7 +174,7 @@ public class FeaturizeData extends TaskDef {
 				mergeDataFunctionScriptPath,
 				mergeTrainDataCallingPath,
 				var("mergeData"),
-				execConfig().setParallelizable(true).setNumJobs(40)
+				execConfig().setParallelizable(false).setNumJobs(40)
 						.setOnCluster(true)
 						.setClusterWorkspace(clusterWorkspace));
 		createValidateTestData.addParam("dataFileFolder", String.class, featurePath);
@@ -233,11 +233,11 @@ public class FeaturizeData extends TaskDef {
 		String featurizedFileExtStr = "PureTrial.featurized.120.csv";
 
 		// This is where the action happens
-		//featurizeGroundTruth(featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
+		featurizeGroundTruth(featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
 		featurizeValidateTest(featurePath, fileNames, cpdAlgorithm, cpdFPR, cpdPath, featurizedFileExt, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
-		//splitData(tvtDataAssignmentPath, splitId, numSplits, fileNames);
-		//mergeGroundTruth(dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr);
-		//mergeValidateTest(cpdAlgorithm, cpdFPR, tvtDataPath, tvtDataAssignmentPath, featurizedFileExtStr, dataSets, splitId, clusterWorkspace, featurePath);
+		splitData(tvtDataAssignmentPath, splitId, numSplits, fileNames);
+		mergeGroundTruth(dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr);
+		mergeValidateTest(cpdAlgorithm, cpdFPR, tvtDataPath, tvtDataAssignmentPath, featurizedFileExtStr, dataSets, splitId, clusterWorkspace, featurePath);
 	}
 
 	//@SuppressWarnings("unused")

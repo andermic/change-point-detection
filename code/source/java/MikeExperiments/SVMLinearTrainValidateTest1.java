@@ -358,11 +358,11 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 		
 		// This is where the action happens
 		trainValidate(clusterJobNum, useCluster, expPath, modelId, clusterWorkspace, jobId, formula, trainDataInfoPath, validateDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, cost);
-		summarizeValidate(cpdAlgorithm, cpdFPR, expPath, splitId, formulaName, cost, tvtDataPath);
-		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath);
-		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
-		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
-		mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
+		//summarizeValidate(cpdAlgorithm, cpdFPR, expPath, splitId, formulaName, cost, tvtDataPath);
+		//testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath);
+		//summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
+		//makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
+		//mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
 	}
 	
 	private void OSU_YR4_30Hz_Hip() throws Exception {

@@ -40,7 +40,7 @@ public class NeuralNet extends TaskDef {
 		Var quickValidateSummaryPath = expPath.fileSep().cat("nnet").dot()
 				.cat(modelId).cat(".validate.summary.csv");
 		ExecutorBuilder singleScale = rScript(trainValidateScriptPath,
-				nnetTrainCallingPath, var("quickTrainValidateCPD"),
+				nnetTrainCallingPath, var("quickTrainValidateNnetCPD"),
 				execConfig().setParallelizable(useCluster).setOnCluster(true)
 						.setNumJobs(clusterJobNum).setClusterWorkspace(clusterWorkspace)
 						.setJobId(jobId));
@@ -56,7 +56,6 @@ public class NeuralNet extends TaskDef {
 				trainingLabVisitFileExt);
 		singleScale.addParam("valiTestLabVisitFileExt", String.class, 
 				valiTestLabVisitFileExt);
-		singleScale.addParam("kernal", String.class, "linear");
 		singleScale.addParam("numHiddenUnits", Integer.class, var(numHiddenUnits));
 		singleScale.addParam("weightDecay", Double.class, var(weightDecay));
 		singleScale.addParam("validateSummaryPath", String.class,
@@ -107,9 +106,9 @@ public class NeuralNet extends TaskDef {
 			String jobId, Var trainDataInfoPath, Var validateDataInfoPath, 
 			Var testDataInfoPath, Array splitId, String labVisitFileFolder,
 			String trainingLabVisitFileExt, Var valiTestLabVisitFileExt, 
-			Var bestModelInfoPath, Var bestModelSavePath, 
-			Var trainResultPath, Var validateResultPath,
-			Var testResultPath) throws Exception {
+			Var bestModelInfoPath, Var bestModelSavePath, Var trainResultPath,
+			Var validateResultPath, Var testResultPath, Array numHiddenUnits,
+			Array weightDecay) throws Exception {
 		logStep("Test the best nnet model");
 		Var testBestSingleScaleModelFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var testBestSingleScaleModelScript = expPath.fileSep().cat("nnet").dot()
@@ -156,6 +155,8 @@ public class NeuralNet extends TaskDef {
 		// parameters for testing the trained model on testing data
 		bestSingleScale.addParam("testReportPath", String.class,
 				testResultPath, VerificationType.After);
+		bestSingleScale.addParam("numHiddenUnits", Integer.class, var(numHiddenUnits));
+		bestSingleScale.addParam("weightDecay", Double.class, var(weightDecay));
 		bestSingleScale.prodMode();
 		bestSingleScale.execute();
 	}
@@ -361,7 +362,7 @@ public class NeuralNet extends TaskDef {
 		//This is where the action happens
 		trainValidate(clusterJobNum, useCluster, expPath, modelId, clusterWorkspace, jobId, formula, trainDataInfoPath, validateDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, numHiddenUnits, weightDecay);
 		summarizeValidate(cpdAlgorithm, cpdFPR, expPath, splitId, formulaName, tvtDataPath, numHiddenUnits, weightDecay);
-		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath);
+		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath, numHiddenUnits, weightDecay);
 		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
 		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
 		mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
@@ -383,7 +384,7 @@ public class NeuralNet extends TaskDef {
 
 		String clusterWorkspace = "/nfs/guille/wong/wonglab3/obesity/2012/cpd/OSU_YR4_Hip_30Hz.ws120.7cls/nnet/cluster";
 		Integer clusterJobNum = 100;
-		Boolean useCluster = true;
+		Boolean useCluster = false;
 		
 		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
 		Array cpdFPR = array(Arrays.asList("0.0001", "0.0002", "0.0003", "0.0004", "0.0005", "0.0006", "0.0007", "0.0008", "0.0009", "0.001", "0.0011", "0.0012", "0.0013", "0.0014", "0.0015", "0.0016", "0.0017", "0.0018", "0.0019", "0.002", "0.0021", "0.0022", "0.0023", "0.0024", "0.0025", "0.0026", "0.0027", "0.0028", "0.0029", "0.003", "0.0031", "0.0032", "0.0033", "0.0034", "0.0035", "0.0036", "0.0037", "0.0038", "0.0039", "0.004", "0.0041", "0.0042", "0.0043", "0.0044", "0.0045", "0.0046", "0.0047", "0.0048", "0.0049", "0.005", "0.0051", "0.0052", "0.0053", "0.0054", "0.0055", "0.0056", "0.0057", "0.0058", "0.0059", "0.006", "0.0061", "0.0062", "0.0063", "0.0064", "0.0065", "0.0066", "0.0067", "0.0068", "0.0069", "0.007", "0.0071", "0.0072", "0.0073", "0.0074", "0.0075", "0.0076", "0.0077", "0.0078", "0.0079", "0.008", "0.0081", "0.0082", "0.0083", "0.0084", "0.0085", "0.0086", "0.0087", "0.0088", "0.0089", "0.009", "0.0091", "0.0092", "0.0093", "0.0094", "0.0095", "0.0096", "0.0097", "0.0098", "0.0099", "0.01"));

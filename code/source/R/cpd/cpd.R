@@ -2,7 +2,7 @@ source("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.
 source("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/featurize.data.R")
 source("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/svm.exp.R")
 library('e1071', lib.loc='/nfs/guille/wong/wonglab3/obesity/2012/cpd')
-#library(nnet)
+library(nnet)
 library(rpart)
 #library(glmnet)
 
@@ -201,6 +201,37 @@ quickTrainValidateCPD <- function(
 	write.csv(data.frame(Accuracy=accuracy), validateSummaryPath, row.names = FALSE)
 }
 
+quickTrainValidateNnetCPD <- function(
+		formula,  
+		trainDataInfoPath, 
+		validateDataInfoPath, 
+		labVisitFileFolder,
+		trainingLabVisitFileExt,
+		valiTestLabVisitFileExt,
+		numHiddenUnits,
+		weightDecay,
+		validateSummaryPath,
+		scale = NA) {
+	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, scale)
+	print("Training data read")
+	
+	#print(training.data)
+	#print(nrow(training.data))
+	model <- nnet(formula=ActivityClass~., data=training.data, size=numHiddenUnits, decay = weightDecay, maxit = 100000, MaxNWts=1000000)
+	
+	print("Model trained")
+	#print(modelSavePath)
+	#save(model, file=modelSavePath)
+	#print("Model saved")
+
+	validate.data <- readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt, scale)
+	#print(nrow(validate.data))
+	pred <- predict(model, featureMatrix(validate.data, formula))
+	real <- data.frame(ActivityClass=validate.data$ActivityClass, ActivityRatios=validate.data$ActivityRatio, Scale=validate.data$Scale)
+	#print(length(real))
+	accuracy <- classificationAccuracyCPD(real, pred)
+	write.csv(data.frame(Accuracy=accuracy), validateSummaryPath, row.names = FALSE)
+}
 
 # Modified from testBestSingleScale in ms.osu/svm.exp.R
 testBestModelCPD <- function(
@@ -255,58 +286,6 @@ testBestModelCPD <- function(
 }
 
 # Modified from testBestSingleScale in ms.osu/svm.exp.R
-testBestModelCPD <- function(
-		validateSummaryFile, 
-		formula, formulaName, labels, 
-		split,
-		trainDataInfoPath, 
-		validateDataInfoPath, 
-		testDataInfoPath, 
-		labVisitFileFolder,
-        trainingLabVisitFileExt,
-		valiTestLabVisitFileExt,
-		kernal,
-		bestModelInfoSavePath,
-		bestModelSavePath,
-		trainReportPath, 
-		validateReportPath, 
-		testReportPath) {
-	validateSummary <- read.csv(validateSummaryFile)
-	validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=120))
-	bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
-	print(bestModelInfo)
-	write.csv(bestModelInfo, bestModelInfoSavePath, row.names = FALSE)
-	
-	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt)
-	print("Training data read")
-	if (kernal=="radial") {
-		model <- svm(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, 
-				kernel=kernal, gamma=bestModelInfo$Gamma, cost=bestModelInfo$Cost)
-	} else if (kernal=="linear") {
-		model <- svm(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, 
-				kernel=kernal, cost=bestModelInfo$Cost)
-	} else {
-		stop(paste("Invalid kernal:", kernal))
-	}
-	
-	print("Model trained")
-	save(model, file=bestModelSavePath)
-	
-	print("Test model on training data")
-	summarizeModelCPD(model, formula, 120, training.data, trainReportPath)
-	
-	print("Test model on validation data")
-	summarizeModelCPD(model, formula, 120, 
-			readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
-			validateReportPath, bestModelInfo$ValidateAccuracy)
-	
-	print("Test model on testing data")
-	summarizeModelCPD(model, formula, 120, 
-			readData(testDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
-			testReportPath)
-}
-
-# Modified from testBestSingleScale in ms.osu/svm.exp.R
 testBestModelNnetCPD <- function(
 		validateSummaryFile, 
 		formula, formulaName, labels, 
@@ -317,12 +296,13 @@ testBestModelNnetCPD <- function(
 		labVisitFileFolder,
         trainingLabVisitFileExt,
 		valiTestLabVisitFileExt,
-		kernal,
 		bestModelInfoSavePath,
 		bestModelSavePath,
 		trainReportPath, 
 		validateReportPath, 
-		testReportPath) {
+		testReportPath,
+		numHiddenUnits,
+		weightDecay) {
 	#validateSummary <- read.csv(validateSummaryFile)
 	#validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=120))
 	#bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
@@ -335,8 +315,7 @@ testBestModelNnetCPD <- function(
 	#my_data <- data.frame(cbind(featureMatrix(training.data, formula), Class=training.data$ActivityClass))
 	my_data <- data.frame(as.data.frame(featureMatrix(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
 	
-	model <- nnet(formula=ActivityClass~., data=my_data, size=15)
-	#model <- glmnet(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, family="multinomial", alpha=1)
+	model <- nnet(formula=ActivityClass~., data=my_data, maxit = 100000, MaxNWts=1000000)
 	
 	print("Model trained")
 	save(model, file=bestModelSavePath)
@@ -409,17 +388,6 @@ testBestModelDtCPD <- function(
 summarizeModelCPD <- function(model, formula, scale, testData, predictionReportPath, expectedAccuracy=NA) {
 	real <- data.frame(ActivityClass=testData$ActivityClass, ActivityRatios=testData$ActivityRatio, Scale=testData$Scale)
 	pred <- as.character(predict(model, data.frame(featureMatrix(testData, formula)), type='class'))
-	
-	#WORST HACK EVAR!!!
-	#data <- data.frame(featureMatrix(testData, formula))
-	#my_data <- featureMatrix(testData, formula)
-	#print('my_data start:')
-	#print(my_data)
-	#print('my_data end:')
-	#write.csv(my_data, paste(predictionReportPath,'.tmp',sep=""))
-	#my_data <- read.csv(paste(predictionReportPath,'.tmp',sep=""))
-	#stopifnot(FALSE)
-	#pred <- as.character(predict(model, my_data, type='class'))
 
 	#print(pred)
 	#stopifnot(FALSE)
@@ -438,7 +406,6 @@ summarizeModelCPD <- function(model, formula, scale, testData, predictionReportP
 	colnames(prediction)[ncol(prediction)] <- "Predict"
 	write.csv(prediction, predictionReportPath, row.names = FALSE)
 }
-
 
 # Modified from summarize in ms.osu/glmnet.single.scale.R 
 summarizeCPD <- function(labels, predictionReportPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath) {
