@@ -31,7 +31,7 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 			String labVisitFileFolder, String trainingLabVisitFileExt,
 			Var valiTestLabVisitFileExt, Array cost) throws Exception {
 		logStep("Train/validate svm model");
-		Var trainValidateScriptPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var trainValidateScriptPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var svmTrainCallingPath = expPath.fileSep().cat("svm").dot()
 				.cat(modelId).cat(".R");
 		//Var modelSavePath = expPath.fileSep().cat("svm").dot().cat(modelId)
@@ -109,7 +109,7 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 			Var trainResultPath, Var validateResultPath,
 			Var testResultPath) throws Exception {
 		logStep("Test the best svm model");
-		Var testBestSingleScaleModelFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var testBestSingleScaleModelFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var testBestSingleScaleModelScript = expPath.fileSep().cat("svm").dot()
 				.cat(formulaName).dot().cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".best.R");
@@ -163,7 +163,7 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 			Var bestModelId, Var testResultPath, Var confusionMatrixPath,
 			Var pctConsufionMatrixPath, Var summaryPath) throws Exception {
 		logStep("Summarize model test results");
-		Var summarizeFunctionPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var summarizeFunctionPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var summarizeScriptPath = expPath.fileSep().cat("svm").dot()
 				.cat(bestModelId).cat(".summarize.R");
 		ExecutorBuilder summarizeSingle = rScript(summarizeFunctionPath,
@@ -224,7 +224,7 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 			Array trialGroupId, Array formulaName, Array splitId)
 			throws Exception {
 		logStep("Merge splits results");
-		Var mergeFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var mergeFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var mergeScript = modelPath.fileSep().cat("svm.merge.split.")
 				.cat(bestModelId).dot().cat(testDataSets).cat(".R");
 		Var accuracySavePath = modelPath.fileSep()
@@ -273,7 +273,7 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 	/*
 	private void mergeAlgorithmResults(Var modelPath, Array cpdAlgorithm, Array cpdFPR) throws Exception {
 		logStep("Merge results across algorithms");
-		Var mergeAlgorithmFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var mergeAlgorithmFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var mergeAlgorithmScript = modelPath.fileSep().cat("svm.merge.algorithms.")
 				.cat(bestModelId).dot().cat(testDataSets).cat(".R");
 		Var summarySavePath = modelPath.dot().cat(cpdAlgorithm).dot().cat("results.csv")
@@ -358,11 +358,11 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 		
 		// This is where the action happens
 		trainValidate(clusterJobNum, useCluster, expPath, modelId, clusterWorkspace, jobId, formula, trainDataInfoPath, validateDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, cost);
-		//summarizeValidate(cpdAlgorithm, cpdFPR, expPath, splitId, formulaName, cost, tvtDataPath);
-		//testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath);
-		//summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
-		//makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
-		//mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
+		summarizeValidate(cpdAlgorithm, cpdFPR, expPath, splitId, formulaName, cost, tvtDataPath);
+		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath);
+		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
+		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
+		mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
 	}
 	
 	private void OSU_YR4_30Hz_Hip() throws Exception {
@@ -383,9 +383,9 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 
 		String clusterWorkspace = "/nfs/guille/wong/wonglab3/obesity/2012/cpd/OSU_YR4_Hip_30Hz.ws120.7cls/svm/cluster";
 		Integer clusterJobNum = 100;
-		Boolean useCluster = true;
+		Boolean useCluster = false;
 
-		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
+		Array cpdAlgorithm = array(Arrays.asList("kliep"));
 		//Array cpdFPR = array(Arrays.asList("0.0001", "0.0002", "0.0003", "0.0004", "0.0005", "0.0006", "0.0007", "0.0008", "0.0009", "0.001", "0.0011", "0.0012", "0.0013", "0.0014", "0.0015", "0.0016", "0.0017", "0.0018", "0.0019", "0.002", "0.0021", "0.0022", "0.0023", "0.0024", "0.0025", "0.0026", "0.0027", "0.0028", "0.0029", "0.003", "0.0031", "0.0032", "0.0033", "0.0034", "0.0035", "0.0036", "0.0037", "0.0038", "0.0039", "0.004", "0.0041", "0.0042", "0.0043", "0.0044", "0.0045", "0.0046", "0.0047", "0.0048", "0.0049", "0.005", "0.0051", "0.0052", "0.0053", "0.0054", "0.0055", "0.0056", "0.0057", "0.0058", "0.0059", "0.006", "0.0061", "0.0062", "0.0063", "0.0064", "0.0065", "0.0066", "0.0067", "0.0068", "0.0069", "0.007", "0.0071", "0.0072", "0.0073", "0.0074", "0.0075", "0.0076", "0.0077", "0.0078", "0.0079", "0.008", "0.0081", "0.0082", "0.0083", "0.0084", "0.0085", "0.0086", "0.0087", "0.0088", "0.0089", "0.009", "0.0091", "0.0092", "0.0093", "0.0094", "0.0095", "0.0096", "0.0097", "0.0098", "0.0099", "0.01"));
 		Array cpdFPR = array(Arrays.asList("0.015", "0.02", "0.025", "0.03", "0.035", "0.04", "0.045", "0.05", "0.055", "0.06", "0.065", "0.07", "0.075", "0.08", "0.085", "0.09", "0.095"));
 		String trainingLabVisitFileExt = ("PureTrial.featurized.120.csv");

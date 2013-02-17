@@ -47,7 +47,7 @@ public class GlmnetTrainValidateTest extends TaskDef {
 		logStep("Generate stacking features");
 		Var modelId = var(formulaName).cat("_alpha").cat(alpha);
 		Array subsets = array(Arrays.asList("train", "validate", "test"));
-		Var stackingFeaturizesFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/stacking.featurize.R");
+		Var stackingFeaturizesFunction = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/ms.osu/stacking.featurize.R");
 		Var stackingFeaturizesScript = expPath.fileSep().cat("glmnet").dot()
 				.cat(modelId).dot().cat(subsets).cat(".stacking.featurize.R");
 		Var stackingFeaturizedPath = expPath.fileSep().cat("glmnet").dot()
@@ -76,7 +76,7 @@ public class GlmnetTrainValidateTest extends TaskDef {
 		stackingFeatures.execute();
 
 		logStep("Summarize single size subwindow models");
-		Var summarizeFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/stacking.featurize.R");
+		Var summarizeFunction = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/ms.osu/stacking.featurize.R");
 		Var summarizeScript = expPath.fileSep().cat("glmnet").dot()
 				.cat(modelId).dot().cat(subsets)
 				.cat(".summarize.single.size.R");
@@ -145,7 +145,7 @@ public class GlmnetTrainValidateTest extends TaskDef {
 		save(bestSingleScaleModelResTable, bestSingleScaleModelResSavePath);
 
 		logStep("Merge splits results");
-		Var mergeFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/function/merge.split.shuffle.R");
+		Var mergeFunction = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/function/merge.split.shuffle.R");
 		Var mergeScript = expPath.fileSep().cat("merge.split.").cat(modelId)
 				.dot().cat(subsets).cat(".R");
 		Var accuracySavePath = expPath.fileSep()
@@ -246,7 +246,7 @@ public class GlmnetTrainValidateTest extends TaskDef {
 		Array weightingFeatures = array(weightingFeatureList);
 		Array trialGroupId = array(trialGroupIdList);
 		bind(weightingFeatures, trialGroupId);
-		Var stackingModelFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/function/glmnet.exp.R");
+		Var stackingModelFunction = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/function/glmnet.exp.R");
 		Var stackingModelScript = expPath.fileSep().cat("glmnet").dot()
 				.cat(modelId).dot().cat("stacking.R");
 		Var modelSavePath = expPath.fileSep().cat("glmnet").dot().cat(modelId)
@@ -336,7 +336,7 @@ public class GlmnetTrainValidateTest extends TaskDef {
 		save(bestModelResTable, bestModelResSavePath);
 
 		logStep("Merge splits results");
-		Var mergeFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/function/merge.split.shuffle.R");
+		Var mergeFunction = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/function/merge.split.shuffle.R");
 		Var mergeScript = expPath.fileSep().cat("glmnet.merge.split.")
 				.cat(modelId).dot().cat(testDataSets).cat(".R");
 		// Var trialWindowPath = var(

@@ -21,7 +21,8 @@ public class FeaturizeData extends TaskDef {
 	protected FeaturizeData() {
 	}
 
-	private void featurizeGroundTruth(Var featurizeFunctionScriptPath,
+	private void featurizeGroundTruth(Integer clusterJobNum,
+			Boolean useCluster, Var featurizeFunctionScriptPath,
 			Var callingScriptPath, String clusterWorkspace, 
 			Var timestampedData, Var frequency, Var featurizeDataPath)
 			throws Exception {
@@ -30,7 +31,7 @@ public class FeaturizeData extends TaskDef {
 				featurizeFunctionScriptPath,
 				callingScriptPath,
 				var("featurizeCPD"),
-				execConfig().setParallelizable(false).setNumJobs(100)
+				execConfig().setParallelizable(useCluster).setNumJobs(clusterJobNum)
 						.setOnCluster(true)
 						.setClusterWorkspace(clusterWorkspace));
 		featurizeGroundTruth.addParam("rawDataFilePath", String.class,
@@ -47,7 +48,8 @@ public class FeaturizeData extends TaskDef {
 		featurizeGroundTruth.execute();
 	}		
 	
-	private void featurizeValidateTest(Var featurePath, Array fileNames, 
+	private void featurizeValidateTest(Integer clusterJobNum,
+	Boolean useCluster, Var featurePath, Array fileNames, 
 			Array cpdAlgorithm, Array cpdFPR, Var cpdPath, Var featurizedFileExt,
 			Var featurizeFunctionScriptPath, Var callingScriptPath, 
 			String clusterWorkspace, Var timestampedData, Var frequency, 
@@ -60,7 +62,8 @@ public class FeaturizeData extends TaskDef {
 				featurizeFunctionScriptPath,
 				callingScriptPath,
 				var("featurizeCPD"),
-				execConfig().setParallelizable(false).setNumJobs(20)
+				execConfig().setParallelizable(useCluster)
+						.setNumJobs(clusterJobNum)
 						.setOnCluster(true)
 						.setClusterWorkspace(clusterWorkspace));
 		featurizeChangePoints.addParam("rawDataFilePath", String.class,
@@ -104,7 +107,8 @@ public class FeaturizeData extends TaskDef {
 		}
 	}
 	
-	private void mergeGroundTruth(Array dataSets, Array splitId, 
+	private void mergeGroundTruth(Integer clusterJobNum, 
+			Boolean useCluster, Array dataSets, Array splitId, 
 			String tvtDataPath, String tvtDataAssignmentPath, 
 			String clusterWorkspace, Var featurePath,
 			String featurizedFileExtStr) throws Exception {
@@ -115,7 +119,7 @@ public class FeaturizeData extends TaskDef {
 		bind(dataSets, dataSetFileExtension, assignment);
 	
 		Var iterationId = var("split").cat(splitId);
-		Var mergeDataFunctionScriptPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/merge.data.R");
+		Var mergeDataFunctionScriptPath = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/free.living/data/merge.data.R");
 		Var trainValidateTestDataPath = var(tvtDataPath);
 		Var mergeTrainDataCallingPath = trainValidateTestDataPath.fileSep()
 				.cat(iterationId).fileSep().cat("merge.").cat(dataSets)
@@ -129,7 +133,8 @@ public class FeaturizeData extends TaskDef {
 				mergeDataFunctionScriptPath,
 				mergeTrainDataCallingPath,
 				var("mergeData"),
-				execConfig().setParallelizable(false).setNumJobs(100)
+				execConfig().setParallelizable(useCluster)
+						.setNumJobs(clusterJobNum)
 						.setOnCluster(true)
 						.setClusterWorkspace(clusterWorkspace));
 		createTrainData.addParam("dataFileFolder", String.class, featurePath);
@@ -145,7 +150,8 @@ public class FeaturizeData extends TaskDef {
 		createTrainData.execute();
 	}
 
-	private void mergeValidateTest(Array cpdAlgorithm, Array cpdFPR, 
+	private void mergeValidateTest(Integer clusterJobNum, Boolean useCluster,
+			Array cpdAlgorithm, Array cpdFPR, 
 			String tvtDataPath, String tvtDataAssignmentPath, 
 			String featurizedFileExtStr, Array dataSets, Array splitId, 
 			String clusterWorkspace, Var featurePath) throws Exception {
@@ -159,7 +165,7 @@ public class FeaturizeData extends TaskDef {
 		bind(dataSets, dataSetFileExtension, assignment);
 	
 		Var iterationId = var("split").cat(splitId);
-		Var mergeDataFunctionScriptPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/merge.data.R");
+		Var mergeDataFunctionScriptPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/merge.data.R");
 		Var trainValidateTestDataPath = var(tvtDataPath);
 		Var mergeTrainDataCallingPath = trainValidateTestDataPath.fileSep()
 				.cat(iterationId).fileSep().cat("merge.").cat(dataSets)
@@ -174,7 +180,8 @@ public class FeaturizeData extends TaskDef {
 				mergeDataFunctionScriptPath,
 				mergeTrainDataCallingPath,
 				var("mergeData"),
-				execConfig().setParallelizable(false).setNumJobs(40)
+				execConfig().setParallelizable(useCluster)
+						.setNumJobs(clusterJobNum)
 						.setOnCluster(true)
 						.setClusterWorkspace(clusterWorkspace));
 		createValidateTestData.addParam("dataFileFolder", String.class, featurePath);
@@ -195,8 +202,8 @@ public class FeaturizeData extends TaskDef {
 			String rawDataPathStr, String rawDataExt,
 			List<String> windowSizeList, List<String> trialGroupIdList,
 			String tvtDataAssignmentPath, String tvtDataPath,
-			String clusterWorkspace, Array cpdAlgorithm, Array cpdFPR)
-			throws Exception {
+			String clusterWorkspace, Array cpdAlgorithm, Array cpdFPR,
+			Integer clusterJobNum, Boolean useCluster) throws Exception {
 		Var dataset = var(datasetStr);
 		Var frequency = var(frequencyStr);
 		Var trialTimeFilePath = var(trialTimeFilePathStr);
@@ -215,7 +222,7 @@ public class FeaturizeData extends TaskDef {
 				fileNames,
 				fileExists(rawDataPath.fileSep().cat(fileNames).cat(rawDataExt)));
 
-		Var featurizeFunctionScriptPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var featurizeFunctionScriptPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var timestampedData = rawDataPath.fileSep().cat(fileNames)
 				.cat("PureTrial.csv");
 		mkdir(featurePath);
@@ -233,11 +240,11 @@ public class FeaturizeData extends TaskDef {
 		String featurizedFileExtStr = "PureTrial.featurized.120.csv";
 
 		// This is where the action happens
-		featurizeGroundTruth(featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
-		featurizeValidateTest(featurePath, fileNames, cpdAlgorithm, cpdFPR, cpdPath, featurizedFileExt, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
-		splitData(tvtDataAssignmentPath, splitId, numSplits, fileNames);
-		mergeGroundTruth(dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr);
-		mergeValidateTest(cpdAlgorithm, cpdFPR, tvtDataPath, tvtDataAssignmentPath, featurizedFileExtStr, dataSets, splitId, clusterWorkspace, featurePath);
+		//featurizeGroundTruth(clusterJobNum, useCluster, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
+		//featurizeValidateTest(clusterJobNum, useCluster, featurePath, fileNames, cpdAlgorithm, cpdFPR, cpdPath, featurizedFileExt, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
+		//splitData(tvtDataAssignmentPath, splitId, numSplits, fileNames);
+		//mergeGroundTruth(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr);
+		mergeValidateTest(clusterJobNum, useCluster, cpdAlgorithm, cpdFPR, tvtDataPath, tvtDataAssignmentPath, featurizedFileExtStr, dataSets, splitId, clusterWorkspace, featurePath);
 	}
 
 	//@SuppressWarnings("unused")
@@ -276,7 +283,11 @@ public class FeaturizeData extends TaskDef {
 		List<String> trialGroupIdList = Arrays.asList("7cls");
 		String tvtDataPath = "/nfs/guille/wong/wonglab3/obesity/2012/cpd/OSU_YR4_Hip_30Hz.ws120.7cls";
 		String tvtDataAssignmentPath = tvtDataPath + "/splits";
+		
 		String clusterWorkspace = "/nfs/guille/wong/wonglab3/obesity/2012/cpd/OSU_YR4_Hip_30Hz.ws120.7cls/cluster";
+		Integer clusterJobNum = 100;
+		Boolean useCluster = false;
+		
 		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
 		//Array cpdFPR = array(Arrays.asList("0.0001", "0.0002", "0.0003", "0.0004", "0.0005", "0.0006", "0.0007", "0.0008", "0.0009", "0.001", "0.0011", "0.0012", "0.0013", "0.0014", "0.0015", "0.0016", "0.0017", "0.0018", "0.0019", "0.002", "0.0021", "0.0022", "0.0023", "0.0024", "0.0025", "0.0026", "0.0027", "0.0028", "0.0029", "0.003", "0.0031", "0.0032", "0.0033", "0.0034", "0.0035", "0.0036", "0.0037", "0.0038", "0.0039", "0.004", "0.0041", "0.0042", "0.0043", "0.0044", "0.0045", "0.0046", "0.0047", "0.0048", "0.0049", "0.005", "0.0051", "0.0052", "0.0053", "0.0054", "0.0055", "0.0056", "0.0057", "0.0058", "0.0059", "0.006", "0.0061", "0.0062", "0.0063", "0.0064", "0.0065", "0.0066", "0.0067", "0.0068", "0.0069", "0.007", "0.0071", "0.0072", "0.0073", "0.0074", "0.0075", "0.0076", "0.0077", "0.0078", "0.0079", "0.008", "0.0081", "0.0082", "0.0083", "0.0084", "0.0085", "0.0086", "0.0087", "0.0088", "0.0089", "0.009", "0.0091", "0.0092", "0.0093", "0.0094", "0.0095", "0.0096", "0.0097", "0.0098", "0.0099", "0.01"));
 		Array cpdFPR = array(Arrays.asList("0.015", "0.02", "0.025", "0.03", "0.035", "0.04", "0.045", "0.05", "0.055", "0.06", "0.065", "0.07", "0.075", "0.08", "0.085", "0.09", "0.095"));
@@ -284,7 +295,8 @@ public class FeaturizeData extends TaskDef {
 		featurizeOSUData(expRootPath, datasetStr, frequencyStr,
 				trialTimeFilePathStr, rawDataPathStr, rawDataExt,
 				windowSizeList, trialGroupIdList, tvtDataAssignmentPath,
-				tvtDataPath, clusterWorkspace, cpdAlgorithm, cpdFPR);
+				tvtDataPath, clusterWorkspace, cpdAlgorithm, cpdFPR,
+				clusterJobNum, useCluster);
 	}
 
 	/*private void OSU_YR4_Wrist_30Hz() throws Exception {

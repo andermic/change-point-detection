@@ -2,7 +2,7 @@
 
 import re
 
-log = open('/nfs/guille/u2/a/andermic/scratch/workspace/GeneralExperimentFramework/gef.log', 'r').readlines()
+log = open('/nfs/guille/wong/users/andermic/scratch/workspace/GeneralExperimentFramework/gef.log', 'r').readlines()
 
 executed = len([line for line in log if 'Rscript' in line])
 executors = 0

@@ -1,6 +1,6 @@
-source("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/common.R")
-source("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/featurize.data.R")
-source("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/svm.exp.R")
+source("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/common.R")
+source("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/featurize.data.R")
+source("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/svm.exp.R")
 library('e1071', lib.loc='/nfs/guille/wong/wonglab3/obesity/2012/cpd')
 library(nnet)
 library(rpart)
@@ -198,6 +198,7 @@ quickTrainValidateCPD <- function(
 	real <- data.frame(ActivityClass=validate.data$ActivityClass, ActivityRatios=validate.data$ActivityRatio, Scale=validate.data$Scale)
 	#print(length(real))
 	accuracy <- classificationAccuracyCPD(real, pred)
+	print(accuracy)
 	write.csv(data.frame(Accuracy=accuracy), validateSummaryPath, row.names = FALSE)
 }
 
@@ -387,10 +388,15 @@ testBestModelDtCPD <- function(
 # Modified from summarizeSingleScaleModel in ms.osu/svm.exp.R
 summarizeModelCPD <- function(model, formula, scale, testData, predictionReportPath, expectedAccuracy=NA) {
 	real <- data.frame(ActivityClass=testData$ActivityClass, ActivityRatios=testData$ActivityRatio, Scale=testData$Scale)
-	pred <- as.character(predict(model, data.frame(featureMatrix(testData, formula)), type='class'))
+	pred <- as.character(predict(model, data.frame(featureMatrixNoFFT(testData, formula)), type='class'))
 
-	#print(pred)
-	#stopifnot(FALSE)
+	#print(colnames(testData))
+	#print(featureMatrixNoFFT(testData,formula))[1,]
+	#print(nrow(featureMatrixNoFFT(testData,formula)))
+	#print(real)
+	#print("")
+	#print(length(pred))
+	#print(nrow(real))
 	if (!is.na(expectedAccuracy)) {
 		accuracy <- classificationAccuracyCPD(real, pred)
 		#print(accuracy)
@@ -402,7 +408,7 @@ summarizeModelCPD <- function(model, formula, scale, testData, predictionReportP
 	if ("SubseqId" %in% colnames(testData)) {
 		prediction <- cbind(prediction, data.frame(SubseqId=testData$SubseqId))
 	}
-	prediction <- cbind(prediction, data.frame(Scale=scale, Real=real,Predict=pred))
+	prediction <- cbind(prediction, data.frame(Scale=scale, Real=real, Predict=pred))
 	colnames(prediction)[ncol(prediction)] <- "Predict"
 	write.csv(prediction, predictionReportPath, row.names = FALSE)
 }

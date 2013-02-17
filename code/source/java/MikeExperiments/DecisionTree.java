@@ -36,7 +36,7 @@ public class DecisionTree extends TaskDef {
 			Var testResultPath)
 			throws Exception {
 		logStep("Test the best decision tree model");
-		Var testBestSingleScaleModelFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var testBestSingleScaleModelFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var testBestSingleScaleModelScript = expPath.fileSep().cat("dt").dot()
 				.cat(formulaName).dot().cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".best.R");
@@ -90,7 +90,7 @@ public class DecisionTree extends TaskDef {
 			Var bestModelId, Var testResultPath, Var confusionMatrixPath,
 			Var pctConsufionMatrixPath, Var summaryPath) throws Exception {
 		logStep("Summarize model test results");
-		Var summarizeFunctionPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var summarizeFunctionPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var summarizeScriptPath = expPath.fileSep().cat("dt").dot()
 				.cat(bestModelId).cat(".summarize.R");
 		ExecutorBuilder summarizeSingle = rScript(summarizeFunctionPath,
@@ -151,7 +151,7 @@ public class DecisionTree extends TaskDef {
 			Array trialGroupId, Array formulaName, Array splitId)
 			throws Exception {
 		logStep("Merge splits results");
-		Var mergeFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var mergeFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var mergeScript = modelPath.fileSep().cat("dt.merge.split.")
 				.cat(bestModelId).dot().cat(testDataSets).cat(".R");
 		Var accuracySavePath = modelPath.fileSep()
@@ -200,7 +200,7 @@ public class DecisionTree extends TaskDef {
 	/*
 	private void mergeAlgorithmResults(Var modelPath, Array cpdAlgorithm, Array cpdFPR) throws Exception {
 		logStep("Merge results across algorithms");
-		Var mergeAlgorithmFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var mergeAlgorithmFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var mergeAlgorithmScript = modelPath.fileSep().cat("dt.merge.algorithms.")
 				.cat(bestModelId).dot().cat(testDataSets).cat(".R");
 		Var summarySavePath = modelPath.dot().cat(cpdAlgorithm).dot().cat("results.csv")

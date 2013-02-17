@@ -32,7 +32,7 @@ public class NeuralNet extends TaskDef {
 			Var valiTestLabVisitFileExt, Array numHiddenUnits,
 			Array weightDecay) throws Exception {
 		logStep("Train/validate nnet model");
-		Var trainValidateScriptPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var trainValidateScriptPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var nnetTrainCallingPath = expPath.fileSep().cat("nnet").dot()
 				.cat(modelId).cat(".R");
 		//Var modelSavePath = expPath.fileSep().cat("nnet").dot().cat(modelId)
@@ -110,7 +110,7 @@ public class NeuralNet extends TaskDef {
 			Var validateResultPath, Var testResultPath, Array numHiddenUnits,
 			Array weightDecay) throws Exception {
 		logStep("Test the best nnet model");
-		Var testBestSingleScaleModelFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var testBestSingleScaleModelFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var testBestSingleScaleModelScript = expPath.fileSep().cat("nnet").dot()
 				.cat(formulaName).dot().cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".best.R");
@@ -166,7 +166,7 @@ public class NeuralNet extends TaskDef {
 			Var bestModelId, Var testResultPath, Var confusionMatrixPath,
 			Var pctConsufionMatrixPath, Var summaryPath) throws Exception {
 		logStep("Summarize model test results");
-		Var summarizeFunctionPath = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var summarizeFunctionPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var summarizeScriptPath = expPath.fileSep().cat("nnet").dot()
 				.cat(bestModelId).cat(".summarize.R");
 		ExecutorBuilder summarizeSingle = rScript(summarizeFunctionPath,
@@ -227,7 +227,7 @@ public class NeuralNet extends TaskDef {
 			Array trialGroupId, Array formulaName, Array splitId)
 			throws Exception {
 		logStep("Merge splits results");
-		Var mergeFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var mergeFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var mergeScript = modelPath.fileSep().cat("nnet.merge.split.")
 				.cat(bestModelId).dot().cat(testDataSets).cat(".R");
 		Var accuracySavePath = modelPath.fileSep()
@@ -276,7 +276,7 @@ public class NeuralNet extends TaskDef {
 	/*
 	private void mergeAlgorithmResults(Var modelPath, Array cpdAlgorithm, Array cpdFPR) throws Exception {
 		logStep("Merge results across algorithms");
-		Var mergeAlgorithmFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+		Var mergeAlgorithmFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var mergeAlgorithmScript = modelPath.fileSep().cat("nnet.merge.algorithms.")
 				.cat(bestModelId).dot().cat(testDataSets).cat(".R");
 		Var summarySavePath = modelPath.dot().cat(cpdAlgorithm).dot().cat("results.csv")

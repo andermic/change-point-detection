@@ -50,7 +50,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 		// convert single scale model prediction results to features
 		logStep("Convert single scale model prediction results to stacking features");
 		Array subsets = array(Arrays.asList("train", "validate", "test"));
-		Var stackingFeaturizesFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/stacking.featurize.R");
+		Var stackingFeaturizesFunction = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/ms.osu/stacking.featurize.R");
 		Var stackingFeaturizesScript = expPath.fileSep().cat("svm").dot()
 				.cat(formulaName).dot().cat(subsets)
 				.cat(".stacking.featurize.R");
@@ -81,7 +81,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 
 		logStep("Summarize single size subwindow models");
 		Var modelId = var(formulaName);
-		Var summarizeFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/stacking.featurize.R");
+		Var summarizeFunction = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/ms.osu/stacking.featurize.R");
 		Var summarizeScript = expPath.fileSep().cat("svm.linear").dot()
 				.cat(modelId).dot().cat(subsets)
 				.cat(".summarize.single.size.R");
@@ -145,7 +145,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 		save(bestSingleScaleModelResTable, bestSingleScaleModelResSavePath);
 
 		logStep("Merge splits results");
-		Var mergeFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/function/merge.split.shuffle.R");
+		Var mergeFunction = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/function/merge.split.shuffle.R");
 		Var mergeScript = expPath.fileSep().cat("merge.split.").cat(modelId)
 				.dot().cat(subsets).cat(".R");
 		Var accuracySavePath = expPath.fileSep()
@@ -218,7 +218,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 		Array weightingFeatures = array(stackingFeatureList);
 		Array trialGroupId = array(trialGroupIdList);
 		bind(weightingFeatures, trialGroupId);
-		Var stackingModelFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/svm.exp.R");
+		Var stackingModelFunction = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/ms.osu/svm.exp.R");
 		Var stackingModelScript = expPath.fileSep().cat("svm").dot()
 				.cat(modelId).dot().cat("quick.train.validate.R");
 		// Var modelSavePath = expPath.fileSep().cat("svm").dot().cat(modelId)
@@ -266,7 +266,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 		stackingValidationTbl.save(validateSummaryFile);
 
 		logStep("Test the best stacking models");
-		Var testBestSingleScaleModelFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/svm.exp.R");
+		Var testBestSingleScaleModelFunction = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/ms.osu/svm.exp.R");
 		Var testBestSingleScaleModelScript = expPath.fileSep().cat("svm").dot()
 				.cat(formulaName).cat(".best.stacking.model.R");
 
@@ -387,7 +387,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 
 		logStep("Merge splits results");
 		modelId = var(formulaName);
-		Var mergeFunction = var("/nfs/guille/u2/a/andermic/scratch/workspace/ObesityExperimentRScript/function/merge.split.shuffle.R");
+		Var mergeFunction = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/function/merge.split.shuffle.R");
 		Var mergeScript = expPath.fileSep().cat("svm.merge.split.")
 				.cat(modelId).dot().cat(testDataSets).cat(".R");
 		ExecutorBuilder merge = rScript(mergeFunction, mergeScript,
