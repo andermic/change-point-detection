@@ -44,6 +44,7 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 						.setNumJobs(clusterJobNum).setClusterWorkspace(clusterWorkspace)
 						.setJobId(jobId));
 		// parameters for model training
+		singleScale.addParam("algorithm", String.class, "svm");
 		singleScale.addParam("formula", String.class, var(formula));
 		singleScale.addParam("trainDataInfoPath", String.class,
 				trainDataInfoPath, VerificationType.Before);
@@ -119,8 +120,7 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 				execConfig().setParallelizable(useCluster).setOnCluster(true)
 						.setNumJobs(clusterJobNum).setClusterWorkspace(clusterWorkspace)
 						.setJobId(jobId));
-		bestSingleScale.addParam("validateSummaryFile", String.class,
-				validateSummaryFile, VerificationType.Before);
+		bestSingleScale.addParam("algorithm", String.class, "svm");
 		bestSingleScale.addParam("formula", Formula.class, var(formula));
 		bestSingleScale.addParam("formulaName", String.class, var(formulaName));
 		bestSingleScale.addParam("labels", List.class, RUtils.varToRList(
@@ -154,6 +154,8 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 		// parameters for testing the trained model on testing data
 		bestSingleScale.addParam("testReportPath", String.class,
 				testResultPath, VerificationType.After);
+		bestSingleScale.addParam("validateSummaryFile", String.class,
+				validateSummaryFile, VerificationType.Before);
 		bestSingleScale.prodMode();
 		bestSingleScale.execute();
 	}

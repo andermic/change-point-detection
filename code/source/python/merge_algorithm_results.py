@@ -1,12 +1,12 @@
 #! /usr/bin/python
 
 INPUT_FOLDER = '/nfs/guille/wong/wonglab3/obesity/2012/cpd/OSU_YR4_Hip_30Hz.ws120.7cls'
-CLASS_ALGS = ['dt']
+CLASS_ALGS = ['svm']
 OUTPUT_FOLDER = '/nfs/stak/students/a/andermic/Windows.Documents/Desktop/change-point-detection/code/source'
 
 ACC = 'MeanAccuracy'
 DET = 'MeanTotalDetectionTime'
-CPD_ALGS = ['cc', 'kliep']
+CPD_ALGS = ['kliep']
 #FPRS = [str(i*0.0001) for i in range(1,101)]
 FPRS = [str(i*0.005) for i in range(3,20)]
 #FPRS = ['0.0005','0.001','0.002','0.003','0.004']

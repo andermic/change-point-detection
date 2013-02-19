@@ -7,13 +7,14 @@ library(rpart)
 #library(glmnet)
 
 # Modified from featurizeMstmData in mstm/mstm.featurize.data.R
-featurizeCPD <- function(rawDataFilePath, frequency, changePointsPath, savePath) {
+featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=NA, windowSize=NA) {
 	MINIMUM_SIZE <- 1
 	rawData <- read.csv(rawDataFilePath)
 
 	# Featurize using either ground truth or predicted change points
-	if (changePointsPath == '') {
-		endRows <- as.matrix(seq(120 * frequency, nrow(rawData), 120 * frequency))
+	if (is.na(changePointsPath)) {
+		stopifnot(!is.na(windowSize))
+		endRows <- as.matrix(seq(windowSize * frequency, nrow(rawData), windowSize * frequency))
 	}
 	else {
 		endRows <- as.matrix(read.csv(changePointsPath)) - 1
@@ -163,6 +164,7 @@ detectionTime <- function(real, pred) {
 
 # Modified from quickTrainValidate in ms.osu/svm.exp.R
 quickTrainValidateCPD <- function(
+		algorithm,
 		formula,  
 		scale=NA, 
 		trainDataInfoPath, 
@@ -171,72 +173,45 @@ quickTrainValidateCPD <- function(
 		trainingLabVisitFileExt,
 		valiTestLabVisitFileExt,
 		kernal="radial",
-		gamma, 
-		cost,
-		validateSummaryPath) {
-	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, scale)
-	print("Training data read")
-	
-	#print(training.data)
-	#print(nrow(training.data))
-	if (kernal=="radial") {
-		model <- svm(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, kernel=kernal, gamma=gamma, cost=cost)
-	} else if (kernal=="linear") {
-		model <- svm(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, kernel=kernal, cost=cost)
-	} else {
-		stop(paste("Invalid kernal:", kernal))
-	}
-	
-	print("Model trained")
-	#print(modelSavePath)
-	#save(model, file=modelSavePath)
-	#print("Model saved")
-
-	validate.data <- readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt, scale)
-	#print(nrow(validate.data))
-	pred <- predict(model, featureMatrix(validate.data, formula))
-	real <- data.frame(ActivityClass=validate.data$ActivityClass, ActivityRatios=validate.data$ActivityRatio, Scale=validate.data$Scale)
-	#print(length(real))
-	accuracy <- classificationAccuracyCPD(real, pred)
-	print(accuracy)
-	write.csv(data.frame(Accuracy=accuracy), validateSummaryPath, row.names = FALSE)
-}
-
-quickTrainValidateNnetCPD <- function(
-		formula,  
-		trainDataInfoPath, 
-		validateDataInfoPath, 
-		labVisitFileFolder,
-		trainingLabVisitFileExt,
-		valiTestLabVisitFileExt,
-		numHiddenUnits,
-		weightDecay,
 		validateSummaryPath,
-		scale = NA) {
+		gamma=NA, 
+		cost=NA,
+		numHiddenUnits=NA,
+		weightDecay=NA) {
 	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, scale)
 	print("Training data read")
-	
-	#print(training.data)
-	#print(nrow(training.data))
-	model <- nnet(formula=ActivityClass~., data=training.data, size=numHiddenUnits, decay = weightDecay, maxit = 100000, MaxNWts=1000000)
-	
+
+	if (algorithm == "svm") {	
+		if (kernal=="radial") {
+			stopifnot(!(is.na(gamma) || is.na(cost)))
+			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, kernel=kernal, gamma=gamma, cost=cost)
+		} else if (kernal=="linear") {
+			stopifnot(!is.na(cost))
+			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, kernel=kernal, cost=cost)
+		} else {
+			stop(paste("Invalid kernal:", kernal))
+		}
+	}
+	else if (algorithm == "nnet") {
+		stopifnot(!(is.na(numHiddenUnits) || is.na(weightDecay)))
+		my_data <- data.frame(as.data.frame(featureMatrixNoFFT(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
+		model <- nnet(formula=ActivityClass~., data=my_data, size=numHiddenUnits, decay = weightDecay, maxit = 100000, MaxNWts=1000000)
+	}
+	else {
+		stop('Bad algorithm')
+	}
 	print("Model trained")
-	#print(modelSavePath)
-	#save(model, file=modelSavePath)
-	#print("Model saved")
 
 	validate.data <- readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt, scale)
-	#print(nrow(validate.data))
-	pred <- predict(model, featureMatrix(validate.data, formula))
+	pred <- predict(model, featureMatrixNoFFT(validate.data, formula))
 	real <- data.frame(ActivityClass=validate.data$ActivityClass, ActivityRatios=validate.data$ActivityRatio, Scale=validate.data$Scale)
-	#print(length(real))
 	accuracy <- classificationAccuracyCPD(real, pred)
 	write.csv(data.frame(Accuracy=accuracy), validateSummaryPath, row.names = FALSE)
 }
 
 # Modified from testBestSingleScale in ms.osu/svm.exp.R
 testBestModelCPD <- function(
-		validateSummaryFile, 
+		algorithm,
 		formula, formulaName, labels, 
 		split,
 		trainDataInfoPath, 
@@ -251,24 +226,45 @@ testBestModelCPD <- function(
 		bestModelSavePath,
 		trainReportPath, 
 		validateReportPath, 
-		testReportPath) {
-	validateSummary <- read.csv(validateSummaryFile)
-	validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=120))
-	bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
-	write.csv(bestModelInfo, bestModelInfoSavePath, row.names = FALSE)
+		testReportPath,
+		validateSummaryFile=NA) {
+	
+	if (!is.na(validateSummaryFile)) {
+		validateSummary <- read.csv(validateSummaryFile)
+		validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=120))
+		bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
+		write.csv(bestModelInfo, bestModelInfoSavePath, row.names = FALSE)
+	}
 	
 	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt)
 	print("Training data read")
-	if (kernal=="radial") {
-		model <- svm(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, 
-				kernel=kernal, gamma=bestModelInfo$Gamma, cost=bestModelInfo$Cost)
-	} else if (kernal=="linear") {
-		model <- svm(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, 
-				kernel=kernal, cost=bestModelInfo$Cost)
-	} else {
-		stop(paste("Invalid kernal:", kernal))
+
+	if (algorithm == "svm") {
+		if (kernal=="radial") {
+			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, 
+					kernel=kernal, gamma=bestModelInfo$Gamma, cost=bestModelInfo$Cost)
+		} else if (kernal=="linear") {
+			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, 
+					kernel=kernal, cost=bestModelInfo$Cost)
+		} else {
+			stop(paste("Invalid kernal:", kernal))
+		}
 	}
-	
+	else if (algorithm == "nnet") {
+		my_data <- data.frame(as.data.frame(featureMatrixNoFFT(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
+		model <- nnet(formula=ActivityClass~., data=my_data, maxit = 100000, MaxNWts=1000000, size=bestModelInfo$NumHiddenUnits, decay=bestModelInfo$WeightDecay)
+	}
+	else if (algorithm == "dt") {
+		my_data <- data.frame(as.data.frame(featureMatrixNoFFT(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
+		model <- rpart(formula=ActivityClass~., data=my_data)
+	}
+	#else if (algorithm == "logr") {
+	#	model <- glmnet(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, family="multinomial", alpha=1)
+	#}
+	else {
+		stop('Bad algorithm')
+	}
+		
 	print("Model trained")
 	save(model, file=bestModelSavePath)
 	
@@ -279,105 +275,6 @@ testBestModelCPD <- function(
 	summarizeModelCPD(model, formula, 120, 
 			readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
 			validateReportPath, bestModelInfo$ValidateAccuracy)
-	
-	print("Test model on testing data")
-	summarizeModelCPD(model, formula, 120, 
-			readData(testDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
-			testReportPath)
-}
-
-# Modified from testBestSingleScale in ms.osu/svm.exp.R
-testBestModelNnetCPD <- function(
-		validateSummaryFile, 
-		formula, formulaName, labels, 
-		split,
-		trainDataInfoPath, 
-		validateDataInfoPath, 
-		testDataInfoPath, 
-		labVisitFileFolder,
-        trainingLabVisitFileExt,
-		valiTestLabVisitFileExt,
-		bestModelInfoSavePath,
-		bestModelSavePath,
-		trainReportPath, 
-		validateReportPath, 
-		testReportPath,
-		numHiddenUnits,
-		weightDecay) {
-	#validateSummary <- read.csv(validateSummaryFile)
-	#validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=120))
-	#bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
-	#print(bestModelInfo)
-	#write.csv(bestModelInfo, bestModelInfoSavePath, row.names = FALSE)
-	
-	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt)
-	#training.data$ActivityClass <- factor(training.data$ActivityClass)
-	print("Training data read")
-	#my_data <- data.frame(cbind(featureMatrix(training.data, formula), Class=training.data$ActivityClass))
-	my_data <- data.frame(as.data.frame(featureMatrix(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
-	
-	model <- nnet(formula=ActivityClass~., data=my_data, maxit = 100000, MaxNWts=1000000)
-	
-	print("Model trained")
-	save(model, file=bestModelSavePath)
-		
-	print("Test model on training data")
-	summarizeModelCPD(model, formula, 120, training.data, trainReportPath)
-	
-	print("Test model on validation data")
-	summarizeModelCPD(model, formula, 120, 
-			readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
-			validateReportPath)
-	
-	print("Test model on testing data")
-	summarizeModelCPD(model, formula, 120, 
-			readData(testDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
-			testReportPath)
-}
-
-# Modified from testBestSingleScale in ms.osu/svm.exp.R
-testBestModelDtCPD <- function(
-		validateSummaryFile, 
-		formula, formulaName, labels, 
-		split,
-		trainDataInfoPath, 
-		validateDataInfoPath, 
-		testDataInfoPath, 
-		labVisitFileFolder,
-        trainingLabVisitFileExt,
-		valiTestLabVisitFileExt,
-		kernal,
-		bestModelInfoSavePath,
-		bestModelSavePath,
-		trainReportPath, 
-		validateReportPath, 
-		testReportPath,
-		classAlg) {
-	#validateSummary <- read.csv(validateSummaryFile)
-	#validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=120))
-	#bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
-	#print(bestModelInfo)
-	#write.csv(bestModelInfo, bestModelInfoSavePath, row.names = FALSE)
-	
-	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt)
-	#training.data$ActivityClass <- factor(training.data$ActivityClass)
-	print("Training data read")
-	#my_data <- data.frame(cbind(featureMatrix(training.data, formula), Class=training.data$ActivityClass))
-	my_data <- data.frame(as.data.frame(featureMatrix(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
-	
-	model <- rpart(formula=ActivityClass~., data=my_data)
-	#model <- glmnet(x=featureMatrix(training.data, formula), y=training.data$ActivityClass, family="multinomial", alpha=1)
-	
-	print("Model trained")
-	save(model, file=bestModelSavePath)
-		
-	print("Test model on training data")
-	summarizeModelCPD(model, formula, 120, training.data, trainReportPath)
-	
-	print("Test model on validation data")
-	summarizeModelCPD(model, formula, 120, 
-			readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
-			validateReportPath)
 	
 	print("Test model on testing data")
 	summarizeModelCPD(model, formula, 120, 

@@ -14,11 +14,11 @@ import web.engr.oregonstate.edu.zheng.gef.def.Var;
 import web.engr.oregonstate.edu.zheng.gef.executor.ExecutorBuilder;
 import web.engr.oregonstate.edu.zheng.gef.executor.ExecutorBuilder.VerificationType;
 
-public class FeaturizeData extends TaskDef {
-	private static final Logger log = Logger.getLogger(FeaturizeData.class
+public class FeaturizeDataCPD extends TaskDef {
+	private static final Logger log = Logger.getLogger(FeaturizeDataCPD.class
 			.getName());
 
-	protected FeaturizeData() {
+	protected FeaturizeDataCPD() {
 	}
 
 	private void featurizeGroundTruth(Integer clusterJobNum,
@@ -37,8 +37,6 @@ public class FeaturizeData extends TaskDef {
 		featurizeGroundTruth.addParam("rawDataFilePath", String.class,
 				timestampedData);
 		featurizeGroundTruth.addParam("frequency", Integer.class, frequency);
-		featurizeGroundTruth
-				.addParam("changePointsPath", String.class, "");
 		featurizeGroundTruth.addParam("savePath", String.class, featurizeDataPath);
 		// add verification
 		featurizeGroundTruth.before(timestampedData);
@@ -70,11 +68,11 @@ public class FeaturizeData extends TaskDef {
 				timestampedData);
 		featurizeChangePoints.addParam("frequency", Integer.class, frequency);
 		Var changePointsPath = cpdPath.fileSep().cat(fileNames).cat(".csv");
-		featurizeChangePoints
-				.addParam("changePointsPath", String.class, changePointsPath);
 		featurizeDataPath = featurePath.fileSep().cat(fileNames)
 				.cat(featurizedFileExt);
 		featurizeChangePoints.addParam("savePath", String.class, featurizeDataPath);
+		featurizeChangePoints
+		.addParam("changePointsPath", String.class, changePointsPath);
 		// add verification
 		featurizeChangePoints.before(timestampedData);
 		featurizeChangePoints.after(featurizeDataPath);
@@ -247,7 +245,6 @@ public class FeaturizeData extends TaskDef {
 		mergeValidateTest(clusterJobNum, useCluster, cpdAlgorithm, cpdFPR, tvtDataPath, tvtDataAssignmentPath, featurizedFileExtStr, dataSets, splitId, clusterWorkspace, featurePath);
 	}
 
-	//@SuppressWarnings("unused")
 	private void splitDataSetInto3Parts(Array fileNames,
 			Var part1AssignmentTablePath, Var part2AssignmentTablePath,
 			Var part3AssignmentTablePath) throws Exception {
@@ -319,8 +316,8 @@ public class FeaturizeData extends TaskDef {
 
 	public static void main(String[] args) {
 		try {
-			new FeaturizeData().OSU_YR4_Hip_30Hz_Hip();
-			// new FeaturizeData().OSU_YR4_Wrist_30Hz();
+			new FeaturizeDataCPD().OSU_YR4_Hip_30Hz_Hip();
+			// new FeaturizeDataCPD().OSU_YR4_Wrist_30Hz();
 		} catch (Exception e) {
 			log.error(e, e);
 		}
