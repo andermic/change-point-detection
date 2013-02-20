@@ -42,7 +42,7 @@ public class DecisionTree extends TaskDef {
 				.cat(".best.R");
 		ExecutorBuilder bestSingleScale = rScript(
 				testBestSingleScaleModelFunction,
-				testBestSingleScaleModelScript, var("testBestModelDtCPD"),
+				testBestSingleScaleModelScript, var("testBestModelCPD"),
 				execConfig().setParallelizable(useCluster).setOnCluster(true)
 						.setNumJobs(clusterJobNumber).setClusterWorkspace(clusterWorkspace)
 						.setJobId(jobId));

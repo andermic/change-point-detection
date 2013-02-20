@@ -171,7 +171,7 @@ quickTrainValidateCPD <- function(
 		validateDataInfoPath, 
 		labVisitFileFolder,
 		trainingLabVisitFileExt,
-		valiTestLabVisitFileExt,
+		valiTestLabVisitFileExt=trainingLabVisitFileExt,
 		kernal="radial",
 		validateSummaryPath,
 		gamma=NA, 
@@ -203,7 +203,7 @@ quickTrainValidateCPD <- function(
 	print("Model trained")
 
 	validate.data <- readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt, scale)
-	pred <- predict(model, featureMatrixNoFFT(validate.data, formula))
+	pred <- predict(model, featureMatrixNoFFT(validate.data, formula), type='class')
 	real <- data.frame(ActivityClass=validate.data$ActivityClass, ActivityRatios=validate.data$ActivityRatio, Scale=validate.data$Scale)
 	accuracy <- classificationAccuracyCPD(real, pred)
 	write.csv(data.frame(Accuracy=accuracy), validateSummaryPath, row.names = FALSE)
@@ -219,15 +219,15 @@ testBestModelCPD <- function(
 		testDataInfoPath, 
 		labVisitFileFolder,
         trainingLabVisitFileExt,
-		valiTestLabVisitFileExt,
+		valiTestLabVisitFileExt=trainingLabVisitFileExt,
 		kernal,
-		bestModelInfo,
 		bestModelInfoSavePath,
 		bestModelSavePath,
 		trainReportPath, 
 		validateReportPath, 
 		testReportPath,
-		validateSummaryFile=NA) {
+		validateSummaryFile=NA,
+		bestModelInfo=NA) {
 	
 	if (!is.na(validateSummaryFile)) {
 		validateSummary <- read.csv(validateSummaryFile)
@@ -272,6 +272,9 @@ testBestModelCPD <- function(
 	summarizeModelCPD(model, formula, 120, training.data, trainReportPath)
 	
 	print("Test model on validation data")
+	if (algorithm == 'nnet') {
+		bestModelInfo$ValidateAccuracy <- NA  # Since nnet package uses random initial weights, accuracy is variable and should not be verified
+	}
 	summarizeModelCPD(model, formula, 120, 
 			readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
 			validateReportPath, bestModelInfo$ValidateAccuracy)
@@ -296,8 +299,8 @@ summarizeModelCPD <- function(model, formula, scale, testData, predictionReportP
 	#print(nrow(real))
 	if (!is.na(expectedAccuracy)) {
 		accuracy <- classificationAccuracyCPD(real, pred)
-		#print(accuracy)
-		#print(expectedAccuracy)
+		print(accuracy)
+		print(expectedAccuracy)
 		stopifnot(abs(expectedAccuracy-accuracy) < 0.01)
 	}
 	#print(colnames(testData)[1:100])

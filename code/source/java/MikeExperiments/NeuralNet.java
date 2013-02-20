@@ -86,8 +86,9 @@ public class NeuralNet extends TaskDef {
 					String filePath = data.getData("ExpPath", i) + "/nnet."
 							+ data.getData("Formula", i) + "."
 							+ data.getData("CpdAlgorithm", i) + "."
-							+ data.getData("CpdFpr", i) + "_cost"
-							+ data.getData("Cost", i) 
+							+ data.getData("CpdFpr", i) + "_"
+							+ data.getData("NumHiddenUnits", i) + "_"
+							+ data.getData("WeightDecay", i)
 							+ ".validate.summary.csv";
 					if (new File(filePath).exists()) {
 						DataSet accTbl = new DataSet(filePath, true);
@@ -96,7 +97,7 @@ public class NeuralNet extends TaskDef {
 					}
 				}
 			singleScaleValidationTbl.save(tvtDataPath 
-					+ "/nnet/nnet." + alg + '.' + fpr + ".summary.csv");
+					+ "/nnet/nnet.validate." + alg + '.' + fpr + ".summary.csv");
 			}
 		}
 	}
@@ -117,7 +118,7 @@ public class NeuralNet extends TaskDef {
 				.cat(".best.R");
 		ExecutorBuilder bestSingleScale = rScript(
 				testBestSingleScaleModelFunction,
-				testBestSingleScaleModelScript, var("testBestModelNnetCPD"),
+				testBestSingleScaleModelScript, var("testBestModelCPD"),
 				execConfig().setParallelizable(useCluster).setOnCluster(true)
 						.setNumJobs(clusterJobNum).setClusterWorkspace(clusterWorkspace)
 						.setJobId(jobId));
