@@ -273,11 +273,11 @@ testBestModelCPD <- function(
 	
 	print("Test model on validation data")
 	if (algorithm == 'nnet') {
-		bestModelInfo$ValidateAccuracy <- NA  # Since nnet package uses random initial weights, accuracy is variable and should not be verified
+		bestModelInfo <- NA  # Since nnet package uses random initial weights, accuracy is variable and should not be verified
 	}
 	summarizeModelCPD(model, formula, 120, 
 			readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
-			validateReportPath, bestModelInfo$ValidateAccuracy)
+			validateReportPath, bestModelInfo)
 	
 	print("Test model on testing data")
 	summarizeModelCPD(model, formula, 120, 
@@ -286,7 +286,7 @@ testBestModelCPD <- function(
 }
 
 # Modified from summarizeSingleScaleModel in ms.osu/svm.exp.R
-summarizeModelCPD <- function(model, formula, scale, testData, predictionReportPath, expectedAccuracy=NA) {
+summarizeModelCPD <- function(model, formula, scale, testData, predictionReportPath, bestModelInfo=NA) {
 	real <- data.frame(ActivityClass=testData$ActivityClass, ActivityRatios=testData$ActivityRatio, Scale=testData$Scale)
 	pred <- as.character(predict(model, data.frame(featureMatrixNoFFT(testData, formula)), type='class'))
 
@@ -297,11 +297,11 @@ summarizeModelCPD <- function(model, formula, scale, testData, predictionReportP
 	#print("")
 	#print(length(pred))
 	#print(nrow(real))
-	if (!is.na(expectedAccuracy)) {
+	if (!is.na(bestModelInfo)) {
 		accuracy <- classificationAccuracyCPD(real, pred)
 		print(accuracy)
-		print(expectedAccuracy)
-		stopifnot(abs(expectedAccuracy-accuracy) < 0.01)
+		print(bestModelInfo$ValidateAccuracy)
+		stopifnot(abs(bestModelInfo$ValidateAccuracy-accuracy) < 0.01)
 	}
 	#print(colnames(testData)[1:100])
 	prediction <- testData[,c("SubjectID", "TrialID", "WindowId")]

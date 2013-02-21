@@ -62,7 +62,7 @@ public class HMM extends TaskDef {
 				quickValidateSummaryPath, VerificationType.After);
 
 		for (int i = 0; i < tuningParams.size(); ++i) {
-			singleScale.addParam(tuningParams.get(i), Double.class, tuningParamVals.get(i));
+			singleScale.addParam(tuningParams.get(i), Double.class, var(array(tuningParamVals.get(i))));
 		}
 		
 		singleScale.prodMode();
@@ -103,10 +103,10 @@ public class HMM extends TaskDef {
 			String clusterWorkspace, 
 			Var validateSummaryFile, Array formula, String jobId, 
 			Var trainDataInfoPath, Var validateDataInfoPath, 
-			Var testDataInfoPath, Array splitId, String labVisitFileFolder,
+			Var trainHMMDataInfoPath, Array splitId, String labVisitFileFolder,
 			Var trainingLabVisitFileExt, Var bestModelInfoPath,
 			Var bestModelSavePath, Var trainResultPath, Var validateResultPath,
-			Var testResultPath, String baseClassifierStr) throws Exception {
+			Var trainHMMResultPath, String baseClassifierStr) throws Exception {
 		logStep("Test the best base classifier model");
 		Var testBestSingleScaleModelFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var testBestSingleScaleModelScript = expPath.fileSep()
@@ -130,7 +130,7 @@ public class HMM extends TaskDef {
 		bestSingleScale.addParam("validateDataInfoPath", String.class,
 				validateDataInfoPath, VerificationType.Before);
 		bestSingleScale.addParam("testDataInfoPath", String.class,
-				testDataInfoPath, VerificationType.Before);
+				trainHMMDataInfoPath, VerificationType.Before);
 		bestSingleScale.addParam("labVisitFileFolder", String.class,
 				labVisitFileFolder);
         bestSingleScale.addParam("trainingLabVisitFileExt", String.class,
@@ -148,14 +148,14 @@ public class HMM extends TaskDef {
 				validateResultPath, VerificationType.After);
 		// parameters for testing the trained model on testing data
 		bestSingleScale.addParam("testReportPath", String.class,
-				testResultPath, VerificationType.After);
+				trainHMMResultPath, VerificationType.After);
 		bestSingleScale.addParam("validateSummaryFile", String.class,
 				validateSummaryFile, VerificationType.Before);
 		bestSingleScale.prodMode();
 		bestSingleScale.execute();
 	}
 	
-	private void summarizeTest(Integer clusterJobNum, Boolean useCluster,
+	/*private void summarizeTest(Integer clusterJobNum, Boolean useCluster,
 			String clusterWorkspace, String jobId, Var expPath,
 			Var bestModelId, Var testResultPath, Var confusionMatrixPath,
 			Var pctConsufionMatrixPath, Var summaryPath) throws Exception {
@@ -263,7 +263,7 @@ public class HMM extends TaskDef {
 		// VerificationType.After);
 		merge.prodMode();
 		merge.execute();
-	}
+	}*/
 
 	/*
 	private void mergeAlgorithmResults(Var modelPath, Array cpdAlgorithm, Array cpdFPR) throws Exception {
@@ -301,18 +301,22 @@ public class HMM extends TaskDef {
 		Var dataset = var(datasetStr);
 		Array trialGroupIds = array(trialGroupIdList);
 
-		Array splitId = array("[0:1:30]");
+		//Array splitId = array("[0:1:30]");
+		Array splitId = array("[0:1:2]");
 		Var iterationId = var("split").cat(splitId);
 		Var expPath = var(expRootPath).fileSep().cat(dataset).dot().cat("ws")
 				.cat(windowSizes).dot().cat(trialGroupIds).fileSep()
 				.cat(baseClassifierStr).fileSep().cat(iterationId);
 
 		Var trainDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("train.").cat(windowSizes).cat("data.csv");
+				.fileSep().cat("trainBase.").cat("ws").cat(windowSizes)
+				.cat(".data.csv");
 		Var validateDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("validate.").cat(windowSizes).cat("data.csv");
-		Var testDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("test.").cat(windowSizes).cat("data.csv");
+				.fileSep().cat("validateBase.").cat("ws").cat(windowSizes)
+				.cat(".data.csv");
+		Var trainHMMDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
+				.fileSep().cat("trainHMM.").cat("ws").cat(windowSizes)
+				.cat(".data.csv");
 
 		Array formula = array(formulaList);
 		Array formulaName = array(formulaNameList);
@@ -330,9 +334,9 @@ public class HMM extends TaskDef {
 		
 		Var bestModelInfoPath = bestModelPrefix.cat(".info.csv");
 		Var bestModelSavePath = bestModelPrefix.cat(".best.model").cat(".save");
-		Var trainResultPath = bestModelPrefix.cat(".train.csv");
-		Var validateResultPath = bestModelPrefix.cat(".validate.csv");
-		Var testResultPath = bestModelPrefix.cat(".test.csv");
+		Var trainResultPath = bestModelPrefix.cat(".trainBase.csv");
+		Var validateResultPath = bestModelPrefix.cat(".validateBase.csv");
+		Var trainHMMResultPath = bestModelPrefix.cat(".trainHMM.csv");
 		
 		Var bestModelId = var("best").dot().cat(formulaName);
 		Var confusionMatrixPath = expPath.fileSep().cat(baseClassifierStr)
@@ -354,10 +358,10 @@ public class HMM extends TaskDef {
 			summarizeValidate(expPath, splitId, formulaName, tuningParams, tuningParamVals, tvtDataPath, baseClassifierStr);
 		}
 		
-		testBestModel(clusterJobNum, useCluster, formulaName, expPath, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath, baseClassifierStr);
-		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
-		makeTable(formulaName, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
-		mergeSplits(modelPath, bestModelId, testDataSets, trialGroupId, formulaName, splitId);
+		testBestModel(clusterJobNum, useCluster, formulaName, expPath, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, trainHMMDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, trainHMMResultPath, baseClassifierStr);
+		//summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
+		//makeTable(formulaName, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
+		//mergeSplits(modelPath, bestModelId, testDataSets, trialGroupId, formulaName, splitId);
 	}
 	
 	private void OSU_YR4_30Hz_Hip() throws Exception {
