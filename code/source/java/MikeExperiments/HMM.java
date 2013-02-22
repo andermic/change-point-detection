@@ -208,7 +208,8 @@ public class HMM extends TaskDef {
 				bestModelSavePath, VerificationType.Before);
 		predictHMM.addParam("labVisitFileExt", String.class, 
 				trainingLabVisitFileExt, VerificationType.Before);
-		predictHMM.addParam("predictBaseSavePath", String.class, predictBaseSavePath);
+		predictHMM.addParam("predictBaseSavePath", String.class,
+				predictBaseSavePath, VerificationType.After);
 		predictHMM.addParam("confusionMatrixPath", String.class,
 				confusionMatrixPath, VerificationType.After);
 		predictHMM.addParam("pctConsufionMatrixPath", String.class,
