@@ -30,17 +30,19 @@ public class HMM extends TaskDef {
 	private void trainValidate(Integer clusterJobNum, Boolean useCluster,
 			Var expPath, Var modelId, String clusterWorkspace, String jobId,
 			Array formula, Var trainDataInfoPath, Var validateDataInfoPath,
-			String labVisitFileFolder, Var trainingLabVisitFileExt,
-			List<String> tuningParams, List<String> tuningParamVals,
-			String baseClassifierStr) throws Exception {
+			Var labVisitFileFolder, Var trainingLabVisitFileExt,
+			List<String> tuningParams, List<Array> tuningParamVals,
+			String baseClassifierStr, Array windowSizes) throws Exception {
 		logStep("Train/validate base classifier");
 		Var trainValidateScriptPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
-		Var svmTrainCallingPath = expPath.fileSep().cat(baseClassifierStr).dot()
-				.cat(modelId).cat(".R");
+		Var svmTrainCallingPath = expPath.fileSep().cat(baseClassifierStr)
+				.cat(".ws").cat(windowSizes).dot().cat(modelId).cat(".R");
+		Var quickValidateSummaryPath = expPath.fileSep().cat(baseClassifierStr)
+				.cat(".ws").cat(windowSizes).dot().cat(modelId)
+				.cat(".validate.summary.csv");
 		//Var modelSavePath = expPath.fileSep().cat(baseClassifierStr).dot().cat(modelId)
 		// .cat(".model.save");
-		Var quickValidateSummaryPath = expPath.fileSep().cat(baseClassifierStr).dot()
-				.cat(modelId).cat(".validate.summary.csv");
+		
 		ExecutorBuilder singleScale = rScript(trainValidateScriptPath,
 				svmTrainCallingPath, var("quickTrainValidateCPD"),
 				execConfig().setParallelizable(useCluster).setOnCluster(true)
@@ -62,7 +64,7 @@ public class HMM extends TaskDef {
 				quickValidateSummaryPath, VerificationType.After);
 
 		for (int i = 0; i < tuningParams.size(); ++i) {
-			singleScale.addParam(tuningParams.get(i), Double.class, var(array(tuningParamVals.get(i))));
+			singleScale.addParam(tuningParams.get(i), Double.class, var(tuningParamVals.get(i)));
 		}
 		
 		singleScale.prodMode();
@@ -71,46 +73,60 @@ public class HMM extends TaskDef {
 
 	private void summarizeValidate(Var expPath, Array splitId,
 			Array formulaName, List<String> tuningParams,
-			List<String> tuningParamVals, String tvtDataPath,
-			String baseClassifierStr) throws Exception {
+			List<Array> tuningParamVals, String tvtDataPath,
+			String baseClassifierStr, Array windowSizes) throws Exception {
 		logStep("Summarize model validation results");
-		Table singleScaleValidationTbl = createTable(
-				new TableColumn("ExpPath", expPath),
-				new TableColumn("Split", var(splitId)),
-				new TableColumn("Formula", var(formulaName)),
-				new TableColumn("Scale", var("120")),
-				new TableColumn("ValidateAccuracy", var("NA")));
-		DataSet data = singleScaleValidationTbl.getData();
-		for (int i = 0; i < data.getRowCount(); ++i) {
-			String filePath = data.getData("ExpPath", i)
-					+ "/" + baseClassifierStr + "."
-					+ data.getData("Formula", i); 
-			for (int j = 0; j < tuningParams.size(); ++j)
-				filePath += "_" + data.getData(tuningParams.get(j), i);	
-			filePath += ".validate.summary.csv";
-			if (new File(filePath).exists()) {
-				DataSet accTbl = new DataSet(filePath, true);
-				double accuracy = accTbl.getDouble("Accuracy", 0);
-				data.insertData("ValidateAccuracy", i, accuracy);
+		
+		for(String windowSize : windowSizes.getValues()) {
+			ArrayList<TableColumn> columns = new ArrayList<TableColumn>(1);
+			columns.add(new TableColumn("ExpPath", expPath));
+			columns.add(new TableColumn("Split", var(splitId)));
+			columns.add(new TableColumn("Formula", var(formulaName)));
+			columns.add(new TableColumn("Scale", var(windowSize)));
+			columns.add(new TableColumn("ValidateAccuracy", var("NA")));
+			for (int i = 0; i < tuningParams.size(); ++i)
+				columns.add(new TableColumn(tuningParams.get(i), var(tuningParamVals.get(i))));
+			
+			Table singleScaleValidationTbl = createTable(columns.toArray(new TableColumn[columns.size()]));
+			DataSet data = singleScaleValidationTbl.getData();
+			for (int i = 0; i < data.getRowCount(); ++i) {
+				String filePath = data.getData("ExpPath", i) + "/"
+						+ baseClassifierStr + ".ws" + windowSize + "."
+						+ data.getData("Formula", i);
+						 
+				for (int j = 0; j < tuningParams.size(); ++j)
+					filePath += "_" + tuningParams.get(j) +
+					data.getData(tuningParams.get(j), i);	
+				filePath += ".validate.summary.csv";
+				//System.out.print(filePath);
+				//System.out.print('\n');
+				if (new File(filePath).exists()) {
+					DataSet accTbl = new DataSet(filePath, true);
+					double accuracy = accTbl.getDouble("Accuracy", 0);
+					data.insertData("ValidateAccuracy", i, accuracy);
+				}
 			}
+		singleScaleValidationTbl.save(tvtDataPath + "/" + baseClassifierStr + 
+				"/" + baseClassifierStr + ".ws" + windowSize +
+				".validate.summary.csv");
 		}
-	singleScaleValidationTbl.save(tvtDataPath + "/" + baseClassifierStr + "/" 
-			+ baseClassifierStr + ".validate.summary.csv");
 	}
 	
 	private void testBestModel(Integer clusterJobNum, Boolean useCluster,
-			Array formulaName, Var expPath, 
-			String clusterWorkspace, 
+			Array formulaName, Var expPath, String clusterWorkspace, 
 			Var validateSummaryFile, Array formula, String jobId, 
 			Var trainDataInfoPath, Var validateDataInfoPath, 
-			Var trainHMMDataInfoPath, Array splitId, String labVisitFileFolder,
+			Var trainHMMDataInfoPath, Array splitId, Var labVisitFileFolder,
 			Var trainingLabVisitFileExt, Var bestModelInfoPath,
 			Var bestModelSavePath, Var trainResultPath, Var validateResultPath,
-			Var trainHMMResultPath, String baseClassifierStr) throws Exception {
+			Var trainHMMResultPath, List<String> tuningParams,
+			List<Array> tuningParamVals, String baseClassifierStr,
+			Array windowSizes) throws Exception {
 		logStep("Test the best base classifier model");
 		Var testBestSingleScaleModelFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var testBestSingleScaleModelScript = expPath.fileSep()
-				.cat(baseClassifierStr).dot().cat(formulaName).cat(".best.R");
+				.cat(baseClassifierStr).dot().cat("ws").cat(windowSizes).dot()
+				.cat(formulaName).cat(".best.R");
 		ExecutorBuilder bestSingleScale = rScript(
 				testBestSingleScaleModelFunction,
 				testBestSingleScaleModelScript, var("testBestModelCPD"),
@@ -151,39 +167,59 @@ public class HMM extends TaskDef {
 				trainHMMResultPath, VerificationType.After);
 		bestSingleScale.addParam("validateSummaryFile", String.class,
 				validateSummaryFile, VerificationType.Before);
+		bestSingleScale.addParam("windowSize", Integer.class, var(windowSizes));
 		bestSingleScale.prodMode();
 		bestSingleScale.execute();
 	}
 	
-	/*private void summarizeTest(Integer clusterJobNum, Boolean useCluster,
-			String clusterWorkspace, String jobId, Var expPath,
-			Var bestModelId, Var testResultPath, Var confusionMatrixPath,
-			Var pctConsufionMatrixPath, Var summaryPath) throws Exception {
-		logStep("Summarize model test results");
-		Var summarizeFunctionPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
+	private void summarizeTest(Integer clusterJobNum, Boolean useCluster,
+			Array formulaName, Array windowSizes, String clusterWorkspace,
+			String jobId, Var expPath, Var bestModelId, Var trainHMMResultPath,
+			Var bestModelSavePath, Var trainingLabVisitFileExt, Var predictionReportPath, 
+			Var confusionMatrixPath, Var pctConsufionMatrixPath,
+			Var summaryPath, String baseClassifierStr) throws Exception {
+		logStep("Train on HMM, predict on base classifier, predict on HMM");
+		Var summarizeFunctionPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/hmm/hmm.R");
 		Var summarizeScriptPath = expPath.fileSep().cat(baseClassifierStr).dot()
-				.cat(bestModelId).cat(".summarize.R");
-		ExecutorBuilder summarizeSingle = rScript(summarizeFunctionPath,
-				summarizeScriptPath, var("summarizeCPD"),
+				.cat(bestModelId).cat(".predictHMM.R");
+		
+		//TODO
+		Var predictBaseSavePath = var("");
+				
+		ExecutorBuilder predictHMM = rScript(summarizeFunctionPath,
+				summarizeScriptPath, var("predictHMM"), 
 				execConfig().setParallelizable(useCluster).setOnCluster(true)
 						.setNumJobs(clusterJobNum).setClusterWorkspace(clusterWorkspace)
 						.setJobId(jobId));
-		summarizeSingle.addParam("labels", List.class, RUtils.varToRList(
+		predictHMM.addParam("labels", List.class, RUtils.varToRList(
 				var(array(Arrays.asList("lying_down", "sitting",
 						"standing_household", "walking", "running",
 						"basketball", "dance"))), true));
-		summarizeSingle.addParam("predictionReportPath", String.class,
-				testResultPath, VerificationType.Before);
-		summarizeSingle.addParam("confusionMatrixPath", String.class,
+		predictHMM.addParam("formula", String.class, var(formulaName));
+		predictHMM.addParam("windowSize", Integer.class, var(windowSizes));
+		
+		//TODO
+		predictHMM.addParam("predictionReportPath", String.class,
+				predictionReportPath, VerificationType.Before);
+		
+		predictHMM.addParam("trainHMMResultPath", String.class,
+				trainHMMResultPath, VerificationType.Before);
+		predictHMM.addParam("bestModelSavePath", String.class,
+				bestModelSavePath, VerificationType.Before);
+		predictHMM.addParam("labVisitFileExt", String.class, 
+				trainingLabVisitFileExt, VerificationType.Before);
+		predictHMM.addParam("predictBaseSavePath", String.class, predictBaseSavePath);
+		predictHMM.addParam("confusionMatrixPath", String.class,
 				confusionMatrixPath, VerificationType.After);
-		summarizeSingle.addParam("pctConsufionMatrixPath", String.class,
+		predictHMM.addParam("pctConsufionMatrixPath", String.class,
 				pctConsufionMatrixPath, VerificationType.After);
-		summarizeSingle.addParam("summaryPath", String.class, summaryPath,
+		predictHMM.addParam("summaryPath", String.class, summaryPath,
 				VerificationType.After);
-		summarizeSingle.prodMode();
-		summarizeSingle.execute();
+		predictHMM.prodMode();
+		predictHMM.execute();
 	}
 	
+	/*
 	private void makeTable(Array formulaName, String tvtDataPath,
 			Array splitId, Array windowSizes, Array trialGroupId,
 			Array testDataSets, Var modelPath) throws Exception {
@@ -288,14 +324,14 @@ public class HMM extends TaskDef {
 	}*/
 	
 	private void singleScaleModel(String expRootPath, String datasetStr,
-			String tvtDataPath, String labVisitFileFolder,
+			String tvtDataPath, Var labVisitFileFolder,
 			Var trainingLabVisitFileExt,
 			List<String> trialGroupIdList,
 			Array windowSizes,
 			List<String> formulaList, List<String> formulaNameList,
 			String clusterWorkspace, String jobId,
 			Integer clusterJobNum, Boolean useCluster,
-			List<String> tuningParams, List<String> tuningParamVals,
+			List<String> tuningParams, List<Array> tuningParamVals,
 			String baseClassifierStr) throws Exception {
 
 		Var dataset = var(datasetStr);
@@ -304,18 +340,18 @@ public class HMM extends TaskDef {
 		//Array splitId = array("[0:1:30]");
 		Array splitId = array("[0:1:2]");
 		Var iterationId = var("split").cat(splitId);
-		Var expPath = var(expRootPath).fileSep().cat(dataset).dot().cat("ws")
-				.cat(windowSizes).dot().cat(trialGroupIds).fileSep()
-				.cat(baseClassifierStr).fileSep().cat(iterationId);
+		Var expPath = var(expRootPath).fileSep().cat(dataset).dot().cat("HMM.")
+				.cat(trialGroupIds).fileSep().cat(baseClassifierStr).fileSep()
+				.cat(iterationId);
 
 		Var trainDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("trainBase.").cat("ws").cat(windowSizes)
+				.fileSep().cat("trainBase.ws").cat(windowSizes) 
 				.cat(".data.csv");
 		Var validateDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("validateBase.").cat("ws").cat(windowSizes)
+				.fileSep().cat("validateBase.ws").cat(windowSizes)
 				.cat(".data.csv");
 		Var trainHMMDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("trainHMM.").cat("ws").cat(windowSizes)
+				.fileSep().cat("trainHMM.ws").cat(windowSizes)
 				.cat(".data.csv");
 
 		Array formula = array(formulaList);
@@ -323,17 +359,16 @@ public class HMM extends TaskDef {
 		bind(formula, formulaName);
 		Var modelId = var(formulaName);
 		for (int i = 0; i < tuningParams.size(); ++i)
-			modelId = modelId.cat("_").cat(tuningParams.get(i)).cat(array(tuningParamVals.get(i)));
+			modelId = modelId.cat("_").cat(tuningParams.get(i)).cat(tuningParamVals.get(i));
 		
 		Var validateSummaryFile = var(tvtDataPath).fileSep()
 				.cat(baseClassifierStr).fileSep().cat(baseClassifierStr)
-				.cat(".validate.summary.csv");
-
-		Var bestModelPrefix = expPath.fileSep().cat(baseClassifierStr).dot()
-				.cat(formulaName).cat(".best.model");
-		
+				.cat(".ws").cat(windowSizes).cat(".validate.summary.csv");
+		Var bestModelPrefix = expPath.fileSep().cat(baseClassifierStr)
+				.cat(".ws").cat(windowSizes).dot().cat(formulaName)
+				.cat(".best.model");
 		Var bestModelInfoPath = bestModelPrefix.cat(".info.csv");
-		Var bestModelSavePath = bestModelPrefix.cat(".best.model").cat(".save");
+		Var bestModelSavePath = bestModelPrefix.cat(".save");
 		Var trainResultPath = bestModelPrefix.cat(".trainBase.csv");
 		Var validateResultPath = bestModelPrefix.cat(".validateBase.csv");
 		Var trainHMMResultPath = bestModelPrefix.cat(".trainHMM.csv");
@@ -354,11 +389,14 @@ public class HMM extends TaskDef {
 		
 		// Validate tuning parameters if there are any
 		if (!tuningParams.isEmpty()) {
-			trainValidate(clusterJobNum, useCluster, expPath, modelId, clusterWorkspace, jobId, formula, trainDataInfoPath, validateDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, tuningParams, tuningParamVals, baseClassifierStr);
-			summarizeValidate(expPath, splitId, formulaName, tuningParams, tuningParamVals, tvtDataPath, baseClassifierStr);
+			trainValidate(clusterJobNum, useCluster, expPath, modelId, clusterWorkspace, jobId, formula, trainDataInfoPath, validateDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, tuningParams, tuningParamVals, baseClassifierStr, windowSizes);
+			summarizeValidate(expPath, splitId, formulaName, tuningParams, tuningParamVals, tvtDataPath, baseClassifierStr, windowSizes);
 		}
 		
-		testBestModel(clusterJobNum, useCluster, formulaName, expPath, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, trainHMMDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, trainHMMResultPath, baseClassifierStr);
+		//TODO
+		Var predictionReportPath = var("");
+		testBestModel(clusterJobNum, useCluster, formulaName, expPath, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, trainHMMDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, trainHMMResultPath, tuningParams, tuningParamVals, baseClassifierStr, windowSizes);
+		summarizeTest(clusterJobNum, useCluster, formulaName, windowSizes, clusterWorkspace, jobId, expPath, bestModelId, trainHMMResultPath, bestModelSavePath, trainingLabVisitFileExt, predictionReportPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath, baseClassifierStr);
 		//summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
 		//makeTable(formulaName, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
 		//mergeSplits(modelPath, bestModelId, testDataSets, trialGroupId, formulaName, splitId);
@@ -372,32 +410,33 @@ public class HMM extends TaskDef {
 		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/hmm";
 		String datasetStr = "OSU_YR4_Hip_30Hz";
 		String tvtDataPath = expRootPath + "/OSU_YR4_Hip_30Hz.HMM.7cls";
-		String labVisitFileFolder = tvtDataPath + "/features";
-		String clusterWorkspace = "/nfs/guille/wong/wonglab3/obesity/2012/cpd/OSU_YR4_Hip_30Hz.ws120.7cls/svm/cluster";
+		String clusterWorkspace = "/nfs/guille/wong/wonglab3/obesity/2012/cpd/OSU_YR4_Hip_30Hz.HMM.7cls/svm/cluster";
 		List<String> formulaList = Arrays.asList(Formula.FORMULA_ALL_WO_FFT
 				.toString());
 		List<String> formulaNameList = Arrays.asList("AllWoFFT");
 		
 		// This block, along with the tuning parameters, will be customized to each experiment
-		Array windowSizes = array(Arrays.asList("1","2","3","4","5","6","7","8","9","10"));
+		Array windowSizes = array(Arrays.asList("10"));
+		//Array windowSizes = array(Arrays.asList("1","2","3","4","5","6","7","8","9","10"));
+		Var labVisitFileFolder = var(tvtDataPath).cat("/features/").cat("ws").cat(windowSizes);
 		List<String> trialGroupIdList = Arrays.asList("7cls");
 		Integer clusterJobNum = 100;
 		Boolean useCluster = false;
 		int baseClassifier = SVM;
 
 		List<String> tuningParams = Collections.emptyList();
-		List<String> tuningParamVals = Collections.emptyList();
+		List<Array> tuningParamVals = Collections.emptyList();
 		String baseClassifierStr;
 		switch (baseClassifier) {
 			case SVM:
 				baseClassifierStr = "svm";
-				tuningParams = Arrays.asList("cost");
-				tuningParamVals = Arrays.asList("[0.01,0.1,1,10,100,1000]");
+				tuningParams = Arrays.asList("Cost");
+				tuningParamVals = Arrays.asList(array("[0.01,0.1,1,10,100,1000]"));
 				break;
 			case NNET:
 				baseClassifierStr = "nnet";
-	            tuningParams = Arrays.asList("","");
-				tuningParamVals = Arrays.asList("[5,10,15]", "[0.0,0.5,1]");
+	            tuningParams = Arrays.asList("NumHiddenUnits","WeightDecay");
+				tuningParamVals = Arrays.asList(array("[5,10,15]"), array("[0.0,0.5,1]"));
 				break;
 			case DT:
 				baseClassifierStr = "dt";
@@ -406,7 +445,7 @@ public class HMM extends TaskDef {
 				throw new Exception();
 		}
 
-		Var trainingLabVisitFileExt = var("PureTrial.featurized.").cat(windowSizes).cat(".csv");
+		Var trainingLabVisitFileExt = var("PureTrial.featurized.csv");
 		
 		singleScaleModel(expRootPath, datasetStr, tvtDataPath,
 				labVisitFileFolder, trainingLabVisitFileExt, trialGroupIdList,
@@ -422,7 +461,7 @@ public class HMM extends TaskDef {
 		List<String> windowSizeList = Arrays.asList("10");
 		List<String> trialGroupIdList = Arrays.asList("7cls");
 
-		String tvtDataPath = expRootPath + "/" + datasetStr + ".ws10.7cls";
+		String tvtDataPath = expRootPath + "/" + datasetStr + ".HMM.7cls";
 		String labVisitFileFolder = tvtDataPath + "/features";
 		String labVisitFileExt = "PureTrial.featurized.csv";
 
@@ -434,7 +473,7 @@ public class HMM extends TaskDef {
 		String scaleExp = "[1:1:10]";
 
 		String clusterWorkspace = "/nfs/guille/wong/wonglab2/obesity/2012/msexp/"
-				+ datasetStr + ".ws10.7cls/svm.linear.stacking/cluster";
+				+ datasetStr + ".HMM.7cls/svm.linear.stacking/cluster";
 		singleScaleModel(expRootPath, datasetStr, tvtDataPath,
 				labVisitFileFolder, labVisitFileExt, trialGroupIdList,
 				windowSizeList, costExp, scaleExp, formulaList,

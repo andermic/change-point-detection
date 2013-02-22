@@ -174,28 +174,29 @@ quickTrainValidateCPD <- function(
 		valiTestLabVisitFileExt=trainingLabVisitFileExt,
 		kernal="radial",
 		validateSummaryPath,
-		gamma=NA, 
-		cost=NA,
-		numHiddenUnits=NA,
-		weightDecay=NA) {
+		Gamma=NA,
+		Cost=NA,
+		NumHiddenUnits=NA,
+		WeightDecay=NA) {
+	print(Cost)
 	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, scale)
 	print("Training data read")
 
 	if (algorithm == "svm") {	
 		if (kernal=="radial") {
 			stopifnot(!(is.na(gamma) || is.na(cost)))
-			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, kernel=kernal, gamma=gamma, cost=cost)
+			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, kernel=kernal, gamma=Gamma, cost=Cost)
 		} else if (kernal=="linear") {
-			stopifnot(!is.na(cost))
-			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, kernel=kernal, cost=cost)
+			stopifnot(!is.na(Cost))
+			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, kernel=kernal, cost=Cost)
 		} else {
 			stop(paste("Invalid kernal:", kernal))
 		}
 	}
 	else if (algorithm == "nnet") {
-		stopifnot(!(is.na(numHiddenUnits) || is.na(weightDecay)))
+		stopifnot(!(is.na(NumHiddenUnits) || is.na(WeightDecay)))
 		my_data <- data.frame(as.data.frame(featureMatrixNoFFT(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
-		model <- nnet(formula=ActivityClass~., data=my_data, size=numHiddenUnits, decay = weightDecay, maxit = 100000, MaxNWts=1000000)
+		model <- nnet(formula=ActivityClass~., data=my_data, size=NumHiddenUnits, decay = WeightDecay, maxit = 100000, MaxNWts=1000000)
 	}
 	else {
 		stop('Bad algorithm')
@@ -226,12 +227,13 @@ testBestModelCPD <- function(
 		trainReportPath, 
 		validateReportPath, 
 		testReportPath,
+		windowSize,
 		validateSummaryFile=NA,
 		bestModelInfo=NA) {
 	
 	if (!is.na(validateSummaryFile)) {
 		validateSummary <- read.csv(validateSummaryFile)
-		validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=120))
+		validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=windowSize))
 		bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
 		write.csv(bestModelInfo, bestModelInfoSavePath, row.names = FALSE)
 	}
@@ -269,18 +271,18 @@ testBestModelCPD <- function(
 	save(model, file=bestModelSavePath)
 	
 	print("Test model on training data")
-	summarizeModelCPD(model, formula, 120, training.data, trainReportPath)
+	summarizeModelCPD(model, formula, windowSize, training.data, trainReportPath)
 	
 	print("Test model on validation data")
 	if (algorithm == 'nnet') {
-		bestModelInfo <- NA  # Since nnet package uses random initial weights, accuracy is variable and should not be verified
+		bestModelInfo <- NA  # Since nnet package uses random initial weights when building models, accuracy is variable and should not be verified
 	}
-	summarizeModelCPD(model, formula, 120, 
+	summarizeModelCPD(model, formula, windowSize, 
 			readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
 			validateReportPath, bestModelInfo)
 	
 	print("Test model on testing data")
-	summarizeModelCPD(model, formula, 120, 
+	summarizeModelCPD(model, formula, windowSize, 
 			readData(testDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
 			testReportPath)
 }
@@ -297,10 +299,8 @@ summarizeModelCPD <- function(model, formula, scale, testData, predictionReportP
 	#print("")
 	#print(length(pred))
 	#print(nrow(real))
-	if (!is.na(bestModelInfo)) {
+	if (!is.na(bestModelInfo[1])) {
 		accuracy <- classificationAccuracyCPD(real, pred)
-		print(accuracy)
-		print(bestModelInfo$ValidateAccuracy)
 		stopifnot(abs(bestModelInfo$ValidateAccuracy-accuracy) < 0.01)
 	}
 	#print(colnames(testData)[1:100])
