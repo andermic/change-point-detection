@@ -37,6 +37,7 @@ public class FeaturizeDataHMM extends TaskDef {
 		featurize.addParam("frequency", Integer.class, frequency);
 		featurize.addParam("savePath", String.class, featurizeDataPath);
 		featurize.addParam("windowSize", Integer.class, var(windowSizes));
+		featurize.addParam("hmm", String.class, var("true"));
 		// add verification
 		featurize.before(timestampedData);
 		featurize.after(featurizeDataPath);
@@ -144,8 +145,7 @@ public class FeaturizeDataHMM extends TaskDef {
 		Var timestampedData = rawDataPath.fileSep().cat(fileNames)
 				.cat("PureTrial.csv");
 		
-		//int numSplits = 30;
-		int numSplits = 2;
+		int numSplits = 30;
 		Array splitId = array("[0:1:" + numSplits + "]");
 		Array dataSets = array(Arrays.asList("trainBase", "validateBase", "trainHMM", "testHMM"));
 
@@ -194,7 +194,7 @@ public class FeaturizeDataHMM extends TaskDef {
 	}
 
 	private void OSU_YR4_Hip_30Hz_Hip() throws Exception {
-		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/hmm";
+		String expRootPath = "/nfs/guille/wong/users/andermic/Desktop/hmm";
 		String datasetStr = "OSU_YR4_Hip_30Hz";
 		String frequencyStr = "30";
 		String trialTimeFilePathStr = "/nfs/guille/wong/wonglab2/obesity/2012/free.living/rawdata/30Hz/YR4/Cleaned Time Input GT3X Plus Hip 2_27_2012.csv";
@@ -202,10 +202,10 @@ public class FeaturizeDataHMM extends TaskDef {
 		String rawDataExt = "PureTrial.csv";
 		List<String> windowSizeList = Arrays.asList("10","9","8","7","6","5","4","3","2","1");
 		List<String> trialGroupIdList = Arrays.asList("7cls");
-		String tvtDataPath = "/nfs/guille/wong/wonglab3/obesity/2012/hmm/OSU_YR4_Hip_30Hz.HMM.7cls";
+		String tvtDataPath = "/nfs/guille/wong/users/andermic/Desktop/hmm/OSU_YR4_Hip_30Hz.HMM.7cls";
 		String tvtDataAssignmentPath = tvtDataPath + "/splits";
 		
-		String clusterWorkspace = "/nfs/guille/wong/wonglab3/obesity/2012/hmm/OSU_YR4_Hip_30Hz.HMM.7cls/cluster";
+		String clusterWorkspace = "/nfs/guille/wong/users/andermic/Desktop/hmm/OSU_YR4_Hip_30Hz.HMM.7cls/cluster";
 		Integer clusterJobNum = 100;
 		Boolean useCluster = false;
 		
@@ -215,28 +215,9 @@ public class FeaturizeDataHMM extends TaskDef {
 				tvtDataPath, clusterWorkspace,clusterJobNum, useCluster);
 	}
 
-	/*private void OSU_YR4_Wrist_30Hz() throws Exception {
-		String expRootPath = "/nfs/guille/wong/wonglab2/obesity/2012/msexp";
-		String datasetStr = "OSU_YR4_Wrist_30Hz";
-		String frequencyStr = "30";
-		String trialTimeFilePathStr = "/nfs/guille/wong/wonglab2/obesity/2012/free.living.hvw/wrist/rawdata/1Hz/YR4/Time Input GT3X Plus Wrist.csv";
-		String rawDataPathStr = "/nfs/guille/wong/wonglab2/obesity/2012/free.living.hvw/wrist/rawdata/30Hz/YR4/converted.7cls";
-		String rawDataExt = "PureTrial.csv";
-		List<String> windowSizeList = Arrays.asList("10");
-		List<String> trialGroupIdList = Arrays.asList("7cls");
-		String tvtDataPath = "/nfs/guille/wong/wonglab2/obesity/2012/msexp/OSU_YR4_Wrist_30Hz.ws10.7cls";
-		String tvtDataAssignmentPath = tvtDataPath + "/splits";
-		String clusterWorkspace = "/nfs/guille/wong/wonglab2/obesity/2012/msexp/OSU_YR4_Wrist_30Hz.ws10.7cls/cluster";
-		featurizeOSUData(expRootPath, datasetStr, frequencyStr,
-				trialTimeFilePathStr, rawDataPathStr, rawDataExt,
-				windowSizeList, trialGroupIdList, tvtDataAssignmentPath,
-				tvtDataPath, clusterWorkspace);
-	}*/
-
 	public static void main(String[] args) {
 		try {
 			new FeaturizeDataHMM().OSU_YR4_Hip_30Hz_Hip();
-			// new FeaturizeDataHMM().OSU_YR4_Wrist_30Hz();
 		} catch (Exception e) {
 			log.error(e, e);
 		}

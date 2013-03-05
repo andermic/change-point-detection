@@ -7,7 +7,7 @@ library(rpart)
 #library(glmnet)
 
 # Modified from featurizeMstmData in mstm/mstm.featurize.data.R
-featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=NA, windowSize=NA) {
+featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=NA, windowSize=NA, hmm='false') {
 	MINIMUM_SIZE <- 1
 	rawData <- read.csv(rawDataFilePath)
 
@@ -34,25 +34,28 @@ featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=
 		endRows = as.matrix(endRows[-exclude])
 	}
 	
-	#print(endRows)
-	#print(rawData)
 	startRow <- 1
 	df <- data.frame()
 	windowId <- 1
 	for (endRow in endRows) {
-		#print(paste("start", as.character(startRow)))
-		#print(paste("end", as.character(endRow)))
-		#print(paste("window: startRow", as.character(startRow), "endRow", as.character(endRow)))
-		#print(paste("scale: start", as.character(start), "end", as.character(end)))
-		#print(paste("end", as.character(endRow)))
 		window <- rawData[startRow:endRow, ]
-		#print(nrow(window))
-		#print(window)
 		df <- rbind(df, cbind(data.frame(WindowId=windowId, Scale=(endRow - startRow + 1), SubseqId=1), featurizeWindowCPD(frequency, window)))
 		startRow <- endRow + 1
 		windowId <- windowId + 1
 	}
-	#print(df)
+	
+	if(hmm == 'true') {
+		exclude <- NULL
+		for (i in 1:nrow(df)) {
+			if(length(unlist(strsplit(as.character(df$TrialID[i]),' '))) > 1) {
+				exclude <- c(exclude,i)
+			} 
+		}
+		if (!is.null(exclude)) {
+			df = df[-exclude,]
+		}
+	}
+	
 	write.csv(df, savePath, row.names=FALSE, quote=FALSE)
 }
 
@@ -178,13 +181,13 @@ quickTrainValidateCPD <- function(
 		Cost=NA,
 		NumHiddenUnits=NA,
 		WeightDecay=NA) {
-	print(Cost)
 	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, scale)
+	print(training.data)
 	print("Training data read")
 
 	if (algorithm == "svm") {	
 		if (kernal=="radial") {
-			stopifnot(!(is.na(gamma) || is.na(cost)))
+			stopifnot(!(is.na(gamma) || is.na(Cost)))
 			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, kernel=kernal, gamma=Gamma, cost=Cost)
 		} else if (kernal=="linear") {
 			stopifnot(!is.na(Cost))
@@ -292,13 +295,6 @@ summarizeModelCPD <- function(model, formula, scale, testData, predictionReportP
 	real <- data.frame(ActivityClass=testData$ActivityClass, ActivityRatios=testData$ActivityRatio, Scale=testData$Scale)
 	pred <- as.character(predict(model, data.frame(featureMatrixNoFFT(testData, formula)), type='class'))
 
-	#print(colnames(testData))
-	#print(featureMatrixNoFFT(testData,formula))[1,]
-	#print(nrow(featureMatrixNoFFT(testData,formula)))
-	#print(real)
-	#print("")
-	#print(length(pred))
-	#print(nrow(real))
 	if (!is.na(bestModelInfo[1])) {
 		accuracy <- classificationAccuracyCPD(real, pred)
 		stopifnot(abs(bestModelInfo$ValidateAccuracy-accuracy) < 0.01)
@@ -322,7 +318,7 @@ summarizeCPD <- function(labels, predictionReportPath, confusionMatrixPath, pctC
 	write.csv(cm, confusionMatrixPath, row.names = TRUE)
 	confusionMatrixNumToPct(confusionMatrixPath, pctConsufionMatrixPath)
 	accuracy <- classificationAccuracyCPD(real, pred)
-	dt <-detectionTime(real, pred)
+	dt <- detectionTime(real, pred)
 	#write.csv(data.frame(Accuracy=accuracy), summaryPath, row.names = FALSE)
 	write.csv(data.frame(Accuracy=accuracy, TotalDetectionTime=dt$TotalDetectionTime, DataSize=dt$DataSize), summaryPath, row.names = FALSE)
 }
@@ -350,7 +346,6 @@ mergeSplitShuffleCPD <- function(
 		filter <- cbind(filter, data.frame(Scale=scale))
 	}
 	filter <- cbind(filter, additionalFilter)
-	#print(filter)
 	res <- df.match(allRes, filter)
 	#res <- allRes[which(allRes$WindowSize==windowSize & allRes$TrialGroup==trialGroup & allRes$Formula==formula & allRes$TestDataSet==testDataSet),]
 	#if (!is.na(alpha)) {

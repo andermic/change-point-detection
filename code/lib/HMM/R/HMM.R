@@ -86,6 +86,7 @@ viterbi = function(hmm, observation)
     }
   }
   return(viterbiPath)
+  #return(v)
 }
 
 forward = function(hmm, observation)
