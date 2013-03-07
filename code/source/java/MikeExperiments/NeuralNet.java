@@ -338,10 +338,10 @@ public class NeuralNet extends TaskDef {
 				.cat("nnet");
 
 		//This is where the action happens
-		//trainValidate(clusterJobNum, useCluster, expPath, modelId, clusterWorkspace, jobId, formula, trainDataInfoPath, validateDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, numHiddenUnits, weightDecay);
-		//summarizeValidate(cpdAlgorithm, cpdFPR, expPath, splitId, formulaName, tvtDataPath, numHiddenUnits, weightDecay);
-		//testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath, numHiddenUnits, weightDecay);
-		//summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
+		trainValidate(clusterJobNum, useCluster, expPath, modelId, clusterWorkspace, jobId, formula, trainDataInfoPath, validateDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, numHiddenUnits, weightDecay);
+		summarizeValidate(cpdAlgorithm, cpdFPR, expPath, splitId, formulaName, tvtDataPath, numHiddenUnits, weightDecay);
+		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath, numHiddenUnits, weightDecay);
+		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
 		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
 		mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
 	}

@@ -8,7 +8,7 @@ FILE_NAME = 'monitor_cluster.tmp'
 try:
     sleep_duration = int(argv[1])
 except:
-    sleep_duration = 30
+    sleep_duration = 1
 
 while(True):
     system('qstat | grep andermic > ' + FILE_NAME)

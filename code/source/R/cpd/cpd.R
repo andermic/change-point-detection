@@ -182,7 +182,6 @@ quickTrainValidateCPD <- function(
 		NumHiddenUnits=NA,
 		WeightDecay=NA) {
 	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, scale)
-	print(training.data)
 	print("Training data read")
 
 	if (algorithm == "svm") {	
@@ -363,7 +362,6 @@ mergeSplitShuffleCPD <- function(
 		#print(i)
 		accuracyFile <- as.character(res$TestAccuracyFile[i])
 		#if (file.exists(accuracyFile)) {
-		print(accuracyFile)
 		accuracyData <- read.csv(accuracyFile)
 		#accuracy <- accuracyData$Accuracy[1]
 		allAcc <- rbind(allAcc, accuracyData)

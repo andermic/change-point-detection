@@ -200,7 +200,7 @@ public class FeaturizeDataHMM extends TaskDef {
 		String trialTimeFilePathStr = "/nfs/guille/wong/wonglab2/obesity/2012/free.living/rawdata/30Hz/YR4/Cleaned Time Input GT3X Plus Hip 2_27_2012.csv";
 		String rawDataPathStr = "/nfs/guille/wong/wonglab2/obesity/2012/free.living/rawdata/30Hz/YR4/converted.7cls";
 		String rawDataExt = "PureTrial.csv";
-		List<String> windowSizeList = Arrays.asList("10","9","8","7","6","5","4","3","2","1");
+		List<String> windowSizeList = Arrays.asList("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20");
 		List<String> trialGroupIdList = Arrays.asList("7cls");
 		String tvtDataPath = "/nfs/guille/wong/users/andermic/Desktop/hmm/OSU_YR4_Hip_30Hz.HMM.7cls";
 		String tvtDataAssignmentPath = tvtDataPath + "/splits";
