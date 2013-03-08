@@ -1,6 +1,6 @@
 
 \documentclass[onehalf,11pt]{beavtex}
-\title{The Meaning of Life}
+\title{Activity Detection on Free-Living Data Using Change Point Detection}
 \author{Michael M. Anderson}
 \degree{Master of Science}
 \doctype{Thesis}
@@ -14,10 +14,25 @@
 \abstract{This is an abstract statement.}
 \acknowledgements{I would like to acknowledge the Starting State and the Transition Function.}
 
+\usepackage{amsmath}
+\usepackage{graphicx}
 
 \begin{document}
 \maketitle
 \mainmatter
+
+
+\abstract{(Abstract text)}
+
+
+\acknowledgements{(Acknowledgement text)}
+
+
+\chapter{Introduction}
+\section{Motivation}
+\section{Previous Research}
+\section{Classification Models}
+\section{Datasets}
 
 
 %I have done some excellent research \cite{matrix}.
@@ -28,18 +43,53 @@
 %\end{figure}
 
 
-\chapter{Introduction}
-\section{Motivation}
-\section{Previous Research}
-\section{Experimental Pipeline}
-\section{Classification Models}
-\section{Datasets}
-
-
 \chapter{Top-Down Approach}
 \section{Change Point Detection}
+For this approach, the data was split into non-overlapping segments for
+featurization using techniques from the field of change point detection. 
+In change point detection, it is assumed that every
+tick of a time series is a draw from some underlying probability distribution,
+but that this underlying distribution occasionally changes at certain 
+points in the time series. To figure out where these
+changes occur, a score is generated for each time tick, and all time ticks with
+scores above a given threshold are considered changes. To generate a score at
+a time tick, we consider a window of data that immediately preceeds it
+(reference data) and it along with a window of data that immediately follows it (test data).
+Scores are calculated by using some metric of dissimilarity or distance
+between the reference data and the test data.
+
+There are many different modeling assumptions and associated algorithms
+for generating change point detection scores,
+including Autoregression, Kernel Density Estimation, Singular Spectrum
+Analysis, Exponential Weighted Moving Average, CUSUM
+(TODO: include more and explain them more).
+
 \section{Methodology}
+We were particularly interested in testing the performance of the
+Kullback-Leibler Importance Estimation Proceedure (KLIEP).
+(TODO: talk about KL distance, direct density ratio estimation, and the off-the-shelf code)
+We tested this algorithm using a module that was previously implemented in MATLAB.
+Our reference windows were fixed at a length of 10 seconds, and our test
+windows were fixed at a length of 1 second.
+
+We also tested the simpler Control Chart algorithm as a baseline. This
+algorithm assumes that each time tick is a draw from a multivariate normal distribution.
+It is assumed that no changes occur in the reference window, and the score of a time
+tick is the Mahalonobis distance of the tick from the estimated distribution of its reference data.
+The mean vector and covariance matrix of the reference data is estimated using
+the sample mean and sample standard deviation along each of the 3 axes. For simplicity
+we assumed that the covariance between pairs of axes is 0, so the covariance matrix is
+diagonal. Our reference windows were fixed at a length of 10 seconds. 
+
+Threshold values were chosen by considering a number of false positive rates of
+the change point detection algorithms. A smaller false positive rate 
+correspondeded to a higher and more conservative threshold, which split the
+time series into fewer segments for featurization. A larger false positive rate
+corresponded to a lower threshold, which split the time series into more segments.
+Our false positive rates ranged from (TODO) per second to (TODO) per second.
+
 \section{Results}
+(TODO)
 
 
 \chapter{Bottom-Up Approach}
