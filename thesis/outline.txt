@@ -1,0 +1,40 @@
+abstract
+
+introduction
+	motivation
+	previous research
+	define relevant metrics of performance
+		accuracy
+		detection time
+	describe datasets
+		show sample graph(s) of data
+	classification models used
+
+change point detection
+	introduction to the field of change point detection
+		applications to control theory
+		consider adding a graph
+ 	methodology
+		fpr / s as a 'tuning parameter'
+		describe cc
+		describe kliep
+		CUSUM, exponentially weighted moving average etc.?
+	results
+		graphs of fpr vs accuracy, fpr vs det time, acc vs det time
+		discussion / interpretation
+
+hidden markov model
+	methodology
+		1 order markov model
+		fixed window size
+		hidden markov model as a smoothing technique
+	results
+		graphs of fpr against accuracy, fpr against detection time
+		discussion
+
+conclusion
+	summarize experimental methodologies
+	restate and interpret results
+	directions for further research
+
+bibliography

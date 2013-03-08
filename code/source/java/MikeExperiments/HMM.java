@@ -424,7 +424,7 @@ public class HMM extends TaskDef {
 		List<String> trialGroupIdList = Arrays.asList("7cls");
 		Integer clusterJobNum = 100;
 		int baseClassifier = NNET;
-		Boolean useCluster = true;
+		Boolean useCluster = false;
 
 		List<String> tuningParams = Collections.emptyList();
 		List<Array> tuningParamVals = Collections.emptyList();
