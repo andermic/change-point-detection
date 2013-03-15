@@ -11,21 +11,21 @@
 \advisor{Weng-Keen Wong}
 \submitdate{January 1, 2013}
 \commencementyear{2013}
-\abstract{This is an abstract statement.}
-\acknowledgements{I would like to acknowledge the Starting State and the Transition Function.}
 
 \usepackage{amsmath}
 \usepackage{graphicx}
-
-\begin{document}
-\maketitle
-\mainmatter
+\graphicspath{ {figures} }
 
 
 \abstract{(Abstract text)}
 
 
 \acknowledgements{(Acknowledgement text)}
+
+
+\begin{document}
+\maketitle
+\mainmatter
 
 
 \chapter{Introduction}
@@ -47,12 +47,13 @@
 \section{Change Point Detection}
 For this approach, the data was split into non-overlapping segments for
 featurization using techniques from the field of change point detection. 
-In change point detection, it is assumed that every
-tick of a time series is a draw from some underlying probability distribution,
-but that this underlying distribution occasionally changes at certain 
-points in the time series. To figure out where these
+These techniques find application in control theory and a number of other
+problem domains. To detect changes in a time series, it is assumed that each
+time tick is a draw from some underlying probability distribution,
+but that this underlying distribution will occasionally change at certain 
+points in time. To figure out when these
 changes occur, a score is generated for each time tick, and all time ticks with
-scores above a given threshold are considered changes. To generate a score at
+scores above a given threshold are flagged as changes. To generate a score at
 a time tick, we consider a window of data that immediately preceeds it
 (reference data) and it along with a window of data that immediately follows it (test data).
 Scores are calculated by using some metric of dissimilarity or distance
@@ -67,8 +68,13 @@ Analysis, Exponential Weighted Moving Average, CUSUM
 \section{Methodology}
 We were particularly interested in testing the performance of the
 Kullback-Leibler Importance Estimation Proceedure (KLIEP).
-(TODO: talk about KL distance, direct density ratio estimation, and the off-the-shelf code)
-We tested this algorithm using a module that was previously implemented in MATLAB.
+This non-parametric approach generates scores using the Kullback-Leibler
+divergence between the reference data and the test data. However, instead of
+estimating the density of the reference distribution and test distribution
+separately, and then comparing them with a likelihood ratio, it models and
+estimates the likelihood ratio directly with a Gaussian kernel. Cross-validation 
+set the kernel width $\sigma$ at each individual time tick.
+We tested this algorithm using a module that was previously implemented in Matlab.
 Our reference windows were fixed at a length of 10 seconds, and our test
 windows were fixed at a length of 1 second.
 
@@ -82,14 +88,40 @@ we assumed that the covariance between pairs of axes is 0, so the covariance mat
 diagonal. Our reference windows were fixed at a length of 10 seconds. 
 
 Threshold values were chosen by considering a number of false positive rates of
-the change point detection algorithms. A smaller false positive rate 
-correspondeded to a higher and more conservative threshold, which split the
+the change point detection algorithms. A smaller false positive rate per second
+corresponded to a higher and more conservative threshold, which split the
 time series into fewer segments for featurization. A larger false positive rate
 corresponded to a lower threshold, which split the time series into more segments.
-Our false positive rates ranged from (TODO) per second to (TODO) per second.
+The false positive rates that we tested ranged from 0.005 per second to 0.5 per second.
 
 \section{Results}
-(TODO)
+To measure the performance of a time series classification algorithm we used
+two metrics. Accuracy is defined as the number of
+ticks that an algorithm correctly classifies in a time series, over the total number of ticks
+in the time series. In many applications involving streaming accelerometer data
+it is important to quickly detect changes in activity type in real time, so we
+were also interested in our algorithms'' detection time.
+Detection time is defined as the average number of ticks
+required for the algorithm to begin correctly classifying data after a
+true activity change has occurred.
+
+As shown in Figure 2.1, we plotted accuracy and detection time as a function of the allowed
+false positive rate per second, along with plots of accuracy against detection
+time, for the SVM, Decision Tree, and Neural Net classifiers.
+
+\begin{figure}
+ \centering
+ \includegraphics[scale=0.3]{svm_fps_acc.png}
+ \includegraphics[scale=0.3]{svm_fps_det.png}
+ \includegraphics[scale=0.3]{svm_det_acc.png}
+ \includegraphics[scale=0.3]{dt_fps_acc.png}
+ \includegraphics[scale=0.3]{dt_fps_det.png}
+ \includegraphics[scale=0.3]{dt_det_acc.png}
+ \includegraphics[scale=0.3]{nnet_fpr_acc.png}
+ \includegraphics[scale=0.3]{nnet_fpr_det.png}
+ \includegraphics[scale=0.3]{nnet_acc_det.png}
+ \caption{CPD Classification Performance}
+\end{figure}
 
 
 \chapter{Bottom-Up Approach}
