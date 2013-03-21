@@ -6,12 +6,12 @@ library(nnet)
 library(rpart)
 #library(glmnet)
 
+
 # Modified from featurizeMstmData in mstm/mstm.featurize.data.R
-featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=NA, windowSize=NA, hmm='false') {
-	MINIMUM_SIZE <- 1
+featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=NA, windowSize=NA, hmm='false', startEndPath = NA) {
 	rawData <- read.csv(rawDataFilePath)
 
-	# Featurize using either ground truth or predicted change points
+	# Featurize using either fixed or variable window sizes
 	if (is.na(changePointsPath)) {
 		stopifnot(!is.na(windowSize))
 		endRows <- as.matrix(seq(windowSize * frequency, nrow(rawData), windowSize * frequency))
@@ -19,22 +19,26 @@ featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=
 	else {
 		endRows <- as.matrix(read.csv(changePointsPath)) - 1
 	}
-	if (endRows[nrow(endRows), ] != nrow(rawData)) {
-		endRows <- rbind(endRows, nrow(rawData))
+	
+	if (!is.na(startEndPath)) {
+		se = read.csv(startEndPath, row.names=1)
+		dataEnd = min(se['Raw','EndTick'], se['Events','EndTick'])
+		if (se['Events', 'StartTick'] > 0) {
+			startRow = se['Events', 'StartTick']
+		}
+		else {
+			startRow = 1
+	}
+	else {
+		startRow = 1
+		dataEnd = nrow(rawData)
+	}		
+
+	# If the last row of the raw data isn't considered as the end of a window, make it so
+	if (endRows[nrow(endRows, ] != dataEnd) {
+		endRows <- rbind(endRows, dataEnd)
 	}
 
-	# Exclude change points that are too near to a previous change point prediction
-	exclude <- NULL
-	for (i in 2:nrow(endRows)) {
-		if ((endRows[i] - endRows[i-1]) < MINIMUM_SIZE) {
-			exclude <- c(exclude,i)
-		} 
-	}
-	if (!is.null(exclude)) {
-		endRows = as.matrix(endRows[-exclude])
-	}
-	
-	startRow <- 1
 	df <- data.frame()
 	windowId <- 1
 	for (endRow in endRows) {

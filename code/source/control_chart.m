@@ -8,9 +8,10 @@ sum_temp = sum(wind);
 sum_sqrd_temp = sum(wind.^2);
 xbar_ref = sum_temp / kpre;
 s_ref = sqrt((sum_sqrd_temp - (2 .* xbar_ref .* sum_temp) + xbar_ref.^2 * kpre) / (kpre-1));
+s_ref(s_ref<eps) = 1;
 
 for i = 1:n-kpre
-    if (mod(i, 10000) == 0)
+    if (mod(i, 100000) == 0)
         i
     end
     
@@ -28,6 +29,8 @@ for i = 1:n-kpre
     sum_sqrd_temp = sum_sqrd_temp + wind(kpre,:).^2;
     xbar_ref = sum_temp / kpre;
     s_ref = sqrt((sum_sqrd_temp - (2 .* xbar_ref .* sum_temp) + xbar_ref.^2 * kpre) / (kpre-1));
+    s_ref(s_ref<eps) = 1;
+
     
 	% Compute the number of standard deviations from the test data to the reference
 	% data along each dimension.
