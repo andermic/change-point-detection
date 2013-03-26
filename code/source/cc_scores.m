@@ -6,9 +6,9 @@ load(NAMES_FILE)
 for path=(uq_file_names)'
     name = regexp(path', '/', 'split');
     name = name{1}{size(name{1},2)-1};
-    name
+    disp(name);
     %scores = control_chart(KPRE, read_data(name'));
     scores = control_chart(KPRE, csvread(path{1},11,1));
     %assert(size(data,2) == 3);
-    csvwrite(strcat(OUTPUT, '/cc_kpre', num2str(KPRE), '/scores.', name, '.csv'), scores);
+    csvwrite(strcat(OUTPUT, '/cc_kpre', num2str(KPRE), '/scores_', name, '.csv'), scores);
 end;

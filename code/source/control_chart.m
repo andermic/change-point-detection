@@ -12,7 +12,7 @@ s_ref(s_ref<eps) = 1;
 
 for i = 1:n-kpre
     if (mod(i, 100000) == 0)
-        i
+        disp(i);
     end
     
     sigmas(i,:) = (data(i+kpre,:)-xbar_ref).^2 ./ s_ref.^2;
