@@ -2,21 +2,9 @@
 
 from os import system
 from subprocess import Popen, PIPE
-from datetime import datetime
+from dif_ticks import dif_ticks
 
 ROOT_PATH = '/nfs/guille/wong/users/andermic/uq/processed'
-
-def dif_ticks(subtrahend, minuend):
-    subt_dt = datetime.strptime(subtrahend[:-4], '%d/%m/%Y %H:%M:%S')
-    minu_dt = datetime.strptime(minuend[:-4], '%d/%m/%Y %H:%M:%S')
-    subt_milli = subtrahend[-4:] 
-    minu_milli = minuend[-4:]
-
-    delta = subt_dt - minu_dt
-    result = (delta.days * 24 * 3600 + delta.seconds) * 30
-    result += int(round((float(subt_milli) - float(minu_milli)) * 30))
-    return result
-
 
 data_files = [i.strip() for i in open('%s/30hz_file_names.csv' % ROOT_PATH, 'r').readlines()]
 event_files = [i.strip() for i in open('%s/events_file_names.csv' % ROOT_PATH, 'r').readlines()]
