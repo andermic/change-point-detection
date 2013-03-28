@@ -34,7 +34,7 @@ for name in names:
             contig_duplicate_count += 1
         else:
             if contig_duplicate_count >= 29:
-                dif = dif_ticks(line_split[0], start_line[0]) - 1
+                dif = dif_ticks(line_split[0], start_line[0])
                 duplicates.write('%s,%d\n' % (','.join(start_line).strip(), dif))
                 buffer = line
             else:
