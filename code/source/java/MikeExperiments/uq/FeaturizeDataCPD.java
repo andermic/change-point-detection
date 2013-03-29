@@ -1,6 +1,6 @@
 // Modified from web.engr.oregonstate.edu.zheng.gef.task.msexp.stacking.osu
 
-package MikeExperiments;
+package MikeExperiments.uq;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,34 +24,40 @@ public class FeaturizeDataCPD extends TaskDef {
 	private void featurizeGroundTruth(Integer clusterJobNum,
 			Boolean useCluster, Var featurizeFunctionScriptPath,
 			Var callingScriptPath, String clusterWorkspace, 
-			Var timestampedData, Var frequency, Var featurizeDataPath)
+			Var truncatedFileNames, Var duplicatesFileNames,
+			Var eventsFileNames, Var frequency, Var featurizeDataPath)
 			throws Exception {
-		logStep("Featurize data using 120 second ground truth windows");
+		logStep("Featurize data using ground truth windows");
 		ExecutorBuilder featurizeGroundTruth = rScript(
 				featurizeFunctionScriptPath,
 				callingScriptPath,
-				var("featurizeCPD"),
+				var("featurizeUQCPD"),
 				execConfig().setParallelizable(useCluster).setNumJobs(clusterJobNum)
 						.setOnCluster(true)
 						.setClusterWorkspace(clusterWorkspace));
-		featurizeGroundTruth.addParam("rawDataFilePath", String.class,
-				timestampedData);
+		featurizeGroundTruth.addParam("truncatedDataFilePath", String.class,
+				truncatedFileNames);
+		featurizeGroundTruth.addParam("duplicatesDataFilePath", String.class,
+				duplicatesFileNames);
+		featurizeGroundTruth.addParam("changePointsPath", String.class,
+				eventsFileNames);
 		featurizeGroundTruth.addParam("frequency", Integer.class, frequency);
 		featurizeGroundTruth.addParam("savePath", String.class, featurizeDataPath);
-		featurizeGroundTruth.addParam("windowSize", Integer.class, "120");
 		// add verification
-		featurizeGroundTruth.before(timestampedData);
+		featurizeGroundTruth.before(truncatedFileNames);
+		featurizeGroundTruth.before(duplicatesFileNames);
 		featurizeGroundTruth.after(featurizeDataPath);
 		// set mode and start
 		featurizeGroundTruth.prodMode();
 		featurizeGroundTruth.execute();
-	}		
+	}
 	
 	private void featurizeValidateTest(Integer clusterJobNum,
 	Boolean useCluster, Var featurePath, Array fileNames, 
-			Array cpdAlgorithm, Array cpdFPR, Var cpdPath, Var featurizedFileExt,
-			Var featurizeFunctionScriptPath, Var callingScriptPath, 
-			String clusterWorkspace, Var timestampedData, Var frequency, 
+			Array cpdAlgorithm, Array cpdFPR, Var cpdPath,
+			Var featurizedFileExt, Var featurizeFunctionScriptPath,
+			Var callingScriptPath, String clusterWorkspace,
+			Var truncatedFileNames, Var duplicatesFileNames, Var frequency,
 			Var featurizeDataPath) throws Exception {
 		logStep("Featurize data using predicted change points from the given algorithm");
 		callingScriptPath = featurePath.fileSep().cat(fileNames)
@@ -99,8 +105,11 @@ public class FeaturizeDataCPD extends TaskDef {
 						.cat("split").cat(String.valueOf(i)).cat(".part1.csv");
 				Var part3AssignmentTablePath = dataSetAssignmentPath.fileSep()
 						.cat("split").cat(String.valueOf(i)).cat(".part2.csv");
-				splitDataSetInto3Parts(fileNames, part1AssignmentTablePath,
-						part2AssignmentTablePath, part3AssignmentTablePath);
+				Var part4AssignmentTablePath = dataSetAssignmentPath.fileSep()
+						.cat("split").cat(String.valueOf(i)).cat(".part2.csv");
+				splitDataSetInto4Parts(fileNames, part1AssignmentTablePath,
+						part2AssignmentTablePath, part3AssignmentTablePath,
+						part4AssignmentTablePath);
 			}
 		}
 	}
@@ -195,16 +204,17 @@ public class FeaturizeDataCPD extends TaskDef {
 		createValidateTestData.execute();
 	}
 
-	private void splitDataSetInto3Parts(Array fileNames,
+	private void splitDataSetInto4Parts(Array fileNames,
 			Var part1AssignmentTablePath, Var part2AssignmentTablePath,
-			Var part3AssignmentTablePath) throws Exception {
+			Var part3AssignmentTablePath, Var part4AssignmentTablePath)
+			throws Exception {
 		Array labVisit1Files = which(fileNames, contains(fileNames, "V1"));
 		log.info("Number of Visit1: " + labVisit1Files.getValues().size());
-		List<Array> labVisit1Split = split(labVisit1Files, 3);
+		List<Array> labVisit1Split = split(labVisit1Files, 4);
 
 		Array labVisit2Files = subtract(fileNames, labVisit1Files);
 		log.info("Number of Visit2: " + labVisit2Files.getValues().size());
-		List<Array> labVisit2Split = split(labVisit2Files, 3);
+		List<Array> labVisit2Split = split(labVisit2Files, 4);
 
 		Array part1 = union(labVisit1Split.get(0), labVisit2Split.get(0));
 		save(createTable(newColumn("SubjectID", part1)),
@@ -217,53 +227,48 @@ public class FeaturizeDataCPD extends TaskDef {
 		Array part3 = union(labVisit1Split.get(2), labVisit2Split.get(2));
 		save(createTable(newColumn("SubjectID", part3)),
 				part3AssignmentTablePath);
+
+		Array part4 = union(labVisit1Split.get(3), labVisit2Split.get(3));
+		save(createTable(newColumn("SubjectID", part4)),
+				part4AssignmentTablePath);
 	}
 	
 	private void featurizeData(String expRootPath, String datasetStr,
-			String frequencyStr, String trialTimeFilePathStr,
-			String rawDataPathStr, String rawDataExt,
-			List<String> windowSizeList, List<String> trialGroupIdList,
+			String frequencyStr, String rawDataPathStr,
 			String tvtDataAssignmentPath, String tvtDataPath,
 			String clusterWorkspace, Array cpdAlgorithm, Array cpdFPR,
-			Integer clusterJobNum, Boolean useCluster) throws Exception {
+			Integer clusterJobNum, Boolean useCluster, Array subjectIDs)
+			throws Exception {
 		Var dataset = var(datasetStr);
 		Var frequency = var(frequencyStr);
-		Var trialTimeFilePath = var(trialTimeFilePathStr);
 		Var rawDataPath = var(rawDataPathStr);
 
-		Array windowSizes = array(windowSizeList);
-		Array trialGroupIds = array(trialGroupIdList);
-		Var expPath = var(expRootPath).fileSep().cat(dataset).dot().cat("ws")
-				.cat(windowSizes).dot().cat(trialGroupIds);
+		Var expPath = var(expRootPath).fileSep().cat(dataset);
 		Var featurePath = expPath.fileSep().cat("features");
 		Var cpdPath = var("/nfs/stak/students/a/andermic/Windows.Documents/Desktop/change-point-detection/results/").cat(var(frequencyStr)).cat("hz").fileSep().cat("predicted_changes_").cat(cpdAlgorithm).fileSep().cat(cpdFPR);
 		logStep("Convert the timestamped data to feature vectors");
-		Table timeTrialTable = readTable(trialTimeFilePath);
-		Array fileNames = column(timeTrialTable, "file");
-		fileNames = which(
-				fileNames,
-				fileExists(rawDataPath.fileSep().cat(fileNames).cat(rawDataExt)));
-
+		Var truncatedFileNames = expPath.fileSep().cat(subjectIDs).fileSep().cat(subjectIDs).cat("_").cat(frequency).cat("hz_truncated.csv");
+		Var duplicatesFileNames = expPath.fileSep().cat(subjectIDs).fileSep().cat(subjectIDs).cat("_").cat(frequency).cat("hz_duplicates.csv");
+		Var eventsFileNames = expPath.fileSep().cat(subjectIDs).fileSep().cat(subjectIDs).cat("_events.csv");
+		
 		Var featurizeFunctionScriptPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
-		Var timestampedData = rawDataPath.fileSep().cat(fileNames)
-				.cat("PureTrial.csv");
 		mkdir(featurePath);
 		
 		int numSplits = 30;
 		Array splitId = array("[0:1:" + numSplits + "]");
-		Array dataSets = array(Arrays.asList("train", "validate", "test"));
+		Array dataSets = array(Arrays.asList("trainBase", "validateBase", "trainHMM", "testHMM"));
 
-		Var callingScriptPath = featurePath.fileSep().cat(fileNames)
-				.cat("PureTrial.featurize.120.R");
-		Var featurizedFileExt = var("PureTrial.featurized.120.csv");
-		Var featurizeDataPath = featurePath.fileSep().cat(fileNames)
+		Var callingScriptPath = featurePath.fileSep().cat(subjectIDs) 
+				.cat(".featurize.R");
+		Var featurizedFileExt = var(".featurized.csv");
+		Var featurizeDataPath = featurePath.fileSep().cat(subjectIDs)
 				.cat(featurizedFileExt);
 		
 		String featurizedFileExtStr = "PureTrial.featurized.120.csv";
 
 		// This is where the action happens
-		featurizeGroundTruth(clusterJobNum, useCluster, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
-		featurizeValidateTest(clusterJobNum, useCluster, featurePath, fileNames, cpdAlgorithm, cpdFPR, cpdPath, featurizedFileExt, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, timestampedData, frequency, featurizeDataPath);
+		featurizeGroundTruth(expPath, clusterJobNum, useCluster, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, truncatedFileNames, duplicatesFileNames, frequency, featurizeDataPath);
+		featurizeValidateTest(clusterJobNum, useCluster, featurePath, cpdAlgorithm, cpdFPR, cpdPath, featurizedFileExt, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, truncatedFileNames, duplicatesFileNames, frequency, featurizeDataPath);
 		splitData(tvtDataAssignmentPath, splitId, numSplits, fileNames);
 		mergeGroundTruth(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr);
 		mergeValidateTest(clusterJobNum, useCluster, cpdAlgorithm, cpdFPR, tvtDataPath, tvtDataAssignmentPath, featurizedFileExtStr, dataSets, splitId, clusterWorkspace, featurePath);
@@ -290,17 +295,41 @@ public class FeaturizeDataCPD extends TaskDef {
 		Array cpdFPR = array(Arrays.asList("0.015", "0.02", "0.025", "0.03", "0.035", "0.04", "0.045", "0.05", "0.055", "0.06", "0.065", "0.07", "0.075", "0.08", "0.085", "0.09", "0.095"));
 		cpdFPR = array(Arrays.asList("0.03"));
 		
-		featurizeData(expRootPath, datasetStr, frequencyStr,
+		featurizeOSUData(expRootPath, datasetStr, frequencyStr,
 				trialTimeFilePathStr, rawDataPathStr, rawDataExt,
 				windowSizeList, trialGroupIdList, tvtDataAssignmentPath,
 				tvtDataPath, clusterWorkspace, cpdAlgorithm, cpdFPR,
 				clusterJobNum, useCluster);
 	}
 
+	private void UQ_30Hz() throws Exception {
+		String expRootPath = "/nfs/guille/wong/users/andermic/Desktop/cpd";
+		String datasetStr = "uq_30Hz";
+		String frequencyStr = "30";
+		
+		String rawDataPathStr = "/nfs/guille/wong/wonglab3/obesity/freeliving/UQ/processed";
+		String tvtDataPath = "/nfs/guille/wong/users/andermic/Desktop/cpd/uq_30hz";
+		String tvtDataAssignmentPath = tvtDataPath + "/splits";
+		
+		String clusterWorkspace = "/nfs/guille/wong/users/andermic/Desktop/cpd/uq_30hz/cluster";
+		Integer clusterJobNum = 100;
+		Boolean useCluster = false;
+		
+		Array subjectIDs = array(Arrays.asList("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "18", "19", "20", "21", "22", "23", "24", "25"));
+		Array cpdAlgorithm = array(Arrays.asList("cc"));
+		//Array cpdFPR = array(Arrays.asList("0.0001", "0.0002", "0.0003", "0.0004", "0.0005", "0.0006", "0.0007", "0.0008", "0.0009", "0.001", "0.0011", "0.0012", "0.0013", "0.0014", "0.0015", "0.0016", "0.0017", "0.0018", "0.0019", "0.002", "0.0021", "0.0022", "0.0023", "0.0024", "0.0025", "0.0026", "0.0027", "0.0028", "0.0029", "0.003", "0.0031", "0.0032", "0.0033", "0.0034", "0.0035", "0.0036", "0.0037", "0.0038", "0.0039", "0.004", "0.0041", "0.0042", "0.0043", "0.0044", "0.0045", "0.0046", "0.0047", "0.0048", "0.0049", "0.005", "0.0051", "0.0052", "0.0053", "0.0054", "0.0055", "0.0056", "0.0057", "0.0058", "0.0059", "0.006", "0.0061", "0.0062", "0.0063", "0.0064", "0.0065", "0.0066", "0.0067", "0.0068", "0.0069", "0.007", "0.0071", "0.0072", "0.0073", "0.0074", "0.0075", "0.0076", "0.0077", "0.0078", "0.0079", "0.008", "0.0081", "0.0082", "0.0083", "0.0084", "0.0085", "0.0086", "0.0087", "0.0088", "0.0089", "0.009", "0.0091", "0.0092", "0.0093", "0.0094", "0.0095", "0.0096", "0.0097", "0.0098", "0.0099", "0.01"));
+		//Array cpdFPR = array(Arrays.asList("0.015", "0.02", "0.025", "0.03", "0.035", "0.04", "0.045", "0.05", "0.055", "0.06", "0.065", "0.07", "0.075", "0.08", "0.085", "0.09", "0.095"));
+		Array cpdFPR = array(Arrays.asList("0.01"));
+		
+		featurizeData(expRootPath, datasetStr, frequencyStr,
+				rawDataPathStr, tvtDataAssignmentPath, tvtDataPath,
+				clusterWorkspace, cpdAlgorithm, cpdFPR, clusterJobNum,
+				useCluster, subjectIDs);
+	}
+
 	public static void main(String[] args) {
 		try {
 			new FeaturizeDataCPD().OSU_YR4_Hip_30Hz_Hip();
-			//new FeaturizeDataCPD().UQ_30Hz();
 		} catch (Exception e) {
 			log.error(e, e);
 		}

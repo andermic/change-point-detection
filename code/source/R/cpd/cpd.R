@@ -8,7 +8,7 @@ library(rpart)
 
 
 # Modified from featurizeMstmData in mstm/mstm.featurize.data.R
-featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=NA, windowSize=NA, hmm='false', startEndPath = NA) {
+featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=NA, windowSize=NA, hmm='false') {
 	rawData <- read.csv(rawDataFilePath)
 
 	# Featurize using either fixed or variable window sizes
@@ -20,22 +20,10 @@ featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=
 		endRows <- as.matrix(read.csv(changePointsPath)) - 1
 	}
 	
-	if (!is.na(startEndPath)) {
-		se = read.csv(startEndPath, row.names=1)
-		dataEnd = min(se['Raw','EndTick'], se['Events','EndTick'])
-		if (se['Events', 'StartTick'] > 0) {
-			startRow = se['Events', 'StartTick']
-		}
-		else {
-			startRow = 1
-	}
-	else {
-		startRow = 1
-		dataEnd = nrow(rawData)
-	}		
+	dataEnd = nrow(rawData)
 
-	# If the last row of the raw data isn't considered as the end of a window, make it so
-	if (endRows[nrow(endRows, ] != dataEnd) {
+	# If the last row of the data isn't the end of a window, make it so
+	if (endRows[nrow(endRows), ] != dataEnd) {
 		endRows <- rbind(endRows, dataEnd)
 	}
 
@@ -106,6 +94,7 @@ featurizeWindowCPD <- function(frequency, window) {
 	return(row)
 }
 
+
 # Modified from....
 classificationAccuracyCPD <- function(real, pred) {
 	dataSize = sum(real$Scale)
@@ -119,6 +108,7 @@ classificationAccuracyCPD <- function(real, pred) {
 	}
 	return(accuracy)
 }
+
 
 # Calculate detection times for the given set of predicted and real values
 detectionTime <- function(real, pred) {
@@ -216,6 +206,7 @@ quickTrainValidateCPD <- function(
 	write.csv(data.frame(Accuracy=accuracy), validateSummaryPath, row.names = FALSE)
 }
 
+
 # Modified from testBestSingleScale in ms.osu/svm.exp.R
 testBestModelCPD <- function(
 		algorithm,
@@ -293,6 +284,7 @@ testBestModelCPD <- function(
 			testReportPath)
 }
 
+
 # Modified from summarizeSingleScaleModel in ms.osu/svm.exp.R
 summarizeModelCPD <- function(model, formula, scale, testData, predictionReportPath, bestModelInfo=NA) {
 	real <- data.frame(ActivityClass=testData$ActivityClass, ActivityRatios=testData$ActivityRatio, Scale=testData$Scale)
@@ -312,6 +304,7 @@ summarizeModelCPD <- function(model, formula, scale, testData, predictionReportP
 	write.csv(prediction, predictionReportPath, row.names = FALSE)
 }
 
+
 # Modified from summarize in ms.osu/glmnet.single.scale.R 
 summarizeCPD <- function(labels, predictionReportPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath) {
 	prediction <- read.csv(predictionReportPath)
@@ -325,6 +318,7 @@ summarizeCPD <- function(labels, predictionReportPath, confusionMatrixPath, pctC
 	#write.csv(data.frame(Accuracy=accuracy), summaryPath, row.names = FALSE)
 	write.csv(data.frame(Accuracy=accuracy, TotalDetectionTime=dt$TotalDetectionTime, DataSize=dt$DataSize), summaryPath, row.names = FALSE)
 }
+
 
 # Modified from mergeSplitShuffle in function/merge.split.shuffle.R
 mergeSplitShuffleCPD <- function(
@@ -400,10 +394,6 @@ mergeSplitShuffleCPD <- function(
 	}
 }
 
-#TODO: Complete this sometime?
-mergeAlgorithmResults <- function(meanAccuracyPath, fprsString, summarySavePath) {
-	fprs <- as.numeric(unlist(strsplit(fprsString, " ")))
-}
 
 # Modified from ms.osu/common.R
 featureMatrixNoFFT <- function(data, formula) {
@@ -417,4 +407,75 @@ featureMatrixNoFFT <- function(data, formula) {
 	
 	stopifnot(!containSpecialCase(data))
 	return(data.matrix(data[attr(terms(as.formula(formula)), "term.labels")]))
+}
+
+
+# Modified from featurizeMstmData in mstm/mstm.featurize.data.R
+featurizeUQCPD <- function(truncatedDataFilePath, duplicatesDataFilePath, frequency, savePath, changePointsPath, hmm='false', startEndPath = NA) {
+	print('reading data')
+	truncated <- read.csv(truncatedDataFilePath)
+	duplicates <- read.csv(duplicatesDataFilePath)
+	endRows <- as.matrix(read.csv(changePointsPath)) - 1  #TODO: FIX ME!!!!!!!!!!!!!
+	
+	# Decompress raw data
+	dup_row = 1
+	raw = truncated[1,]
+	print('decompressing data')
+	for (i in 2:1000) {  #nrow(truncated)) {
+		if (i %% 100 == 0) {
+			print(i)			
+		}
+		lastTick = truncated[i-1,1]
+		thisTick = truncated[i,1]
+		if (thisTick != (lastTick+1)) {
+			dups = duplicates[rep(dup_row, duplicates$Interval[dup_row]),2:4]
+			dups = cbind(data.frame(Tick=(lastTick+1):(thisTick-1)), dups)
+			raw = rbind(raw, dups) 
+			dup_row = dup_row + 1
+		}
+		raw = rbind(raw, truncated[i,])
+	}
+	print('writing data')
+	write.csv(raw,'~/DELETE_ME.csv',row.names=FALSE)
+	stop()
+	
+	if (!is.na(startEndPath)) {
+		se = read.csv(startEndPath, row.names=1)
+		dataEnd = min(se['Raw','EndTick'], se['Events','EndTick'])
+		if (se['Events', 'StartTick'] > 0) {
+			startRow = se['Events', 'StartTick']
+		}
+	}
+	else {
+		startRow = 1
+		dataEnd = nrow(rawData)
+	}		
+
+	# If the last row of the labelled raw data isn't the end of a window, make it so
+	if (endRows[nrow(endRows), ] != dataEnd) {
+		endRows <- rbind(endRows, dataEnd)
+	}
+
+	df <- data.frame()
+	windowId <- 1
+	for (endRow in endRows) {
+		window <- rawData[startRow:endRow, ]
+		df <- rbind(df, cbind(data.frame(WindowId=windowId, Scale=(endRow - startRow + 1), SubseqId=1), featurizeWindowCPD(frequency, window)))
+		startRow <- endRow + 1
+		windowId <- windowId + 1
+	}
+	
+	if(hmm == 'true') {
+		exclude <- NULL
+		for (i in 1:nrow(df)) {
+			if(length(unlist(strsplit(as.character(df$TrialID[i]),' '))) > 1) {
+				exclude <- c(exclude,i)
+			} 
+		}
+		if (!is.null(exclude)) {
+			df = df[-exclude,]
+		}
+	}
+	
+	write.csv(df, savePath, row.names=FALSE, quote=FALSE)
 }
