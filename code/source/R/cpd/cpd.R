@@ -415,51 +415,53 @@ featurizeUQCPD <- function(truncatedDataFilePath, duplicatesDataFilePath, freque
 	print('reading data')
 	truncated <- read.csv(truncatedDataFilePath)
 	duplicates <- read.csv(duplicatesDataFilePath)
-	endRows <- as.matrix(read.csv(changePointsPath)) - 1  #TODO: FIX ME!!!!!!!!!!!!!
+	endRows <- read.csv(changePointsPath)$DataCount  # TODO: may be an off by one error for predicted changepoints, but not for true changepoints
+
+	# Do this bullshit somewhere else. 
+	offset <- 3564000
+	day_len <- 24*3600*30
 	
-	# Decompress raw data
-	dup_row = 1
-	raw = truncated[1,]
 	print('decompressing data')
-	for (i in 2:1000) {  #nrow(truncated)) {
-		if (i %% 100 == 0) {
-			print(i)			
-		}
-		lastTick = truncated[i-1,1]
-		thisTick = truncated[i,1]
-		if (thisTick != (lastTick+1)) {
-			dups = duplicates[rep(dup_row, duplicates$Interval[dup_row]),2:4]
-			dups = cbind(data.frame(Tick=(lastTick+1):(thisTick-1)), dups)
-			raw = rbind(raw, dups) 
-			dup_row = dup_row + 1
-		}
-		raw = rbind(raw, truncated[i,])
-	}
-	print('writing data')
-	write.csv(raw,'~/DELETE_ME.csv',row.names=FALSE)
-	stop()
+	data <- data.frame(SubjectID=rep(as.numeric(strsplit(truncatedDataFilePath,'/')[[1]][4]), day_len), LabVisit=rep(NULL, day_len),
+	 File=rep(truncatedDataFilePath, day_len), DateTime=(offset+1):(offset+day_len), TrialID=rep(NA, day_len), Axis1=rep(NA, day_len),
+	 Axis2=rep(NA, day_len), Axis3=rep(NA, day_len), stringsAsFactors=FALSE)
 	
-	if (!is.na(startEndPath)) {
-		se = read.csv(startEndPath, row.names=1)
-		dataEnd = min(se['Raw','EndTick'], se['Events','EndTick'])
-		if (se['Events', 'StartTick'] > 0) {
-			startRow = se['Events', 'StartTick']
-		}
+	data[truncated$Tick-offset, 6:8] = truncated[,2:4]
+	print(nrow(duplicates))
+	for (i in 1:nrow(duplicates)) {
+		start <- duplicates[i,1]
+		print(start - offset)
+		interval <- duplicates[i,5]
+		dups <- duplicates[rep(i, interval),2:4]
+		data[(start-offset):(start+interval-offset-1),] <- dups
 	}
-	else {
-		startRow = 1
-		dataEnd = nrow(rawData)
-	}		
+	
+	#if (!is.na(startEndPath)) {
+	#	se <- read.csv(startEndPath, row.names=1)
+	#	dataEnd <- min(se['Raw','EndTick'], se['Events','EndTick'])
+	#	if (se['Events', 'StartTick'] > 0) {
+	#		startRow = se['Events', 'StartTick']
+	#	}
+	#}
+	#else {
+	#	startRow <- 1
+	#}		
 
-	# If the last row of the labelled raw data isn't the end of a window, make it so
-	if (endRows[nrow(endRows), ] != dataEnd) {
-		endRows <- rbind(endRows, dataEnd)
+	endRows = endRows - offset - 1 
+	endRows = endRows[which(endRows>0 & endRows<=day_len)]
+
+	# If the last row of the data isn't the end of a window, make it so
+	if (endRows[length(endRows)] != day_len) {
+		endRows <- c(endRows, day_len)
 	}
 
+	startRow <- 1
+	print('featurizing data')
 	df <- data.frame()
 	windowId <- 1
 	for (endRow in endRows) {
-		window <- rawData[startRow:endRow, ]
+		print(endRow)
+		window <- data[startRow:endRow, ]
 		df <- rbind(df, cbind(data.frame(WindowId=windowId, Scale=(endRow - startRow + 1), SubseqId=1), featurizeWindowCPD(frequency, window)))
 		startRow <- endRow + 1
 		windowId <- windowId + 1
@@ -473,7 +475,7 @@ featurizeUQCPD <- function(truncatedDataFilePath, duplicatesDataFilePath, freque
 			} 
 		}
 		if (!is.null(exclude)) {
-			df = df[-exclude,]
+			df <- df[-exclude,]
 		}
 	}
 	
