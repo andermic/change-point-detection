@@ -23,7 +23,7 @@ for subject in subjects:
 
     raw_start = se[1].split(',')[1]
     raw_start_split = raw_start.split('/')
-    second_day_start = '%d/%s/%s 12:00:00.000' % (int(raw_start_split[0])+1, raw_start_split[1], raw_start_split[2].split(' ')[0])
+    second_day_start = '%d/%s/%s 0:00:00.000' % (int(raw_start_split[0])+1, raw_start_split[1], raw_start_split[2].split(' ')[0])
     first_day_len = dif_ticks(second_day_start, raw_start)
     
     day_end_ticks = [0, first_day_len]
@@ -31,6 +31,7 @@ for subject in subjects:
     while day_end_ticks[-1] + TICKS_PER_DAY < raw_end_tick:
         day_end_ticks.append(day_end_ticks[-1] + TICKS_PER_DAY)
     day_end_ticks.append(raw_end_tick)
+    print day_end_ticks
 
     day = 0
     for i in xrange(1,len(truncated)):
@@ -38,6 +39,7 @@ for subject in subjects:
             if int(truncated[i].split(',')[0]) > day_end_ticks[day]:
                 day += 1
                 day_stream = open('%s/%d/%d_30hz_truncated_day%d.csv' % (ROOT_PATH, subject, subject, day), 'w')
+                day_stream.write('Tick,Axis1,Axis2,Axis3\n')
             day_stream.write(truncated[i])
         except IndexError:
             print 'list index out of range'
@@ -53,6 +55,7 @@ for subject in subjects:
         if start_time > day_end_ticks[day]:
             day += 1
             day_stream = open('%s/%d/%d_30hz_duplicates_day%d.csv' % (ROOT_PATH, subject, subject, day), 'w')
+            day_stream.write('StartTime,Axis1,Axis2,Axis3,Interval\n')
             day_stream.write(duplicates[i])
         elif start_time + interval > day_end_ticks[day]:
             first_half_interval = day_end_ticks[day] - start_time + 1

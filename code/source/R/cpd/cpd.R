@@ -411,43 +411,31 @@ featureMatrixNoFFT <- function(data, formula) {
 
 
 # Modified from featurizeMstmData in mstm/mstm.featurize.data.R
-featurizeUQCPD <- function(truncatedDataFilePath, duplicatesDataFilePath, frequency, savePath, changePointsPath, hmm='false', startEndPath = NA) {
+featurizeUQCPD <- function(truncatedDataFilePath, duplicatesDataFilePath, frequency, savePath, eventsPath=NA, startEndPath=NA, hmm='false', predictedCpPath=NA) {
 	print('reading data')
 	truncated <- read.csv(truncatedDataFilePath)
 	duplicates <- read.csv(duplicatesDataFilePath)
-	endRows <- read.csv(changePointsPath)$DataCount  # TODO: may be an off by one error for predicted changepoints, but not for true changepoints
-
-	# Do this bullshit somewhere else. 
-	offset <- 3564000
-	day_len <- 24*3600*30
+	events <- read.csv(eventsPath)
 	
-	print('decompressing data')
-	data <- data.frame(SubjectID=rep(as.numeric(strsplit(truncatedDataFilePath,'/')[[1]][4]), day_len), LabVisit=rep(NULL, day_len),
-	 File=rep(truncatedDataFilePath, day_len), DateTime=(offset+1):(offset+day_len), TrialID=rep(NA, day_len), Axis1=rep(NA, day_len),
-	 Axis2=rep(NA, day_len), Axis3=rep(NA, day_len), stringsAsFactors=FALSE)
-	
-	data[truncated$Tick-offset, 6:8] = truncated[,2:4]
-	print(nrow(duplicates))
-	for (i in 1:nrow(duplicates)) {
-		start <- duplicates[i,1]
-		print(start - offset)
-		interval <- duplicates[i,5]
-		dups <- duplicates[rep(i, interval),2:4]
-		data[(start-offset):(start+interval-offset-1),] <- dups
+	day <- as.numeric(substr(strsplit(strsplit(truncatedDataFilePath,'/')[[1]][10],'_')[[1]][4], 4, 4))
+	if (day == 1) {
+		offset <- 0
+		day_len = 21 * 3600 * 30
+	}
+	else {
+		offset = ((day - 1) * 24 - 3) * 3600 * 30)
+		day_len <- 24 * 3600 * 30 
 	}
 	
-	#if (!is.na(startEndPath)) {
-	#	se <- read.csv(startEndPath, row.names=1)
-	#	dataEnd <- min(se['Raw','EndTick'], se['Events','EndTick'])
-	#	if (se['Events', 'StartTick'] > 0) {
-	#		startRow = se['Events', 'StartTick']
-	#	}
-	#}
-	#else {
-	#	startRow <- 1
-	#}		
-
-	endRows = endRows - offset - 1 
+	if(is.na(predictedCpPath)) {
+		endRows <- events$DataCount
+		se <- read.csv(startEndPath, row.names=1)
+		endRows <- endRows + se['Events', 'StartTick'] - 1
+	}
+	else {
+		endRows <- read.csv(predictedCpPath)$ChangePointPredictions - 1
+	}
+	endRows = endRows - offset 
 	endRows = endRows[which(endRows>0 & endRows<=day_len)]
 
 	# If the last row of the data isn't the end of a window, make it so
@@ -455,11 +443,40 @@ featurizeUQCPD <- function(truncatedDataFilePath, duplicatesDataFilePath, freque
 		endRows <- c(endRows, day_len)
 	}
 
-	startRow <- 1
+	data <- data.frame(SubjectID=rep(day, day_len), LabVisit=rep(1, day_len),
+	 File=rep(truncatedDataFilePath, day_len), DateTime=(offset+1):(offset+day_len), TrialID=rep(NA, day_len), ActivityClass=rep(NA, day_len), 
+	 Axis1=rep(NA, day_len), Axis2=rep(NA, day_len), Axis3=rep(NA, day_len), stringsAsFactors=FALSE)
+	
+	print('Adding events to data')
+	
+	
+	#for(i in 1:nrow(events)) {
+	#	if(i %% 100 == 0) {
+	#		print i
+	#	}
+	#	start = events[i,1]
+	#	data[] #TODO: ???
+	#}
+	#stop()
+	
+	print('decompressing data')
+	data[truncated$Tick-offset, 7:9] = truncated[,2:4]
+	print(nrow(duplicates))
+#	for (i in 1:nrow(duplicates)) {
+i=1
+		start <- duplicates[i,1]
+		print(start - offset)
+		interval <- duplicates[i,5]
+		data[(start-offset):(start+interval-offset-1),7:9] <- duplicates[rep(i, interval),2:4]
+#	}
+	#write.csv(data, 'delete_me.csv')
+	#stop()
+	
+	startRow <- 597408  # DEBUG, Reset to 1
 	print('featurizing data')
 	df <- data.frame()
 	windowId <- 1
-	for (endRow in endRows) {
+	for (endRow in endRows[2:10]) { # DEBUG, lose indices
 		print(endRow)
 		window <- data[startRow:endRow, ]
 		df <- rbind(df, cbind(data.frame(WindowId=windowId, Scale=(endRow - startRow + 1), SubseqId=1), featurizeWindowCPD(frequency, window)))
