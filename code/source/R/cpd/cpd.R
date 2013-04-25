@@ -411,7 +411,7 @@ featureMatrixNoFFT <- function(data, formula) {
 
 
 # Modified from featurizeMstmData in mstm/mstm.featurize.data.R
-featurizeUQCPD <- function(day, truncatedDataFilePath, duplicatesDataFilePath, frequency, savePath, eventsPath, hmm='false', predictedCpPath=NA) {
+featurizeUQCPD <- function(day, truncatedDataFilePath, duplicatesDataFilePath, frequency, savePath, eventsPath, predictedCpPath=NA, windowSize = NA, hmm='false') {
 	print('reading data')
 	trunc <- read.csv(truncatedDataFilePath)
 	dup <- read.csv(duplicatesDataFilePath)

@@ -14,11 +14,11 @@ import web.engr.oregonstate.edu.zheng.gef.def.Var;
 import web.engr.oregonstate.edu.zheng.gef.executor.ExecutorBuilder;
 import web.engr.oregonstate.edu.zheng.gef.executor.ExecutorBuilder.VerificationType;
 
-public class FeaturizeDataUQ extends TaskDef {
-	private static final Logger log = Logger.getLogger(FeaturizeDataUQ.class
+public class FeaturizeData extends TaskDef {
+	private static final Logger log = Logger.getLogger(FeaturizeData.class
 			.getName());
 
-	protected FeaturizeDataUQ() {
+	protected FeaturizeData() {
 	}
 
 	private void featurizeGroundTruth(Var expPath, Integer clusterJobNum,
@@ -95,11 +95,11 @@ public class FeaturizeDataUQ extends TaskDef {
 
 
 	private void splitData(String tvtDataAssignmentPath, Array splitId,
-			int numSplits, Array fileNames) throws Exception {
-		logStep("Split dataset into three subsets");
+			int numSplits, Array subjectIDs) throws Exception {
+		logStep("Split dataset into four subsets");
 		Var dataSetAssignmentPath = var(tvtDataAssignmentPath);
 		// Randomly assign training and validation data
-		Array subsetId = array("[0:1:3]");
+		Array subsetId = array("[0:1:4]");
 		Var assignmentTablePath = dataSetAssignmentPath.fileSep().cat("split")
 				.cat(splitId).cat(".part").cat(subsetId).cat(".csv");
 		if (!all(fileExists(assignmentTablePath))) {
@@ -113,7 +113,7 @@ public class FeaturizeDataUQ extends TaskDef {
 						.cat("split").cat(String.valueOf(i)).cat(".part2.csv");
 				Var part4AssignmentTablePath = dataSetAssignmentPath.fileSep()
 						.cat("split").cat(String.valueOf(i)).cat(".part2.csv");
-				splitDataSetInto4Parts(fileNames, part1AssignmentTablePath,
+				splitDataSetInto4Parts(subjectIDs, part1AssignmentTablePath,
 						part2AssignmentTablePath, part3AssignmentTablePath,
 						part4AssignmentTablePath);
 			}
@@ -123,12 +123,13 @@ public class FeaturizeDataUQ extends TaskDef {
 	private void mergeGroundTruth(Integer clusterJobNum, 
 			Boolean useCluster, Array dataSets, Array splitId, 
 			String tvtDataPath, String tvtDataAssignmentPath, 
-			String clusterWorkspace, Var featurePath,
-			String featurizedFileExtStr) throws Exception {
+			String clusterWorkspace, Var featurePath)
+			throws Exception {
 		logStep("Merge featurized ground truth data to train, validate and test data set files");
+		String featurizedFileExtStr = "featurized.ground.csv";
 		Array dataSetFileExtension = array(Arrays.asList(featurizedFileExtStr,
-				featurizedFileExtStr, featurizedFileExtStr));
-		Array assignment = array(Arrays.asList("0", "1", "2"));
+				featurizedFileExtStr, featurizedFileExtStr, featurizedFileExtStr));
+		Array assignment = array(Arrays.asList("0", "1", "2", "3"));
 		bind(dataSets, dataSetFileExtension, assignment);
 	
 		Var iterationId = var("split").cat(splitId);
@@ -136,9 +137,9 @@ public class FeaturizeDataUQ extends TaskDef {
 		Var trainValidateTestDataPath = var(tvtDataPath);
 		Var mergeTrainDataCallingPath = trainValidateTestDataPath.fileSep()
 				.cat(iterationId).fileSep().cat("merge.").cat(dataSets)
-				.cat(".120.data.R");
+				.cat(".ground.data.R");
 		Var saveDataPath = trainValidateTestDataPath.fileSep().cat(iterationId)
-				.fileSep().cat(dataSets).cat(".120.data.csv");
+				.fileSep().cat(dataSets).cat(".ground.data.csv");
 		Var dataAssignmentTablePath = var(tvtDataAssignmentPath).fileSep()
 				.cat("split").cat(splitId).cat(".part").cat(assignment)
 				.cat(".csv");
@@ -166,15 +167,19 @@ public class FeaturizeDataUQ extends TaskDef {
 	private void mergeValidateTest(Integer clusterJobNum, Boolean useCluster,
 			Array cpdAlgorithm, Array cpdFPR, 
 			String tvtDataPath, String tvtDataAssignmentPath, 
-			String featurizedFileExtStr, Array dataSets, Array splitId, 
+			Array dataSets, Array splitId, 
 			String clusterWorkspace, Var featurePath) throws Exception {
 		logStep("Merge featurized cpd algorithm data");
 		//Var featurizedFileExt = var("PureTrial.featurized.").
 		//		cat(cpdAlgorithm).dot().cat(cpdFPR).dot()
 		//		.cat("csv");
+
+		//TODO
+		String featurizedFileExtStr = "";
+		
 		Array dataSetFileExtension = array(Arrays.asList(featurizedFileExtStr,
-				featurizedFileExtStr, featurizedFileExtStr));
-		Array assignment = array(Arrays.asList("0", "1", "2"));
+				featurizedFileExtStr, featurizedFileExtStr, featurizedFileExtStr));
+		Array assignment = array(Arrays.asList("0", "1", "2", "3"));
 		bind(dataSets, dataSetFileExtension, assignment);
 	
 		Var iterationId = var("split").cat(splitId);
@@ -210,31 +215,25 @@ public class FeaturizeDataUQ extends TaskDef {
 		createValidateTestData.execute();
 	}
 
-	private void splitDataSetInto4Parts(Array fileNames,
+	private void splitDataSetInto4Parts(Array subjectIDs,
 			Var part1AssignmentTablePath, Var part2AssignmentTablePath,
 			Var part3AssignmentTablePath, Var part4AssignmentTablePath)
 			throws Exception {
-		Array labVisit1Files = which(fileNames, contains(fileNames, "V1"));
-		log.info("Number of Visit1: " + labVisit1Files.getValues().size());
-		List<Array> labVisit1Split = split(labVisit1Files, 4);
-
-		Array labVisit2Files = subtract(fileNames, labVisit1Files);
-		log.info("Number of Visit2: " + labVisit2Files.getValues().size());
-		List<Array> labVisit2Split = split(labVisit2Files, 4);
-
-		Array part1 = union(labVisit1Split.get(0), labVisit2Split.get(0));
+		List<Array> splits = split(subjectIDs, 4);
+		
+		Array part1 = splits.get(0);
 		save(createTable(newColumn("SubjectID", part1)),
 				part1AssignmentTablePath);
 
-		Array part2 = union(labVisit1Split.get(1), labVisit2Split.get(1));
+		Array part2 = splits.get(1);
 		save(createTable(newColumn("SubjectID", part2)),
 				part2AssignmentTablePath);
 
-		Array part3 = union(labVisit1Split.get(2), labVisit2Split.get(2));
+		Array part3 = splits.get(2);
 		save(createTable(newColumn("SubjectID", part3)),
 				part3AssignmentTablePath);
 
-		Array part4 = union(labVisit1Split.get(3), labVisit2Split.get(3));
+		Array part4 = splits.get(3);
 		save(createTable(newColumn("SubjectID", part4)),
 				part4AssignmentTablePath);
 	}
@@ -271,11 +270,11 @@ public class FeaturizeDataUQ extends TaskDef {
 		Array dataSets = array(Arrays.asList("trainBase", "validateBase", "trainHMM", "testHMM"));
 
 		// This is where the action happens
-		featurizeGroundTruth(expPath, clusterJobNum, useCluster, featurizeFunctionScriptPath, clusterWorkspace, truncatedFileNames, duplicatesFileNames, eventsFileNames, frequency, featurePath, subjectIDs, day, featurizeDataPath, callingScriptPath);
+		//featurizeGroundTruth(expPath, clusterJobNum, useCluster, featurizeFunctionScriptPath, clusterWorkspace, truncatedFileNames, duplicatesFileNames, eventsFileNames, frequency, featurePath, subjectIDs, day, featurizeDataPath, callingScriptPath);
 		featurizeValidateTest(clusterJobNum, useCluster, cpdAlgorithms, cpdFPR, featurizeFunctionScriptPath, callingScriptPathCPD, featurizeDataPathCPD, clusterWorkspace, truncatedFileNames, duplicatesFileNames, frequency, eventsFileNames, predictedCpFileNames, subjectIDs, day);
-		//splitData(tvtDataAssignmentPath, splitId, numSplits, fileNames);
-		//mergeGroundTruth(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr);
-		//mergeValidateTest(clusterJobNum, useCluster, cpdAlgorithm, cpdFPR, tvtDataPath, tvtDataAssignmentPath, featurizedFileExtStr, dataSets, splitId, clusterWorkspace, featurePath);
+		//splitData(tvtDataAssignmentPath, splitId, numSplits, subjectIDs);
+		//mergeGroundTruth(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath);
+		//mergeValidateTest(clusterJobNum, useCluster, cpdAlgorithms, cpdFPR, tvtDataPath, tvtDataAssignmentPath, dataSets, splitId, clusterWorkspace, featurePath);
 	}
 	
 	private void UQ_30Hz() throws Exception {
@@ -307,7 +306,7 @@ cpdFPR = array(Arrays.asList("0.01"));
 
 	public static void main(String[] args) {
 		try {
-			new FeaturizeDataUQ().UQ_30Hz();
+			new FeaturizeData().UQ_30Hz();
 		} catch (Exception e) {
 			log.error(e, e);
 		}
