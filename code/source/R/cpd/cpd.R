@@ -411,16 +411,13 @@ featureMatrixNoFFT <- function(data, formula) {
 
 
 # Modified from featurizeMstmData in mstm/mstm.featurize.data.R
-featurizeUQCPD <- function(truncatedDataFilePath, duplicatesDataFilePath, frequency, savePath, eventsPath=NA, startEndPath=NA, hmm='false', predictedCpPath=NA) {
-	#TODO: Event start tick is now a variable
-	#TODO: There is no longer an event offset 
-
+featurizeUQCPD <- function(day, truncatedDataFilePath, duplicatesDataFilePath, frequency, savePath, eventsPath, hmm='false', predictedCpPath=NA) {
 	print('reading data')
-	truncated <- read.csv(truncatedDataFilePath)
-	duplicates <- read.csv(duplicatesDataFilePath)
+	trunc <- read.csv(truncatedDataFilePath)
+	dup <- read.csv(duplicatesDataFilePath)
 	events <- read.csv(eventsPath)
 	
-	day <- as.numeric(substr(strsplit(strsplit(truncatedDataFilePath,'/')[[1]][10],'_')[[1]][4], 4, 4))
+	day <- as.numeric(day)
 	if (day == 1) {
 		offset <- 0
 		day_len = 21 * 3600 * 30
@@ -449,36 +446,17 @@ featurizeUQCPD <- function(truncatedDataFilePath, duplicatesDataFilePath, freque
 	 TrialID=NA, ActivityClass=NA, Axis1=NA, Axis2=NA, Axis3=NA,
 	 stringsAsFactors=FALSE)
 	
-	print('adding events to data')
-	for(i in 1:nrow(events)) {
-		print(i)
-		start <- events$StartTick[i] - offset
-		print(start)
-		end <- events$StartTick[i] + events$Interval[i] - 1 - offset
-		print(end)
-		data$ActivityClass[start:end] = rep(events$ActivityCode, end-start+1)
-	}
-	print(data[1:10,])
-	stop()
+	data[trunc$Tick-offset, c('Axis1','Axis2','Axis3')] <- trunc[,2:4]
+	data[which(is.na(data$Axis1)), 'Axis1'] <- rep(dup[, 'Axis1'], dup$Interval) 
+	data[which(is.na(data$Axis2)), 'Axis2'] <- rep(dup[, 'Axis2'], dup$Interval)
+	data[which(is.na(data$Axis3)), 'Axis3'] <- rep(dup[, 'Axis3'], dup$Interval)
+	data$ActivityClass = rep(events$ActivityCode, events$Interval)
 	
-	print('decompressing data')
-	data[truncated$Tick-offset, 7:9] = truncated[,2:4]
-	print(nrow(duplicates))
-#	for (i in 1:nrow(duplicates)) {  # DEBUG
-i=1
-		start <- duplicates[i,1]
-		print(start - offset)
-		interval <- duplicates[i,5]
-		data[(start-offset):(start+interval-offset-1),7:9] <- duplicates[rep(i, interval),2:4]
-#	}
-	#write.csv(data, 'delete_me.csv')
-	#stop()
-	
-	startRow <- 597408  # DEBUG, Reset to 1
 	print('featurizing data')
+	startRow <- 1
 	df <- data.frame()
 	windowId <- 1
-	for (endRow in endRows[2:10]) { # DEBUG, lose indices
+	for (endRow in endRows) {
 		print(endRow)
 		window <- data[startRow:endRow, ]
 		df <- rbind(df, cbind(data.frame(WindowId=windowId, Scale=(endRow - startRow + 1), SubseqId=1), featurizeWindowCPD(frequency, window)))

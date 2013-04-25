@@ -10,6 +10,7 @@ xbar_ref = sum_temp / kpre;
 s_ref = sqrt((sum_sqrd_temp - (2 .* xbar_ref .* sum_temp) + xbar_ref.^2 * kpre) / (kpre-1));
 s_ref(s_ref<eps) = 1;
 
+tic;
 for i = 1:n-kpre
     if (mod(i, 100000) == 0)
         disp(i);
@@ -37,6 +38,8 @@ for i = 1:n-kpre
     %sigmas(i,:) = (data(i+kpre,:)-xbar_ref).^2 ./ s_ref.^2;
     
 end
+disp('toc:');
+toc
 
 % Return the L2 norm (Mahalanobis distance since we assume the 3 normals are
 % independent) of the sigmas along each dimension.

@@ -15,7 +15,7 @@ for name in names:
     folder = name.split('/')[-2]
     start = open('%s/%s/%s_start_and_end.csv' % (ROOT_PATH, folder, folder)).readlines()[1].split(',')[1]
     truncated = open('%s/%s/%s_30hz_truncated.csv' % (ROOT_PATH, folder, folder), 'w')
-    truncated.write('Tick,Axis1,Axis2,Axis3\n')
+    truncated.write('Tick,Axis1,Axis2,Axis3\r\n')
     duplicates = open('%s/%s/%s_30hz_duplicates.csv' % (ROOT_PATH, folder, folder), 'w')
     duplicates.write('StartTime,Axis1,Axis2,Axis3,Interval\n')
     contig_duplicate_count = 0

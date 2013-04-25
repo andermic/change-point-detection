@@ -13,12 +13,11 @@ subjects.remove(5)
 subjects.remove(17)
 
 
-#for subject in subjects:
 for subject in subjects:
     print subject
     print 'reading data'
-    #truncated = open('%s/%d/%d_%dhz_truncated.csv' % (ROOT_PATH, subject, subject, FREQ)).readlines()
-    #duplicates = open('%s/%d/%d_%dhz_duplicates.csv' % (ROOT_PATH, subject, subject, FREQ)).readlines()
+    truncated = open('%s/%d/%d_%dhz_truncated.csv' % (ROOT_PATH, subject, subject, FREQ)).readlines()
+    duplicates = open('%s/%d/%d_%dhz_duplicates.csv' % (ROOT_PATH, subject, subject, FREQ)).readlines()
     events = open('%s/%d/%d_events.csv' % (ROOT_PATH, subject, subject)).readlines()
     se = open('%s/%d/%d_start_and_end.csv' % (ROOT_PATH, subject, subject)).readlines()
     print 'done reading data'
@@ -49,6 +48,7 @@ for subject in subjects:
             print i
             print truncated[i]
             exit()
+    """
 
     day = 0
     for i in xrange(1,len(duplicates)):
@@ -68,11 +68,12 @@ for subject in subjects:
             second_half = '%s,%s,%s\n' % (day_end_ticks[day] + 1, ','.join(line_split[1:4]), interval - cur_interval)
             day += 1
             day_stream = open('%s/%d/%d_30hz_duplicates_day%d.csv' % (ROOT_PATH, subject, subject, day), 'w')
+            day_stream.write('StartTime,Axis1,Axis2,Axis3,Interval\n')
             day_stream.write(second_half)
         else:
             day_stream.write(duplicates[i])
-    """
 
+    """
     day = 0
     for i in xrange(1,len(events)):
         line_split = events[i].split(',')
@@ -111,3 +112,4 @@ for subject in subjects:
         if done:
             break
         day_stream.write('%s,%d,%d,%s' % (' '.join(time), start_tick, interval, ','.join(line_split[3:])))
+    """

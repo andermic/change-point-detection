@@ -16,7 +16,7 @@ for file_path in event_files:
     print folder
 
     data = open(file_path, 'r').readlines()[1:]
-    out = open('%s/%s/%s_events2.csv' % (ROOT_PATH, folder, folder), 'w')
+    out = open('%s/%s/%s_events.csv' % (ROOT_PATH, folder, folder), 'w')
     out.write('Time,StartTick,Interval,ActivityCode,CumulativeStepCount,ActivityScore\n')
 
     milli = 0
