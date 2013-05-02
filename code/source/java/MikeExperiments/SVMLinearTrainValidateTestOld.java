@@ -19,10 +19,10 @@ import web.engr.oregonstate.edu.zheng.gef.task.freeliving.Formula;
 import web.engr.oregonstate.edu.zheng.gef.utils.RUtils;
 import web.engr.oregonstate.edu.zheng.obesity.commons.utils.DataSet;
 
-public class SVMLinearTrainValidateTest extends TaskDef {
+public class SVMLinearTrainValidateTestOld extends TaskDef {
 
 	private static final Logger log = Logger
-			.getLogger(SVMLinearTrainValidateTest.class.getName());
+			.getLogger(SVMLinearTrainValidateTestOld.class.getName());
 
 	private void singleScaleModel(String expRootPath, String datasetStr,
 			String tvtDataPath, String labVisitFileFolder,
@@ -501,7 +501,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 
 	public static void main(String[] args) {
 		try {
-			new SVMLinearTrainValidateTest().OSU_YR4_30Hz_Hip();
+			new SVMLinearTrainValidateTestOld().OSU_YR4_30Hz_Hip();
 			//new SVMLinearTrainValidateTest().OSU_YR4_30Hz_Wrist();
 		} catch (Exception e) {
 			log.error(e, e);

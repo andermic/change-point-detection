@@ -30,9 +30,10 @@ public class FeaturizeDataHMM extends TaskDef {
 		logStep("Featurize data using the given window sizes");
 		ExecutorBuilder featurize = rScript(
 				featurizeFunctionScriptPath, callingScriptPath,
-				var("featurizeCPD"), execConfig().setParallelizable(useCluster)
+				var("featurizeUQCPD"), execConfig().setParallelizable(useCluster)
 				.setNumJobs(clusterJobNum).setOnCluster(true)
 				.setClusterWorkspace(clusterWorkspace));
+		featurize.addParam("day", String.class, day);
 		featurize.addParam("truncatedDataFilePath", String.class,
 				truncatedFileNames);
 		featurize.addParam("duplicatesDataFilePath", String.class,
@@ -42,7 +43,7 @@ public class FeaturizeDataHMM extends TaskDef {
 		featurize.addParam("eventsPath", String.class,
 				eventsFileNames);
 		featurize.addParam("windowSize", Integer.class, var(windowSizes));
-		featurize.addParam("hmm", String.class, var("true"));
+		featurize.addParam("hmm", String.class, "true");
 		// add verification
 		featurize.before(truncatedFileNames);
 		featurize.before(duplicatesFileNames);
@@ -92,7 +93,7 @@ public class FeaturizeDataHMM extends TaskDef {
 		bind(dataSets, dataSetFileExtension, assignment);
 	
 		Var iterationId = var("split").cat(splitId);
-		Var mergeDataFunctionScriptPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/merge.data.R");
+		Var mergeDataFunctionScriptPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var trainValidateTestDataPath = var(tvtDataPath);
 		Var mergeTrainDataCallingPath = trainValidateTestDataPath.fileSep()
 				.cat(iterationId).fileSep().cat("merge.").cat(dataSets)
@@ -106,7 +107,7 @@ public class FeaturizeDataHMM extends TaskDef {
 		ExecutorBuilder createTrainData = rScript(
 				mergeDataFunctionScriptPath,
 				mergeTrainDataCallingPath,
-				var("mergeData"),
+				var("mergeDataUQ"),
 				execConfig().setParallelizable(useCluster)
 						.setNumJobs(clusterJobNum)
 						.setOnCluster(true)
@@ -119,7 +120,7 @@ public class FeaturizeDataHMM extends TaskDef {
 		createTrainData.addParam("savePath", String.class, saveDataPath,
 				VerificationType.After);
 		createTrainData.addParam("columns", List.class,
-				var("c(\"WindowId\",\"File\")"));
+				var("c(\"WindowId\",\"SubjectID\")"));
 		createTrainData.prodMode();
 		createTrainData.execute();
 	}
@@ -128,14 +129,14 @@ public class FeaturizeDataHMM extends TaskDef {
 			String frequencyStr, String rawDataPathStr, List<String> windowSizeList,
 			String tvtDataAssignmentPath, String tvtDataPath,
 			String clusterWorkspace, Integer clusterJobNum, Boolean useCluster,
-			Array subjectIDs, String day)
+			Array subjectIDs, String day, int numSplits, Array splitId)
 			throws Exception {
 		Var dataset = var(datasetStr);
 		Var frequency = var(frequencyStr);
 		Var rawDataPath = var(rawDataPathStr);
 
 		Array windowSizes = array(windowSizeList);
-		Var expPath = var(expRootPath).fileSep().cat(dataset).cat("HMM");
+		Var expPath = var(expRootPath).fileSep().cat(dataset).cat(".HMM");
 		Var featurePath = expPath.fileSep().cat("features").fileSep().cat("ws")
 				.cat(windowSizes);
 		logStep("Convert the timestamped data to feature vectors");
@@ -149,22 +150,20 @@ public class FeaturizeDataHMM extends TaskDef {
 		Var duplicatesFileNames = rawDataPath.fileSep().cat(subjectIDs).fileSep().cat(subjectIDs).cat("_").cat(frequency).cat("hz_duplicates_day").cat(day).cat(".csv");
 		//Var startEndFileNames = rawDataPath.fileSep().cat(subjectIDs).fileSep().cat(subjectIDs).cat("_start_and_end.csv");
 		Var eventsFileNames = rawDataPath.fileSep().cat(subjectIDs).fileSep().cat(subjectIDs).cat("_events_day").cat(day).cat(".csv");
-		Var callingScriptPath = featurePath.fileSep().cat(subjectIDs).cat(".featurize.").cat("ws").cat(windowSizes).cat(".R");
-		Var featurizeDataPath = featurePath.fileSep().cat(subjectIDs).cat(".featurized.").cat("ws").cat(windowSizes).cat(".csv");
+		Var callingScriptPath = featurePath.fileSep().cat(subjectIDs).cat(".featurize.R");
+		Var featurizeDataPath = featurePath.fileSep().cat(subjectIDs).cat(".featurized.csv");
 
 		Var featurizeFunctionScriptPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		mkdir(featurePath);
 		
-		int numSplits = 30;
-		Array splitId = array("[0:1:" + numSplits + "]");
 		Array dataSets = array(Arrays.asList("trainBase", "validateBase", "trainHMM", "testHMM"));
 
-		String featurizedFileExtStr = "PureTrial.featurized.csv";
+		String featurizedFileExtStr = ".featurized.csv";
 
 		// This is where the action happens
 		featurize(clusterJobNum, useCluster, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, truncatedFileNames, duplicatesFileNames, eventsFileNames, frequency, featurizeDataPath, windowSizes, day);
-		splitData(tvtDataAssignmentPath, splitId, numSplits, subjectIDs);
-		merge(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr, windowSizes);
+		//splitData(tvtDataAssignmentPath, splitId, numSplits, subjectIDs);
+		//merge(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr, windowSizes);
 	}
 
 	private void splitDataSetInto4Parts(Array subjectIDs,
@@ -191,26 +190,28 @@ public class FeaturizeDataHMM extends TaskDef {
 	}
 
 	private void UQ_30Hz() throws Exception {
-		String expRootPath = "/nfs/guille/wong/users/andermic/Desktop/hmm";
-		String day = "2";
+		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/hmm";
+		String day = "3";
 		String frequencyStr = "30";
 		String datasetStr = "uq_" + frequencyStr + "Hz_day" + day;
 
-		String rawDataPathStr = "/nfs/guille/wong/wonglab2/obesity/2012/free.living/rawdata/30Hz/YR4/converted.7cls";
+		String rawDataPathStr = "/nfs/guille/wong/users/andermic/uq/processed";
 		List<String> windowSizeList = Arrays.asList("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20");
-		String tvtDataPath = "/nfs/guille/wong/users/andermic/Desktop/hmm/OSU_YR4_Hip_30Hz.HMM.7cls";
+		String tvtDataPath = expRootPath + "/" + datasetStr + ".HMM";
 		String tvtDataAssignmentPath = tvtDataPath + "/splits";
 		
-		String clusterWorkspace = "/nfs/guille/wong/users/andermic/Desktop/hmm/" + datasetStr + "/cluster";
+		String clusterWorkspace = tvtDataPath + "/cluster";
 		Integer clusterJobNum = 100;
-		Boolean useCluster = false;
+		Boolean useCluster = true;
 		
 		Array subjectIDs = array(Arrays.asList("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "18", "19", "20", "21", "22", "23", "24", "25"));
+		int numSplits = 30;
+		Array splitId = array("[0:1:" + numSplits + "]");
 		
 		featurizeUQData(expRootPath, datasetStr, frequencyStr,
 				rawDataPathStr, windowSizeList, tvtDataAssignmentPath,
 				tvtDataPath, clusterWorkspace, clusterJobNum, useCluster,
-				subjectIDs, day);
+				subjectIDs, day, numSplits, splitId);
 	}
 
 	public static void main(String[] args) {

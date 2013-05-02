@@ -1,6 +1,6 @@
 // Modified from web.engr.oregonstate.edu.zheng.gef.task.msexp.stacking.osu
 
-package MikeExperiments;
+package MikeExperiments.osu_hip;
 
 import java.util.Arrays;
 import java.util.List;

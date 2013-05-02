@@ -3,7 +3,7 @@ MatMPI_Delete_all;
 pause(2.0);
 
 % Number of nodes to use on the cluster
-num_nodes = 1;
+num_nodes = 23;
 
 % Name of matlab file to run on the cluster
 % Change this line to be the name of your .m file

@@ -53,19 +53,25 @@ featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=
 
 
 # Modified from featurizeWindow in mstm/mstm.featurize.data.R
-featurizeWindowCPD <- function(frequency, window) {
+featurizeWindowCPD <- function(frequency, window, hmm='false') {
 	trialId <- paste(as.character(unique(window$TrialID)), collapse=" ")
 
 	ac = window$ActivityClass
 	acu = unique(ac)
+	
 	activityRatio <- NULL
 	for (activity in acu) {
 		activityRatio <- c(activityRatio, length(which(ac==activity)) / length(ac)) 
 	}
 	activityRatio <- paste(as.character(activityRatio), collapse=" ")
 	activityClass <- paste(as.character(acu), collapse=" ")
-	#print(activityClass)
 	
+	if(hmm == 'true') {
+		if(length(acu) > 1) {
+			activityClass <- NA
+		}
+	}
+
 	#print("Axis1")
 	axis1 <- addNoiseToStraightLine(window$Axis1)
 	a1 <- featurizeAxis(frequency, axis1)
@@ -169,7 +175,7 @@ quickTrainValidateCPD <- function(
 		labVisitFileFolder,
 		trainingLabVisitFileExt,
 		valiTestLabVisitFileExt=trainingLabVisitFileExt,
-		kernal="radial",
+		kernal="linear",
 		validateSummaryPath,
 		Gamma=NA,
 		Cost=NA,
@@ -227,14 +233,14 @@ testBestModelCPD <- function(
 		windowSize,
 		validateSummaryFile=NA,
 		bestModelInfo=NA) {
-	
+
 	if (!is.na(validateSummaryFile)) {
 		validateSummary <- read.csv(validateSummaryFile)
 		validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=windowSize))
 		bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
 		write.csv(bestModelInfo, bestModelInfoSavePath, row.names = FALSE)
 	}
-	
+
 	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt)
 	print("Training data read")
 
@@ -351,7 +357,8 @@ mergeSplitShuffleCPD <- function(
 	#if (!is.na(scale)) {
 	#	res <- res[which(res$Scale==scale),]
 	#}
-	#print(nrow(res))
+	print(nrow(res))
+	print(expectedNumEntries)
 	stopifnot(nrow(res) == expectedNumEntries)
 	allAcc <- data.frame(Accuracy=NULL,TotalDetectionTime=NULL,DataSize=NULL)
 	allCm <- NA
@@ -427,18 +434,25 @@ featurizeUQCPD <- function(day, truncatedDataFilePath, duplicatesDataFilePath, f
 		day_len <- 24 * 3600 * 30 
 	}
 	
-	if(is.na(predictedCpPath)) {
-		endRows <- events$StartTick - 1
+
+	# Featurize using either fixed or variable window sizes
+	if (is.na(windowSize)) {
+		if(is.na(predictedCpPath)) {
+			endRows <- events$StartTick - 1
+		}
+		else {
+			endRows <- read.csv(predictedCpPath)$ChangePointPredictions - 1
+		}
+		endRows = endRows - offset
+		endRows = endRows[which(endRows>0 & endRows<=day_len)]
+
+		# Make the last row of the data an end row, if it isn't already
+		if (endRows[length(endRows)] != day_len) {
+			endRows <- c(endRows, day_len)
+		}
 	}
 	else {
-		endRows <- read.csv(predictedCpPath)$ChangePointPredictions - 1
-	}
-	endRows = endRows - offset
-	endRows = endRows[which(endRows>0 & endRows<=day_len)]
-
-	# Make the last row of the data an end row, if it isn't already
-	if (endRows[length(endRows)] != day_len) {
-		endRows <- c(endRows, day_len)
+		endRows <- seq(windowSize * frequency, day_len, windowSize * frequency)
 	}
 
 	data <- data.frame(SubjectID=rep(day, day_len), LabVisit=day,
@@ -459,22 +473,34 @@ featurizeUQCPD <- function(day, truncatedDataFilePath, duplicatesDataFilePath, f
 	for (endRow in endRows) {
 		print(endRow)
 		window <- data[startRow:endRow, ]
-		df <- rbind(df, cbind(data.frame(WindowId=windowId, Scale=(endRow - startRow + 1), SubseqId=1), featurizeWindowCPD(frequency, window)))
+		df <- rbind(df, cbind(data.frame(WindowId=windowId, Scale=(endRow - startRow + 1), SubseqId=1), featurizeWindowCPD(frequency, window, hmm)))
 		startRow <- endRow + 1
 		windowId <- windowId + 1
 	}
-	
+
 	if(hmm == 'true') {
-		exclude <- NULL
-		for (i in 1:nrow(df)) {
-			if(length(unlist(strsplit(as.character(df$TrialID[i]),' '))) > 1) {
-				exclude <- c(exclude,i)
-			} 
-		}
-		if (!is.null(exclude)) {
-			df <- df[-exclude,]
-		}
+		df = df[-which(is.na(df$ActivityClass)), ]
 	}
 	
 	write.csv(df, savePath, row.names=FALSE, quote=FALSE)
+}
+
+mergeDataUQ <- function(dataFileFolder, dataNameFilePath, dataFileExtension, savePath, columns=NA) {
+	dataNames <- read.csv(dataNameFilePath)
+	df <- data.frame()
+	for (i in 1 : nrow(dataNames)) {
+		file <- file.path(dataFileFolder, paste(dataNames[i,1], dataFileExtension, sep=""))
+		print(file)
+		data <- read.csv(file)
+		if (!is.na(columns)) {
+			data <- unique(data[,columns])
+			names(data)[2] = 'File'
+			data['File'] = dataNames[i,]
+		}
+		df <- rbind(df, data)
+	}
+	write.csv(df, savePath, row.names=FALSE, quote=FALSE)
+	
+	mergeInfo <- data.frame(DataFolder=dataFileFolder, FileList=dataNameFilePath, FileExt=dataFileExtension)
+	write.csv(mergeInfo, paste(savePath, ".info.csv", sep=""), row.names=FALSE, quote=FALSE)
 }

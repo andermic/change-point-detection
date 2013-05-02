@@ -33,7 +33,7 @@ public class DecisionTree extends TaskDef {
 			String trainingLabVisitFileExt, Var valiTestLabVisitFileExt, 
 			Var bestModelInfoPath, Var bestModelSavePath, 
 			Var trainResultPath, Var validateResultPath,
-			Var testResultPath)
+			Var testResultPath, Array labels)
 			throws Exception {
 		logStep("Test decision tree model");
 		Var testBestSingleScaleModelFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
@@ -49,10 +49,7 @@ public class DecisionTree extends TaskDef {
 		bestSingleScale.addParam("algorithm", String.class, "dt");
 		bestSingleScale.addParam("formula", Formula.class, var(formula));
 		bestSingleScale.addParam("formulaName", String.class, var(formulaName));
-		bestSingleScale.addParam("labels", List.class, RUtils.varToRList(
-				var(array(Arrays.asList("lying_down", "sitting",
-						"standing_household", "walking", "running",
-						"basketball", "dance"))), true));
+		bestSingleScale.addParam("labels", List.class, RUtils.varToRList(var(labels), true));
 		bestSingleScale.addParam("split", Integer.class, var(splitId));
 		bestSingleScale.addParam("trainDataInfoPath", String.class,
 				trainDataInfoPath, VerificationType.Before);
@@ -87,7 +84,7 @@ public class DecisionTree extends TaskDef {
 	private void summarizeTest(Integer clusterJobNum, Boolean useCluster,
 			String clusterWorkspace, String jobId, Var expPath,
 			Var bestModelId, Var testResultPath, Var confusionMatrixPath,
-			Var pctConsufionMatrixPath, Var summaryPath) throws Exception {
+			Var pctConsufionMatrixPath, Var summaryPath, Array labels) throws Exception {
 		logStep("Summarize model test results");
 		Var summarizeFunctionPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var summarizeScriptPath = expPath.fileSep().cat("dt").dot()
@@ -98,9 +95,7 @@ public class DecisionTree extends TaskDef {
 						.setNumJobs(clusterJobNum).setClusterWorkspace(clusterWorkspace)
 						.setJobId(jobId));
 		summarizeSingle.addParam("labels", List.class, RUtils.varToRList(
-				var(array(Arrays.asList("lying_down", "sitting",
-						"standing_household", "walking", "running",
-						"basketball", "dance"))), true));
+				var(labels), true));
 		summarizeSingle.addParam("predictionReportPath", String.class,
 				testResultPath, VerificationType.Before);
 		summarizeSingle.addParam("confusionMatrixPath", String.class,
@@ -225,8 +220,8 @@ public class DecisionTree extends TaskDef {
 			List<String> windowSizeList,
 			List<String> formulaList, List<String> formulaNameList,
 			String clusterWorkspace, String jobId, Array cpdAlgorithm,
-			Array cpdFPR, Integer clusterJobNum, Boolean useCluster)
-			throws Exception {
+			Array cpdFPR, Integer clusterJobNum, Boolean useCluster,
+			Array labels) throws Exception {
 
 		Var dataset = var(datasetStr);
 		Array windowSizes = array(windowSizeList);
@@ -234,17 +229,17 @@ public class DecisionTree extends TaskDef {
 
 		Array splitId = array("[0:1:30]");
 		Var iterationId = var("split").cat(splitId);
-		Var expPath = var(expRootPath).fileSep().cat(dataset).dot().cat("ws")
-				.cat(windowSizes).dot().cat(trialGroupIds).fileSep()
+		Var expPath = var(expRootPath).fileSep().cat(dataset)
+				.dot().cat(trialGroupIds).fileSep()
 				.cat("dt").fileSep().cat(iterationId);
 
 		Var trainDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("train.120.data.csv");
+				.fileSep().cat("trainBase.ground.data.csv");
 		Var validateDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("validate.").cat(cpdAlgorithm).dot().cat(cpdFPR)
+				.fileSep().cat("validateBase.").cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".data.csv");
 		Var testDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("test.").cat(cpdAlgorithm).dot().cat(cpdFPR)
+				.fileSep().cat("trainHMM.").cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".data.csv");
 
 		Array formula = array(formulaList);
@@ -279,8 +274,8 @@ public class DecisionTree extends TaskDef {
 				.cat(windowSizes).dot().cat(trialGroupIds).fileSep()
 				.cat("dt");
 		
-		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath);
-		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
+		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath, labels);
+		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath, labels);
 		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
 		mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
 	}
@@ -294,7 +289,10 @@ public class DecisionTree extends TaskDef {
 
 		String tvtDataPath = expRootPath + "/OSU_YR4_Hip_30Hz.ws120.7cls";
 		String labVisitFileFolder = tvtDataPath + "/features";
-
+		Array labels = array(Arrays.asList("lying_down", "sitting",
+				"standing_household", "walking", "running",
+				"basketball", "dance"));
+		
 		List<String> formulaList = Arrays.asList(Formula.FORMULA_ALL_WO_FFT
 				.toString());
 		List<String> formulaNameList = Arrays.asList("AllWoFFT");
@@ -313,49 +311,45 @@ public class DecisionTree extends TaskDef {
 				labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, trialGroupIdList,
 				windowSizeList, formulaList,
 				formulaNameList, clusterWorkspace, "single",
-				cpdAlgorithm, cpdFPR, clusterJobNum, useCluster);
+				cpdAlgorithm, cpdFPR, clusterJobNum, useCluster, labels);
 	}
 
-	/*private void OSU_YR4_30Hz_Wrist() throws Exception {
-		String expRootPath = "/nfs/guille/wong/wonglab2/obesity/2012/msexp";
-		String datasetStr = "OSU_YR4_Wrist_30Hz";
+	private void UQ_30Hz() throws Exception {
+		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/cpd";
+		String day = "2";
+		String datasetStr = "uq_30Hz_day" + day;
 
-		List<String> windowSizeList = Arrays.asList("10");
-		List<String> trialGroupIdList = Arrays.asList("7cls");
+		List<String> windowSizeList = Arrays.asList("1");
+		List<String> trialGroupIdList = Arrays.asList("");
 
-		String tvtDataPath = expRootPath + "/" + datasetStr + ".ws10.7cls";
+		String tvtDataPath = expRootPath + "/" + datasetStr;
 		String labVisitFileFolder = tvtDataPath + "/features";
-		String labVisitFileExt = "PureTrial.featurized.csv";
-
+		Array labels = array(Arrays.asList("0","1","2"));
+		
 		List<String> formulaList = Arrays.asList(Formula.FORMULA_ALL_WO_FFT
 				.toString());
 		List<String> formulaNameList = Arrays.asList("AllWoFFT");
 
-		String costExp = "[0.01,0.1,1,10,100,1000]";
-		String scaleExp = "[1:1:10]";
-
-		String clusterWorkspace = "/nfs/guille/wong/wonglab2/obesity/2012/msexp/"
-				+ datasetStr + ".ws10.7cls/dt/cluster";
+		String clusterWorkspace = expRootPath + "/" + datasetStr + "/dt/cluster";
+		Integer clusterJobNum = 120;
+		Boolean useCluster = true;
+		
+		Array cpdAlgorithm = array(Arrays.asList("cc"));
+		Array cpdFPR = array(Arrays.asList("0.0005", "0.001", "0.005", "0.01"));
+		String trainingLabVisitFileExt = (".featurized.csv");
+		Var valiTestLabVisitFileExt = var(".featurized.").cat(cpdAlgorithm).dot().cat(cpdFPR).cat(".csv");
+		
 		singleScaleModel(expRootPath, datasetStr, tvtDataPath,
-				labVisitFileFolder, labVisitFileExt, trialGroupIdList,
-				windowSizeList, costExp, scaleExp, formulaList,
-				formulaNameList, clusterWorkspace, "single");
-		allScaleStackingModel(expRootPath, datasetStr, tvtDataPath,
+				labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt,
 				trialGroupIdList, windowSizeList, formulaList, formulaNameList,
-				costExp, clusterWorkspace, "stacking");
-		List<String> singleScaleList = Arrays.asList("1", "2", "3", "4", "5",
-				"6", "7", "8", "9");
-		for (String singleScale : singleScaleList) {
-			singleScaleStackingModel(expRootPath, datasetStr, tvtDataPath,
-					trialGroupIdList, windowSizeList, formulaNameList,
-					singleScale, costExp, clusterWorkspace, "mss");
-		}
-	}*/
+				clusterWorkspace, "single", cpdAlgorithm, cpdFPR, clusterJobNum,
+				useCluster, labels);
+	}
 
 	public static void main(String[] args) {
 		try {
-			new DecisionTree().OSU_YR4_30Hz_Hip();
-			//new SVMLinearTrainValidateTest1().OSU_YR4_30Hz_Wrist();
+			//new DecisionTree().OSU_YR4_30Hz_Hip();
+			new DecisionTree().UQ_30Hz();
 		} catch (Exception e) {
 			log.error(e, e);
 		}

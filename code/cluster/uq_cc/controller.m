@@ -20,7 +20,7 @@ leader = 0;
 %load('SimData.mat');
 
 % Number of simulations
-Nsims = 1;
+Nsims = 23;
 
 % Size of array
 %[n Nsims]=size(YsimOS); % YsimOS is the name of the data matrix read in the above load()
@@ -43,11 +43,11 @@ lib_dir = '../../lib';
 start_at = 1;
 
 kpre = 300;
-folders = [1:4 6:16 17:25]
-trunc_files = arrayfun(@(x) strcat('/nfs/guille/wong/users/andermic/uq/processed/', num2str(x), '/', num2str(x), '_30hz_truncated.csv'), folders, 'UniformOutput', false)
-dup_files = arrayfun(@(x) strcat('/nfs/guille/wong/users/andermic/uq/processed/', num2str(x), '/', num2str(x), '_30hz_duplicates.csv'), folders, 'UniformOutput', false)
-se_files = arrayfun(@(x) strcat('/nfs/guille/wong/users/andermic/uq/processed/', num2str(x), '/', num2str(x), '_30hz_start_and_end.csv'), folders, 'UniformOutput', false)
-out_files = arrayfun(@(x) strcat('/nfs/guille/wong/users/andermic/uq/changepoints/cc_kpre', num2str(kpre), '/scores_', num2str(x), '.csv', folders, 'UniformOutput', false)
+folders = [1:4 6:16 18:25];
+trunc_files = arrayfun(@(x) strcat('/nfs/guille/wong/users/andermic/uq/processed/', num2str(x), '/', num2str(x), '_30hz_truncated.csv'), folders, 'UniformOutput', false);
+dup_files = arrayfun(@(x) strcat('/nfs/guille/wong/users/andermic/uq/processed/', num2str(x), '/', num2str(x), '_30hz_duplicates.csv'), folders, 'UniformOutput', false);
+se_files = arrayfun(@(x) strcat('/nfs/guille/wong/users/andermic/uq/processed/', num2str(x), '/', num2str(x), '_start_and_end.csv'), folders, 'UniformOutput', false);
+out_files = arrayfun(@(x) strcat('/nfs/guille/wong/users/andermic/uq/changepoints/cc_kpre', num2str(kpre), '/scores_', num2str(x), '.csv'), folders, 'UniformOutput', false);
 
 for Sim=startchunk:endchunk
      disp(['Simulation ' num2str(Sim) ' of ' num2str(Nsims)])
@@ -55,16 +55,13 @@ for Sim=startchunk:endchunk
      % Do some real work here
      addpath(source_dir);
      addpath(lib_dir);
-     addpath(data_dir);
 
-     trunc_file = trunc_files(Sim+start_at-1, :);
-     dup_file = dup_files(Sim+start_at-1, :);
-     se_file = se_files(Sim+start_at-1, :);
-     out_file = out_files(sim+start_at-1, :);
-     disp('expanding data')
+     trunc_file = trunc_files{Sim+start_at-1};
+     dup_file = dup_files{Sim+start_at-1};
+     se_file = se_files{Sim+start_at-1};
+     out_file = out_files{Sim+start_at-1};
+     disp('expanding data');
      data = expand_uq(trunc_file, dup_file, se_file);
-
-data = data[626640:627640,:]
 
      disp('done expanding')
      csvwrite(out_file, control_chart(kpre, data));

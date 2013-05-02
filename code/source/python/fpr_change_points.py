@@ -22,20 +22,20 @@ def binary_search(list_, val, start, end):
         print 'end: %d' % end
         exit()
 
-FPR_LIST = [0.01]
+FPR_LIST = [0.0005, 0.001, 0.005, 0.01]
 DATASET = 'uq'
 KPRE = 300
 GRANULARITY = 3
 ALGORITHM = 'cc'
 #ROOT_FOLDER = '/nfs/stak/students/a/andermic/Windows.Documents/Desktop/change-point-detection/results/30hz'
-ROOT_FOLDER = '/nfs/guille/wong/users/andermic/Desktop/uq/changepoints'
+ROOT_FOLDER = '/nfs/guille/wong/users/andermic/uq/changepoints'
 INPUT_PATH = ROOT_FOLDER + '/' + '%s_kpre%d' % (ALGORITHM, KPRE)
 OUTPUT_FOLDER = 'predicted_changes_%s_kpre%d' % (ALGORITHM, KPRE)
 OUTPUT_PATH = ROOT_FOLDER + '/' + OUTPUT_FOLDER
 if OUTPUT_FOLDER in listdir(ROOT_FOLDER):
     print 'There are existing results at %s.\n' % OUTPUT_PATH
     print 'These results will not be overwritten by this program, so delete them manually to continue.'
-    exit()
+    #exit()
 
 PROCESSED_FOLDER = '/nfs/guille/wong/wonglab3/obesity/freeliving/UQ/processed'
 folders = []
@@ -64,11 +64,11 @@ for fpr in FPR_LIST:
         print 'done reading data\n'
         fp_num = int(round(fpr*len(cur_scores_pre)))
         score_len = len(cur_scores_pre)
-        print 'enumerate data'
+        print 'enumerating data'
         cur_scores_pre = enumerate(cur_scores_pre)
         print 'done enumerating data\n'
 
-        print 'remove excess scores'
+        print 'removing excess scores'
         cur_scores = []
         while True: 
             try:
@@ -109,7 +109,7 @@ for fpr in FPR_LIST:
             events = open(events_files[file_num], 'r').readlines()
             have_changed = [True] + [False] * len(events)
             event_ticks = [1]
-            event_ticks += [int(events[i].split(',')[1]) + events_start_tick - raw_start_tick for i in range(1, len(events))]
+            event_ticks += [int(events[i].split(',')[1]) for i in range(1, len(events))]
             data_end = event_ticks[-1] + int(round(float(events[-1].split(',')[2]) * 30))
             event_ticks.append(data_end)
             print 'raw_end_tick: %d' % raw_end_tick

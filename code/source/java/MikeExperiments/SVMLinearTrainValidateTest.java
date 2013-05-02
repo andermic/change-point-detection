@@ -20,10 +20,10 @@ import web.engr.oregonstate.edu.zheng.gef.task.freeliving.Formula;
 import web.engr.oregonstate.edu.zheng.gef.utils.RUtils;
 import web.engr.oregonstate.edu.zheng.obesity.commons.utils.DataSet;
 
-public class SVMLinearTrainValidateTest1 extends TaskDef {
+public class SVMLinearTrainValidateTest extends TaskDef {
 
 	private static final Logger log = Logger
-			.getLogger(SVMLinearTrainValidateTest1.class.getName());
+			.getLogger(SVMLinearTrainValidateTest.class.getName());
 
 	private void trainValidate(Integer clusterJobNum, Boolean useCluster,
 			Var expPath, Var modelId, String clusterWorkspace, String jobId,
@@ -439,7 +439,7 @@ public class SVMLinearTrainValidateTest1 extends TaskDef {
 
 	public static void main(String[] args) {
 		try {
-			new SVMLinearTrainValidateTest1().OSU_YR4_30Hz_Hip();
+			new SVMLinearTrainValidateTest().OSU_YR4_30Hz_Hip();
 			//new SVMLinearTrainValidateTest1().OSU_YR4_30Hz_Wrist();
 		} catch (Exception e) {
 			log.error(e, e);

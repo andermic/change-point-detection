@@ -13,11 +13,11 @@ trainSupervised <- function(stateAlphabet, emissionAlphabet, stateSample, emissi
 	dimnames(emissionProbs) = list(stateAlphabet, emissionAlphabet)
 	names(sourceCounts) = stateAlphabet
 	
-	for (i in 1:length(stateSample)-1) {
+	for (i in 1:(length(stateSample)-1)) {
 		source = stateSample[i]
 		dest = stateSample[i+1]
 		transProbs[source, dest] = transProbs[source, dest] + 1
-		
+
 		e = emissionSample[i]
 		emissionProbs[source,e] = emissionProbs[source,e] + 1
 		
@@ -50,20 +50,19 @@ predictHMM <- function(
 		pctConsufionMatrixPath,
 		summaryPath) {
 
-	# Train the HMM
+	print('training hmm')	
 	training.data <- read.csv(trainHMMResultPath)
-	training.data <-
 	hmm <- trainSupervised(labels, labels, training.data$Real.ActivityClass, training.data$Predict)
 	
-	# Predict on the HMM testing data with the base classifier
+	print('predicting on the hmm testing data with the base classifier')
 	load(bestModelSavePath)
 	summarizeModelCPD(model, formula, windowSize, readData(testHMMDataInfoPath, labVisitFileFolder, labVisitFileExt), predictBasePath)
 
-	# Predict with the HMM
+	print('predicting with the hmm')
 	testing.data <- read.csv(predictBasePath)
 	testing.data$Predict <- viterbi(hmm, as.character(testing.data$Predict))
 	write.csv(testing.data, predictHMMPath)
 	
-	# Summarize results
+	print('summarizing results')
 	summarizeCPD(labels, predictHMMPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath)
 }
