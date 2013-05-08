@@ -108,8 +108,8 @@ public class DecisionTree extends TaskDef {
 		summarizeSingle.execute();
 	}
 	
-	private void makeTable(Array formulaName, Array cpdAlgorithm, Array cpdFPR,
-			String tvtDataPath, Array splitId, Array windowSizes,
+	private void makeTable(Array formulaName, Array cpdAlgorithm,
+			Array cpdFPR, String tvtDataPath, Array splitId,
 			Array trialGroupId, Array testDataSets, Var modelPath)
 			throws Exception {
 		logStep("List all resources in a table");
@@ -121,7 +121,6 @@ public class DecisionTree extends TaskDef {
 					Var summaryPathSingle = var(tvtDataPath).cat("/dt/").cat("split").cat(splitId).cat("/dt.").cat(bestModelIdSingle).cat(".test.summary.csv");
 					Var confusionMatrixPathSingle = var(tvtDataPath).cat("/dt/").cat("split").cat(splitId).cat("/dt.").cat(bestModelIdSingle).cat(".test.cm.csv");
 					Table bestSingleScaleModelResTable = createTable(
-							newColumn("WindowSize", windowSizes),
 							newColumn("TrialGroup", trialGroupId),
 							newColumn("Formula", formulaName),
 							newColumn("Split", splitId),
@@ -171,7 +170,7 @@ public class DecisionTree extends TaskDef {
 		merge.addParam("bestModelResFilePath", String.class,
 				bestSingleScaleModelResSavePathVar, VerificationType.Before);
 		//merge.addParam("windowSize", Integer.class, var(windowSizes));
-		merge.addParam("trialGroup", String.class, var(trialGroupId));
+		//merge.addParam("trialGroup", String.class, var(trialGroupId));
 		merge.addParam("formula", String.class, var(formulaName));
 		merge.addParam("testDataSet", String.class, var(testDataSets));
 		String expectedNumEntries = String.valueOf(splitId.getValues().size());
@@ -217,29 +216,27 @@ public class DecisionTree extends TaskDef {
 			String tvtDataPath, String labVisitFileFolder,
 			String trainingLabVisitFileExt, Var valiTestLabVisitFileExt,
 			List<String> trialGroupIdList,
-			List<String> windowSizeList,
 			List<String> formulaList, List<String> formulaNameList,
 			String clusterWorkspace, String jobId, Array cpdAlgorithm,
 			Array cpdFPR, Integer clusterJobNum, Boolean useCluster,
 			Array labels) throws Exception {
 
 		Var dataset = var(datasetStr);
-		Array windowSizes = array(windowSizeList);
 		Array trialGroupIds = array(trialGroupIdList);
 
 		Array splitId = array("[0:1:30]");
 		Var iterationId = var("split").cat(splitId);
 		Var expPath = var(expRootPath).fileSep().cat(dataset)
-				.dot().cat(trialGroupIds).fileSep()
+				.cat(trialGroupIds).fileSep()
 				.cat("dt").fileSep().cat(iterationId);
 
 		Var trainDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("trainBase.ground.data.csv");
+				.fileSep().cat("train.ground.data.csv");
 		Var validateDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("validateBase.").cat(cpdAlgorithm).dot().cat(cpdFPR)
+				.fileSep().cat("validate.").cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".data.csv");
 		Var testDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("trainHMM.").cat(cpdAlgorithm).dot().cat(cpdFPR)
+				.fileSep().cat("test.").cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".data.csv");
 
 		Array formula = array(formulaList);
@@ -270,13 +267,12 @@ public class DecisionTree extends TaskDef {
 
 		Array trialGroupId = array(trialGroupIdList);
 		Array testDataSets = array(Arrays.asList("test"));
-		Var modelPath = var(expRootPath).fileSep().cat(dataset).dot().cat("ws")
-				.cat(windowSizes).dot().cat(trialGroupIds).fileSep()
-				.cat("dt");
+		Var modelPath = var(expRootPath).fileSep().cat(dataset)
+				.cat(trialGroupIds).fileSep().cat("dt");
 		
 		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath, labels);
 		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath, labels);
-		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
+		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, trialGroupId, testDataSets, modelPath);
 		mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
 	}
 	
@@ -284,8 +280,7 @@ public class DecisionTree extends TaskDef {
 		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/cpd";
 		String datasetStr = "OSU_YR4_Hip_30Hz";
 
-		List<String> windowSizeList = Arrays.asList("120");
-		List<String> trialGroupIdList = Arrays.asList("7cls");
+		List<String> trialGroupIdList = Arrays.asList(".7cls");
 
 		String tvtDataPath = expRootPath + "/OSU_YR4_Hip_30Hz.ws120.7cls";
 		String labVisitFileFolder = tvtDataPath + "/features";
@@ -309,8 +304,7 @@ public class DecisionTree extends TaskDef {
 		
 		singleScaleModel(expRootPath, datasetStr, tvtDataPath,
 				labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, trialGroupIdList,
-				windowSizeList, formulaList,
-				formulaNameList, clusterWorkspace, "single",
+				formulaList, formulaNameList, clusterWorkspace, "single",
 				cpdAlgorithm, cpdFPR, clusterJobNum, useCluster, labels);
 	}
 
@@ -319,7 +313,6 @@ public class DecisionTree extends TaskDef {
 		String day = "2";
 		String datasetStr = "uq_30Hz_day" + day;
 
-		List<String> windowSizeList = Arrays.asList("1");
 		List<String> trialGroupIdList = Arrays.asList("");
 
 		String tvtDataPath = expRootPath + "/" + datasetStr;
@@ -331,17 +324,17 @@ public class DecisionTree extends TaskDef {
 		List<String> formulaNameList = Arrays.asList("AllWoFFT");
 
 		String clusterWorkspace = expRootPath + "/" + datasetStr + "/dt/cluster";
-		Integer clusterJobNum = 120;
-		Boolean useCluster = true;
+		Integer clusterJobNum = 50;
+		Boolean useCluster = false;
 		
-		Array cpdAlgorithm = array(Arrays.asList("cc"));
+		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
 		Array cpdFPR = array(Arrays.asList("0.0005", "0.001", "0.005", "0.01"));
-		String trainingLabVisitFileExt = (".featurized.csv");
+		String trainingLabVisitFileExt = (".featurized.ground.csv");
 		Var valiTestLabVisitFileExt = var(".featurized.").cat(cpdAlgorithm).dot().cat(cpdFPR).cat(".csv");
 		
 		singleScaleModel(expRootPath, datasetStr, tvtDataPath,
 				labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt,
-				trialGroupIdList, windowSizeList, formulaList, formulaNameList,
+				trialGroupIdList, formulaList, formulaNameList,
 				clusterWorkspace, "single", cpdAlgorithm, cpdFPR, clusterJobNum,
 				useCluster, labels);
 	}

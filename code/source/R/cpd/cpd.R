@@ -206,6 +206,7 @@ quickTrainValidateCPD <- function(
 	print("Model trained")
 
 	validate.data <- readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt, scale)
+    write.csv(featureMatrixNoFFT(validate.data, formula), 'test.csv')
 	pred <- predict(model, featureMatrixNoFFT(validate.data, formula), type='class')
 	real <- data.frame(ActivityClass=validate.data$ActivityClass, ActivityRatios=validate.data$ActivityRatio, Scale=validate.data$Scale)
 	accuracy <- classificationAccuracyCPD(real, pred)
@@ -230,7 +231,7 @@ testBestModelCPD <- function(
 		trainReportPath, 
 		validateReportPath, 
 		testReportPath,
-		windowSize,
+		windowSize=NA,
 		validateSummaryFile=NA,
 		bestModelInfo=NA) {
 
@@ -338,7 +339,9 @@ mergeSplitShuffleCPD <- function(
 		reportSavePath=NA) {
 	
 	allRes <- read.csv(bestModelResFilePath)
+	print(nrow(allRes))
 	filter <- data.frame(Formula=formula, TestDataSet=testDataSet, Alpha=alpha)
+	print(nrow(filter))
 	if (!is.na(windowSize)) {
 		filter <- cbind(filter, data.frame(WindowSize=windowSize))
 	}
@@ -423,6 +426,7 @@ featurizeUQCPD <- function(day, truncatedDataFilePath, duplicatesDataFilePath, f
 	trunc <- read.csv(truncatedDataFilePath)
 	dup <- read.csv(duplicatesDataFilePath)
 	events <- read.csv(eventsPath)
+	GRANULARITY <- 3
 	
 	day <- as.numeric(day)
 	if (day == 1) {
@@ -447,7 +451,7 @@ featurizeUQCPD <- function(day, truncatedDataFilePath, duplicatesDataFilePath, f
 		endRows = endRows[which(endRows>0 & endRows<=day_len)]
 
 		# Make the last row of the data an end row, if it isn't already
-		if (endRows[length(endRows)] != day_len) {
+		if (day_len - endRows[length(endRows)] >= GRANULARITY) {
 			endRows <- c(endRows, day_len)
 		}
 	}

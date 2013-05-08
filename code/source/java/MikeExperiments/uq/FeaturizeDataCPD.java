@@ -130,7 +130,7 @@ public class FeaturizeDataCPD extends TaskDef {
 		bind(dataSets, dataSetFileExtension, assignment);
 	
 		Var iterationId = var("split").cat(splitId);
-		Var mergeDataFunctionScriptPath = var("/nfs/guille/wong/users/andermic//scratch/workspace/ObesityExperimentRScript/free.living/data/merge.data.R");
+		Var mergeDataFunctionScriptPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var trainValidateTestDataPath = var(tvtDataPath);
 		Var mergeTrainDataCallingPath = trainValidateTestDataPath.fileSep()
 				.cat(iterationId).fileSep().cat("merge.").cat(dataSets)
@@ -143,7 +143,7 @@ public class FeaturizeDataCPD extends TaskDef {
 		ExecutorBuilder createTrainData = rScript(
 				mergeDataFunctionScriptPath,
 				mergeTrainDataCallingPath,
-				var("mergeData"),
+				var("mergeDataUQ"),
 				execConfig().setParallelizable(useCluster)
 						.setNumJobs(clusterJobNum)
 						.setOnCluster(true)
@@ -168,7 +168,6 @@ public class FeaturizeDataCPD extends TaskDef {
 			String clusterWorkspace, Var featurePath) throws Exception {
 		logStep("Merge featurized cpd algorithm data");
 
-		//TODO
 		Var dataSetFileExtension = var(".featurized.")
 				.cat(cpdAlgorithms).dot().cat(cpdFPR).cat(".csv");
 		Array assignment = array(Arrays.asList("0", "1", "2"));
@@ -202,7 +201,7 @@ public class FeaturizeDataCPD extends TaskDef {
 				VerificationType.After);
 		createValidateTestData.addParam("columns", List.class,
 				var("c(\"WindowId\",\"File\")"));
-		createValidateTestData.testMode();
+		createValidateTestData.prodMode();
 		createValidateTestData.execute();
 	}
 
@@ -257,11 +256,11 @@ public class FeaturizeDataCPD extends TaskDef {
 		Array dataSets = array(Arrays.asList("train", "validate", "test"));
 
 		// This is where the action happens
-		//featurizeGroundTruth(expPath, clusterJobNum, useCluster, featurizeFunctionScriptPath, clusterWorkspace, truncatedFileNames, duplicatesFileNames, eventsFileNames, frequency, featurePath, subjectIDs, day, featurizeDataPath, callingScriptPath);
+		featurizeGroundTruth(expPath, clusterJobNum, useCluster, featurizeFunctionScriptPath, clusterWorkspace, truncatedFileNames, duplicatesFileNames, eventsFileNames, frequency, featurePath, subjectIDs, day, featurizeDataPath, callingScriptPath);
 		featurizeValidateTest(clusterJobNum, useCluster, cpdAlgorithms, cpdFPR, featurizeFunctionScriptPath, callingScriptPathCPD, featurizeDataPathCPD, clusterWorkspace, truncatedFileNames, duplicatesFileNames, frequency, eventsFileNames, predictedCpFileNames, subjectIDs, day);
-		//splitData(tvtDataAssignmentPath, splitId, numSplits, subjectIDs);
-		//mergeGroundTruth(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath);
-		//mergeValidateTest(clusterJobNum, useCluster, cpdAlgorithms, cpdFPR, tvtDataPath, tvtDataAssignmentPath, dataSets, splitId, clusterWorkspace, featurePath);
+		splitData(tvtDataAssignmentPath, splitId, numSplits, subjectIDs);
+		mergeGroundTruth(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath);
+		mergeValidateTest(clusterJobNum, useCluster, cpdAlgorithms, cpdFPR, tvtDataPath, tvtDataAssignmentPath, dataSets, splitId, clusterWorkspace, featurePath);
 	}
 	
 	private void UQ_30Hz() throws Exception {
@@ -276,10 +275,10 @@ public class FeaturizeDataCPD extends TaskDef {
 		
 		String clusterWorkspace = expRootPath + "/" + datasetStr + "/cluster";
 		Integer clusterJobNum = 100;
-		Boolean useCluster = true;
+		Boolean useCluster = false;
 		
 		Array subjectIDs = array(Arrays.asList("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "18", "19", "20", "21", "22", "23", "24", "25"));
-		Array cpdAlgorithms = array(Arrays.asList("cc"));
+		Array cpdAlgorithms = array(Arrays.asList("cc", "kliep"));
 		Array cpdFPR = array(Arrays.asList("0.0005", "0.001", "0.005", "0.01"));
 		Array kpres = array(Arrays.asList("300"));
 		

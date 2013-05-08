@@ -57,7 +57,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 		singleScale.addParam("valiTestLabVisitFileExt", String.class, 
 				valiTestLabVisitFileExt);
 		singleScale.addParam("kernal", String.class, "linear");
-		singleScale.addParam("cost", Double.class, var(cost));
+		singleScale.addParam("Cost", Double.class, var(cost));
 		singleScale.addParam("validateSummaryPath", String.class,
 				quickValidateSummaryPath, VerificationType.After);
 		singleScale.prodMode();
@@ -108,7 +108,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 			String trainingLabVisitFileExt, Var valiTestLabVisitFileExt, 
 			Var bestModelInfoPath, Var bestModelSavePath, 
 			Var trainResultPath, Var validateResultPath,
-			Var testResultPath) throws Exception {
+			Var testResultPath, Array labels) throws Exception {
 		logStep("Test the best svm model");
 		Var testBestSingleScaleModelFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var testBestSingleScaleModelScript = expPath.fileSep().cat("svm").dot()
@@ -124,9 +124,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 		bestSingleScale.addParam("formula", Formula.class, var(formula));
 		bestSingleScale.addParam("formulaName", String.class, var(formulaName));
 		bestSingleScale.addParam("labels", List.class, RUtils.varToRList(
-				var(array(Arrays.asList("lying_down", "sitting",
-						"standing_household", "walking", "running",
-						"basketball", "dance"))), true));
+				var(labels), true));
 		bestSingleScale.addParam("split", Integer.class, var(splitId));
 		bestSingleScale.addParam("trainDataInfoPath", String.class,
 				trainDataInfoPath, VerificationType.Before);
@@ -163,7 +161,8 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 	private void summarizeTest(Integer clusterJobNum, Boolean useCluster,
 			String clusterWorkspace, String jobId, Var expPath,
 			Var bestModelId, Var testResultPath, Var confusionMatrixPath,
-			Var pctConsufionMatrixPath, Var summaryPath) throws Exception {
+			Var pctConsufionMatrixPath, Var summaryPath, Array labels)
+			throws Exception {
 		logStep("Summarize model test results");
 		Var summarizeFunctionPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var summarizeScriptPath = expPath.fileSep().cat("svm").dot()
@@ -174,9 +173,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 						.setNumJobs(clusterJobNum).setClusterWorkspace(clusterWorkspace)
 						.setJobId(jobId));
 		summarizeSingle.addParam("labels", List.class, RUtils.varToRList(
-				var(array(Arrays.asList("lying_down", "sitting",
-						"standing_household", "walking", "running",
-						"basketball", "dance"))), true));
+				var(labels), true));
 		summarizeSingle.addParam("predictionReportPath", String.class,
 				testResultPath, VerificationType.Before);
 		summarizeSingle.addParam("confusionMatrixPath", String.class,
@@ -190,9 +187,8 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 	}
 	
 	private void makeTable(Array formulaName, Array cpdAlgorithm, Array cpdFPR,
-			String tvtDataPath, Array splitId, Array windowSizes,
-			Array trialGroupId, Array testDataSets, Var modelPath)
-			throws Exception {
+			String tvtDataPath, Array splitId, Array trialGroupId,
+			Array testDataSets, Var modelPath) throws Exception {
 		logStep("List all resources in a table");
 		for(String form: formulaName.getValues()) {
 			for(String alg : cpdAlgorithm.getValues()) {
@@ -202,7 +198,6 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 					Var summaryPathSingle = var(tvtDataPath).cat("/svm/").cat("split").cat(splitId).cat("/svm.").cat(bestModelIdSingle).cat(".test.summary.csv");
 					Var confusionMatrixPathSingle = var(tvtDataPath).cat("/svm/").cat("split").cat(splitId).cat("/svm.").cat(bestModelIdSingle).cat(".test.cm.csv");
 					Table bestSingleScaleModelResTable = createTable(
-							newColumn("WindowSize", windowSizes),
 							newColumn("TrialGroup", trialGroupId),
 							newColumn("Formula", formulaName),
 							newColumn("Split", splitId),
@@ -252,7 +247,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 		merge.addParam("bestModelResFilePath", String.class,
 				bestSingleScaleModelResSavePathVar, VerificationType.Before);
 		//merge.addParam("windowSize", Integer.class, var(windowSizes));
-		merge.addParam("trialGroup", String.class, var(trialGroupId));
+		//merge.addParam("trialGroup", String.class, var(trialGroupId));
 		merge.addParam("formula", String.class, var(formulaName));
 		merge.addParam("testDataSet", String.class, var(testDataSets));
 		String expectedNumEntries = String.valueOf(splitId.getValues().size());
@@ -297,25 +292,23 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 	private void singleScaleModel(String expRootPath, String datasetStr,
 			String tvtDataPath, String labVisitFileFolder,
 			String trainingLabVisitFileExt, Var valiTestLabVisitFileExt,
-			List<String> trialGroupIdList,
-			List<String> windowSizeList, String costExp,
+			List<String> trialGroupIdList, String costExp,
 			List<String> formulaList, List<String> formulaNameList,
 			String clusterWorkspace, String jobId, Array cpdAlgorithm,
-			Array cpdFPR, Integer clusterJobNum, Boolean useCluster)
-			throws Exception {
+			Array cpdFPR, Integer clusterJobNum, Boolean useCluster,
+			Array labels) throws Exception {
 
 		Var dataset = var(datasetStr);
-		Array windowSizes = array(windowSizeList);
 		Array trialGroupIds = array(trialGroupIdList);
 
 		Array splitId = array("[0:1:30]");
 		Var iterationId = var("split").cat(splitId);
-		Var expPath = var(expRootPath).fileSep().cat(dataset).dot().cat("ws")
-				.cat(windowSizes).dot().cat(trialGroupIds).fileSep()
-				.cat("svm").fileSep().cat(iterationId);
+		Var expPath = var(expRootPath).fileSep().cat(dataset)
+				.cat(trialGroupIds).fileSep().cat("svm").fileSep()
+				.cat(iterationId);
 
 		Var trainDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("train.120.data.csv");
+				.fileSep().cat("train.ground.data.csv");
 		Var validateDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
 				.fileSep().cat("validate.").cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".data.csv");
@@ -354,16 +347,15 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 
 		Array trialGroupId = array(trialGroupIdList);
 		Array testDataSets = array(Arrays.asList("test"));
-		Var modelPath = var(expRootPath).fileSep().cat(dataset).dot().cat("ws")
-				.cat(windowSizes).dot().cat(trialGroupIds).fileSep()
-				.cat("svm");
+		Var modelPath = var(expRootPath).fileSep().cat(dataset)
+				.cat(trialGroupIds).fileSep().cat("svm");
 		
 		// This is where the action happens
 		trainValidate(clusterJobNum, useCluster, expPath, modelId, clusterWorkspace, jobId, formula, trainDataInfoPath, validateDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, cost);
 		summarizeValidate(cpdAlgorithm, cpdFPR, expPath, splitId, formulaName, cost, tvtDataPath);
-		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath);
-		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
-		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
+		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath, labels);
+		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath, labels);
+		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, trialGroupId, testDataSets, modelPath);
 		mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
 	}
 	
@@ -371,11 +363,13 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/cpd";
 		String datasetStr = "OSU_YR4_Hip_30Hz";
 
-		List<String> windowSizeList = Arrays.asList("120");
-		List<String> trialGroupIdList = Arrays.asList("7cls");
+		List<String> trialGroupIdList = Arrays.asList(".7cls");
 
 		String tvtDataPath = expRootPath + "/OSU_YR4_Hip_30Hz.ws120.7cls";
 		String labVisitFileFolder = tvtDataPath + "/features";
+		Array labels = array(Arrays.asList("lying_down", "sitting",
+				"standing_household", "walking", "running",
+				"basketball", "dance"));
 
 		List<String> formulaList = Arrays.asList(Formula.FORMULA_ALL_WO_FFT
 				.toString());
@@ -388,59 +382,54 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 		Boolean useCluster = false;
 
 		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
-		//Array cpdFPR = array(Arrays.asList("0.0002"));
 		Array cpdFPR = array(Arrays.asList("0.0001", "0.0002", "0.0003", "0.0004", "0.0005", "0.0006", "0.0007", "0.0008", "0.0009", "0.001", "0.0011", "0.0012", "0.0013", "0.0014", "0.0015", "0.0016", "0.0017", "0.0018", "0.0019", "0.002", "0.0021", "0.0022", "0.0023", "0.0024", "0.0025", "0.0026", "0.0027", "0.0028", "0.0029", "0.003", "0.0031", "0.0032", "0.0033", "0.0034", "0.0035", "0.0036", "0.0037", "0.0038", "0.0039", "0.004", "0.0041", "0.0042", "0.0043", "0.0044", "0.0045", "0.0046", "0.0047", "0.0048", "0.0049", "0.005", "0.0051", "0.0052", "0.0053", "0.0054", "0.0055", "0.0056", "0.0057", "0.0058", "0.0059", "0.006", "0.0061", "0.0062", "0.0063", "0.0064", "0.0065", "0.0066", "0.0067", "0.0068", "0.0069", "0.007", "0.0071", "0.0072", "0.0073", "0.0074", "0.0075", "0.0076", "0.0077", "0.0078", "0.0079", "0.008", "0.0081", "0.0082", "0.0083", "0.0084", "0.0085", "0.0086", "0.0087", "0.0088", "0.0089", "0.009", "0.0091", "0.0092", "0.0093", "0.0094", "0.0095", "0.0096", "0.0097", "0.0098", "0.0099", "0.01"));
-		//Array cpdFPR = array(Arrays.asList("0.015", "0.02", "0.025", "0.03", "0.035", "0.04", "0.045", "0.05", "0.055", "0.06", "0.065", "0.07", "0.075", "0.08", "0.085", "0.09", "0.095"));
 		String trainingLabVisitFileExt = ("PureTrial.featurized.120.csv");
 		Var valiTestLabVisitFileExt = var("PureTrial.featurized.").cat(cpdAlgorithm).dot().cat(cpdFPR).cat(".csv");
 		
 		singleScaleModel(expRootPath, datasetStr, tvtDataPath,
-				labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, trialGroupIdList,
-				windowSizeList, costExp, formulaList,
-				formulaNameList, clusterWorkspace, "single",
-				cpdAlgorithm, cpdFPR, clusterJobNum, useCluster);
+				labVisitFileFolder, trainingLabVisitFileExt,
+				valiTestLabVisitFileExt, trialGroupIdList, costExp,
+				formulaList, formulaNameList, clusterWorkspace, "single",
+				cpdAlgorithm, cpdFPR, clusterJobNum, useCluster, labels);
 	}
+	
+	private void UQ_30Hz() throws Exception {
+		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/cpd";
+		String day = "2";
+		String datasetStr = "uq_30Hz_day" + day;
 
-	/*private void OSU_YR4_30Hz_Wrist() throws Exception {
-		String expRootPath = "/nfs/guille/wong/wonglab2/obesity/2012/msexp";
-		String datasetStr = "OSU_YR4_Wrist_30Hz";
+		List<String> trialGroupIdList = Arrays.asList("");
 
-		List<String> windowSizeList = Arrays.asList("10");
-		List<String> trialGroupIdList = Arrays.asList("7cls");
-
-		String tvtDataPath = expRootPath + "/" + datasetStr + ".ws10.7cls";
+		String tvtDataPath = expRootPath + "/" + datasetStr;
 		String labVisitFileFolder = tvtDataPath + "/features";
-		String labVisitFileExt = "PureTrial.featurized.csv";
-
+		Array labels = array(Arrays.asList("0","1","2"));
+		
 		List<String> formulaList = Arrays.asList(Formula.FORMULA_ALL_WO_FFT
 				.toString());
 		List<String> formulaNameList = Arrays.asList("AllWoFFT");
 
 		String costExp = "[0.01,0.1,1,10,100,1000]";
-		String scaleExp = "[1:1:10]";
-
-		String clusterWorkspace = "/nfs/guille/wong/wonglab2/obesity/2012/msexp/"
-				+ datasetStr + ".ws10.7cls/svm.linear.stacking/cluster";
+		
+		String clusterWorkspace = expRootPath + "/" + datasetStr + "/svm/cluster";
+		Integer clusterJobNum = 100;
+		Boolean useCluster = false;
+		
+		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
+		Array cpdFPR = array(Arrays.asList("0.0005", "0.001", "0.005", "0.01"));
+		String trainingLabVisitFileExt = (".featurized.ground.csv");
+		Var valiTestLabVisitFileExt = var(".featurized.").cat(cpdAlgorithm).dot().cat(cpdFPR).cat(".csv");
+		
 		singleScaleModel(expRootPath, datasetStr, tvtDataPath,
-				labVisitFileFolder, labVisitFileExt, trialGroupIdList,
-				windowSizeList, costExp, scaleExp, formulaList,
-				formulaNameList, clusterWorkspace, "single");
-		allScaleStackingModel(expRootPath, datasetStr, tvtDataPath,
-				trialGroupIdList, windowSizeList, formulaList, formulaNameList,
-				costExp, clusterWorkspace, "stacking");
-		List<String> singleScaleList = Arrays.asList("1", "2", "3", "4", "5",
-				"6", "7", "8", "9");
-		for (String singleScale : singleScaleList) {
-			singleScaleStackingModel(expRootPath, datasetStr, tvtDataPath,
-					trialGroupIdList, windowSizeList, formulaNameList,
-					singleScale, costExp, clusterWorkspace, "mss");
-		}
-	}*/
-
+				labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt,
+				trialGroupIdList, costExp, formulaList, formulaNameList,
+				clusterWorkspace, "single", cpdAlgorithm, cpdFPR, clusterJobNum,
+				useCluster, labels);
+	}
+	
 	public static void main(String[] args) {
 		try {
-			new SVMLinearTrainValidateTest().OSU_YR4_30Hz_Hip();
-			//new SVMLinearTrainValidateTest1().OSU_YR4_30Hz_Wrist();
+			//new SVMLinearTrainValidateTest().OSU_YR4_30Hz_Hip();
+			new SVMLinearTrainValidateTest().UQ_30Hz();
 		} catch (Exception e) {
 			log.error(e, e);
 		}

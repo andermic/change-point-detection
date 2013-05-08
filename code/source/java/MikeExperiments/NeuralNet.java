@@ -107,7 +107,7 @@ public class NeuralNet extends TaskDef {
 			String trainingLabVisitFileExt, Var valiTestLabVisitFileExt, 
 			Var bestModelInfoPath, Var bestModelSavePath, Var trainResultPath,
 			Var validateResultPath, Var testResultPath, Array numHiddenUnits,
-			Array weightDecay) throws Exception {
+			Array weightDecay, Array labels) throws Exception {
 		logStep("Test the best nnet model");
 		Var testBestSingleScaleModelFunction = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var testBestSingleScaleModelScript = expPath.fileSep().cat("nnet").dot()
@@ -123,9 +123,7 @@ public class NeuralNet extends TaskDef {
 		bestSingleScale.addParam("formula", Formula.class, var(formula));
 		bestSingleScale.addParam("formulaName", String.class, var(formulaName));
 		bestSingleScale.addParam("labels", List.class, RUtils.varToRList(
-				var(array(Arrays.asList("lying_down", "sitting",
-						"standing_household", "walking", "running",
-						"basketball", "dance"))), true));
+				var(labels), true));
 		bestSingleScale.addParam("split", Integer.class, var(splitId));
 		bestSingleScale.addParam("trainDataInfoPath", String.class,
 				trainDataInfoPath, VerificationType.Before);
@@ -161,7 +159,8 @@ public class NeuralNet extends TaskDef {
 	private void summarizeTest(Integer clusterJobNum, Boolean useCluster,
 			String clusterWorkspace, String jobId, Var expPath,
 			Var bestModelId, Var testResultPath, Var confusionMatrixPath,
-			Var pctConsufionMatrixPath, Var summaryPath) throws Exception {
+			Var pctConsufionMatrixPath, Var summaryPath, Array labels)
+			throws Exception {
 		logStep("Summarize model test results");
 		Var summarizeFunctionPath = var("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/cpd/cpd.R");
 		Var summarizeScriptPath = expPath.fileSep().cat("nnet").dot()
@@ -172,9 +171,7 @@ public class NeuralNet extends TaskDef {
 						.setNumJobs(clusterJobNum).setClusterWorkspace(clusterWorkspace)
 						.setJobId(jobId));
 		summarizeSingle.addParam("labels", List.class, RUtils.varToRList(
-				var(array(Arrays.asList("lying_down", "sitting",
-						"standing_household", "walking", "running",
-						"basketball", "dance"))), true));
+				var(labels), true));
 		summarizeSingle.addParam("predictionReportPath", String.class,
 				testResultPath, VerificationType.Before);
 		summarizeSingle.addParam("confusionMatrixPath", String.class,
@@ -188,9 +185,8 @@ public class NeuralNet extends TaskDef {
 	}
 	
 	private void makeTable(Array formulaName, Array cpdAlgorithm, Array cpdFPR,
-			String tvtDataPath, Array splitId, Array windowSizes,
-			Array trialGroupId, Array testDataSets, Var modelPath)
-			throws Exception {
+			String tvtDataPath, Array splitId, Array trialGroupId,
+			Array testDataSets, Var modelPath) throws Exception {
 		logStep("List all resources in a table");
 		for(String form: formulaName.getValues()) {
 			for(String alg : cpdAlgorithm.getValues()) {
@@ -200,7 +196,6 @@ public class NeuralNet extends TaskDef {
 					Var summaryPathSingle = var(tvtDataPath).cat("/nnet/").cat("split").cat(splitId).cat("/nnet.").cat(bestModelIdSingle).cat(".test.summary.csv");
 					Var confusionMatrixPathSingle = var(tvtDataPath).cat("/nnet/").cat("split").cat(splitId).cat("/nnet.").cat(bestModelIdSingle).cat(".test.cm.csv");
 					Table bestSingleScaleModelResTable = createTable(
-							newColumn("WindowSize", windowSizes),
 							newColumn("TrialGroup", trialGroupId),
 							newColumn("Formula", formulaName),
 							newColumn("Split", splitId),
@@ -246,7 +241,7 @@ public class NeuralNet extends TaskDef {
 				.cat(".res.csv");
 		merge.addParam("bestModelResFilePath", String.class,
 				bestSingleScaleModelResSavePathVar, VerificationType.Before);
-		merge.addParam("trialGroup", String.class, var(trialGroupId));
+		//merge.addParam("trialGroup", String.class, var(trialGroupId));
 		merge.addParam("formula", String.class, var(formulaName));
 		merge.addParam("testDataSet", String.class, var(testDataSets));
 		String expectedNumEntries = String.valueOf(splitId.getValues().size());
@@ -267,22 +262,20 @@ public class NeuralNet extends TaskDef {
 	private void singleScaleModel(String expRootPath, String datasetStr,
 			String tvtDataPath, String labVisitFileFolder,
 			String trainingLabVisitFileExt, Var valiTestLabVisitFileExt,
-			List<String> trialGroupIdList, List<String> windowSizeList,
-			Array numHiddenUnits, Array weightDecay,
+			List<String> trialGroupIdList, Array numHiddenUnits, Array weightDecay,
 			List<String> formulaList, List<String> formulaNameList,
 			String clusterWorkspace, String jobId, Array cpdAlgorithm,
-			Array cpdFPR, Integer clusterJobNum, Boolean useCluster)
-			throws Exception {
+			Array cpdFPR, Integer clusterJobNum, Boolean useCluster,
+			Array labels) throws Exception {
 
 		Var dataset = var(datasetStr);
-		Array windowSizes = array(windowSizeList);
 		Array trialGroupIds = array(trialGroupIdList);
 
 		Array splitId = array("[0:1:30]");
 		Var iterationId = var("split").cat(splitId);
-		Var expPath = var(expRootPath).fileSep().cat(dataset).dot().cat("ws")
-				.cat(windowSizes).dot().cat(trialGroupIds).fileSep()
-				.cat("nnet").fileSep().cat(iterationId);
+		Var expPath = var(expRootPath).fileSep().cat(dataset)
+				.cat(trialGroupIds).fileSep().cat("nnet").fileSep()
+				.cat(iterationId);
 
 		/*Var trainDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
 				.fileSep().cat("train.120.data.csv");
@@ -293,12 +286,12 @@ public class NeuralNet extends TaskDef {
 				.fileSep().cat("test.").cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".data.csv");*/
 
-		Var trainDataInfoPath = var("/nfs/guille/wong/wonglab3/obesity/2012/cpd/OSU_YR4_Hip_30Hz.ws120.7cls").fileSep().cat(iterationId)
-				.fileSep().cat("train.120.data.csv");
-		Var validateDataInfoPath = var("/nfs/guille/wong/wonglab3/obesity/2012/cpd/OSU_YR4_Hip_30Hz.ws120.7cls/").fileSep().cat(iterationId)
+		Var trainDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
+				.fileSep().cat("train.ground.data.csv");
+		Var validateDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
 				.fileSep().cat("validate.").cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".data.csv");
-		Var testDataInfoPath = var("/nfs/guille/wong/wonglab3/obesity/2012/cpd/OSU_YR4_Hip_30Hz.ws120.7cls/").fileSep().cat(iterationId)
+		Var testDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
 				.fileSep().cat("test.").cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".data.csv");
 		
@@ -333,16 +326,15 @@ public class NeuralNet extends TaskDef {
 
 		Array trialGroupId = array(trialGroupIdList);
 		Array testDataSets = array(Arrays.asList("test"));
-		Var modelPath = var(expRootPath).fileSep().cat(dataset).dot().cat("ws")
-				.cat(windowSizes).dot().cat(trialGroupIds).fileSep()
-				.cat("nnet");
+		Var modelPath = var(expRootPath).fileSep().cat(dataset)
+				.cat(trialGroupIds).fileSep().cat("nnet");
 
 		//This is where the action happens
 		trainValidate(clusterJobNum, useCluster, expPath, modelId, clusterWorkspace, jobId, formula, trainDataInfoPath, validateDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, numHiddenUnits, weightDecay);
 		summarizeValidate(cpdAlgorithm, cpdFPR, expPath, splitId, formulaName, tvtDataPath, numHiddenUnits, weightDecay);
-		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath, numHiddenUnits, weightDecay);
-		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath);
-		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, windowSizes, trialGroupId, testDataSets, modelPath);
+		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath, numHiddenUnits, weightDecay, labels);
+		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath, labels);
+		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, trialGroupId, testDataSets, modelPath);
 		mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
 	}
 	
@@ -351,12 +343,14 @@ public class NeuralNet extends TaskDef {
 		String expRootPath = "/nfs/guille/wong/users/andermic/Desktop/cpd";
 		String datasetStr = "OSU_YR4_Hip_30Hz";
 
-		List<String> windowSizeList = Arrays.asList("120");
-		List<String> trialGroupIdList = Arrays.asList("7cls");
+		List<String> trialGroupIdList = Arrays.asList(".7cls");
 
 		String tvtDataPath = expRootPath + "/OSU_YR4_Hip_30Hz.ws120.7cls";
 		//String labVisitFileFolder = tvtDataPath + "/features";
 		String labVisitFileFolder = "/nfs/guille/wong/wonglab3/obesity/2012/cpd/OSU_YR4_Hip_30Hz.ws120.7cls/features";
+		Array labels = array(Arrays.asList("lying_down", "sitting",
+				"standing_household", "walking", "running",
+				"basketball", "dance"));
 		
 		List<String> formulaList = Arrays.asList(Formula.FORMULA_ALL_WO_FFT
 				.toString());
@@ -378,15 +372,51 @@ public class NeuralNet extends TaskDef {
 		
 		singleScaleModel(expRootPath, datasetStr, tvtDataPath,
 				labVisitFileFolder, trainingLabVisitFileExt, 
-				valiTestLabVisitFileExt, trialGroupIdList, windowSizeList,
+				valiTestLabVisitFileExt, trialGroupIdList,
 				numHiddenUnits, weightDecay, formulaList,
 				formulaNameList, clusterWorkspace, "single",
-				cpdAlgorithm, cpdFPR, clusterJobNum, useCluster);
+				cpdAlgorithm, cpdFPR, clusterJobNum, useCluster, labels);
+	}
+
+	private void UQ_30Hz() throws Exception {
+		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/cpd";
+		String day = "2";
+		String datasetStr = "uq_30Hz_day" + day;
+
+		List<String> trialGroupIdList = Arrays.asList("");
+
+		String tvtDataPath = expRootPath + "/" + datasetStr;
+		String labVisitFileFolder = tvtDataPath + "/features";
+		Array labels = array(Arrays.asList("0","1","2"));
+		
+		List<String> formulaList = Arrays.asList(Formula.FORMULA_ALL_WO_FFT
+				.toString());
+		List<String> formulaNameList = Arrays.asList("AllWoFFT");
+
+		String clusterWorkspace = expRootPath + "/" + datasetStr + "/nnet/cluster";
+		Integer clusterJobNum = 100;
+		Boolean useCluster = true;
+		
+		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
+		Array cpdFPR = array(Arrays.asList("0.0005", "0.001", "0.005", "0.01"));
+		Array numHiddenUnits = array(Arrays.asList("5", "10", "15"));
+		Array weightDecay = array(Arrays.asList("0.0", "0.5", "1"));
+		
+		String trainingLabVisitFileExt = (".featurized.ground.csv");
+		Var valiTestLabVisitFileExt = var(".featurized.").cat(cpdAlgorithm).dot().cat(cpdFPR).cat(".csv");
+		
+		singleScaleModel(expRootPath, datasetStr, tvtDataPath,
+				labVisitFileFolder, trainingLabVisitFileExt,
+				valiTestLabVisitFileExt,
+				trialGroupIdList, numHiddenUnits, weightDecay, formulaList, formulaNameList,
+				clusterWorkspace, "single", cpdAlgorithm, cpdFPR, clusterJobNum,
+				useCluster, labels);
 	}
 
 	public static void main(String[] args) {
 		try {
-			new NeuralNet().OSU_YR4_30Hz_Hip();
+			//new NeuralNet().OSU_YR4_30Hz_Hip();
+			new NeuralNet().UQ_30Hz();
 		} catch (Exception e) {
 			log.error(e, e);
 		}

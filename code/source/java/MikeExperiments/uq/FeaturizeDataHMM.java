@@ -162,8 +162,8 @@ public class FeaturizeDataHMM extends TaskDef {
 
 		// This is where the action happens
 		featurize(clusterJobNum, useCluster, featurizeFunctionScriptPath, callingScriptPath, clusterWorkspace, truncatedFileNames, duplicatesFileNames, eventsFileNames, frequency, featurizeDataPath, windowSizes, day);
-		//splitData(tvtDataAssignmentPath, splitId, numSplits, subjectIDs);
-		//merge(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr, windowSizes);
+		splitData(tvtDataAssignmentPath, splitId, numSplits, subjectIDs);
+		merge(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath, featurizedFileExtStr, windowSizes);
 	}
 
 	private void splitDataSetInto4Parts(Array subjectIDs,
@@ -191,18 +191,20 @@ public class FeaturizeDataHMM extends TaskDef {
 
 	private void UQ_30Hz() throws Exception {
 		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/hmm";
-		String day = "3";
+		String day = "2";
 		String frequencyStr = "30";
 		String datasetStr = "uq_" + frequencyStr + "Hz_day" + day;
 
 		String rawDataPathStr = "/nfs/guille/wong/users/andermic/uq/processed";
-		List<String> windowSizeList = Arrays.asList("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20");
+		List<String> windowSizeList = Arrays.asList("10","12","14","16","18","20");
+		windowSizeList = Arrays.asList("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20");
+		windowSizeList = Arrays.asList("20");
 		String tvtDataPath = expRootPath + "/" + datasetStr + ".HMM";
 		String tvtDataAssignmentPath = tvtDataPath + "/splits";
 		
 		String clusterWorkspace = tvtDataPath + "/cluster";
 		Integer clusterJobNum = 100;
-		Boolean useCluster = true;
+		Boolean useCluster = false;
 		
 		Array subjectIDs = array(Arrays.asList("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "18", "19", "20", "21", "22", "23", "24", "25"));
 		int numSplits = 30;

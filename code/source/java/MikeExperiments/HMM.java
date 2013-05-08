@@ -420,7 +420,7 @@ public class HMM extends TaskDef {
 		Array windowSizes = array("[1:1:20]");
 		Var labVisitFileFolder = var(tvtDataPath).cat("/features/").cat("ws").cat(windowSizes);
 		Integer clusterJobNum = 100;
-		int baseClassifier = SVM;
+		int baseClassifier = NNET;
 		Boolean useCluster = true;
 
 		List<String> tuningParams = Collections.emptyList();
@@ -460,7 +460,7 @@ public class HMM extends TaskDef {
 		final int DT = 3;
 		
 		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/hmm";
-		String day = "2";
+		String day = "3";
 		String expName = "uq_30Hz_day" + day + ".HMM";
 		String datasetStr = "uq_30Hz_day" + day;
 		String tvtDataPath = expRootPath + "/" + expName;
@@ -472,10 +472,10 @@ public class HMM extends TaskDef {
 		
 		// This block, along with the tuning parameters, will be customized to each experiment
 		Array windowSizes = array("[1:1:20]");
-		windowSizes = array(Arrays.asList("16","18","20"));
+		windowSizes = array(Arrays.asList("8","6","4"));
 		Var labVisitFileFolder = var(tvtDataPath).cat("/features/").cat("ws").cat(windowSizes);
-		Integer clusterJobNum = 100;
-		int baseClassifier = NNET;
+		Integer clusterJobNum = 150;
+		int baseClassifier = SVM;
 		Boolean useCluster = true;
 
 		List<String> tuningParams = Collections.emptyList();
@@ -485,12 +485,12 @@ public class HMM extends TaskDef {
 			case SVM:
 				baseClassifierStr = "svm";
 				tuningParams = Arrays.asList("Cost");
-				tuningParamVals = Arrays.asList(array("[0.01,0.1,1,10,100,1000]"));
+				tuningParamVals = Arrays.asList(array("[0.01,0.1,1,10,100]"));
 				break;
 			case NNET:
 				baseClassifierStr = "nnet";
 	            tuningParams = Arrays.asList("NumHiddenUnits","WeightDecay");
-	            tuningParamVals = Arrays.asList(array("[1:1:30]"), array("[0.0,0.5,1]"));
+	            tuningParamVals = Arrays.asList(array("[5,10,15]"), array("[0.0,0.5,1]"));
 				break;
 			case DT:
 				baseClassifierStr = "dt";
