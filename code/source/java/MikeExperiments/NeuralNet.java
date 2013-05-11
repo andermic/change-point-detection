@@ -380,7 +380,7 @@ public class NeuralNet extends TaskDef {
 
 	private void UQ_30Hz() throws Exception {
 		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/cpd";
-		String day = "3";
+		String day = "2";
 		String datasetStr = "uq_30Hz_day" + day;
 
 		List<String> trialGroupIdList = Arrays.asList("");
