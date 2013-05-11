@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Control Parameters for the Tune Function</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for tune.control {e1071}"><tr><td>tune.control {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Control Parameters for the Tune Function</h2>
+
+<h3>Description</h3>
+
+<p>Creates an object of class <code>tune.control</code> to be used with
+the <code>tune</code> function, containing various control parameters.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+tune.control(random = FALSE, nrepeat = 1, repeat.aggregate = min,
+sampling = c("cross", "fix", "bootstrap"), sampling.aggregate = mean,
+sampling.dispersion = sd,
+cross = 10, fix = 2/3, nboot = 10, boot.size = 9/10, best.model = TRUE,
+performances = TRUE, error.fun = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>random</code></td>
+<td>
+<p>if an integer value is specified, <code>random</code>
+parameter vectors are drawn from the parameter space.</p>
+</td></tr>
+<tr valign="top"><td><code>nrepeat</code></td>
+<td>
+<p>specifies how often training shall be repeated.</p>
+</td></tr>
+<tr valign="top"><td><code>repeat.aggregate</code></td>
+<td>
+<p>function for aggregating the repeated training results.</p>
+</td></tr>
+<tr valign="top"><td><code>sampling</code></td>
+<td>
+<p>sampling scheme. If <code>sampling = "cross"</code>, a
+<code>cross</code>-times cross validation is performed. If <code>sampling
+      = "boot"</code>, <code>nboot</code> training sets of size <code>boot.size</code> (part)
+are sampled (with replacement) from the supplied data. If <code>sampling
+      = "fix"</code>, a single split into training/validation set is
+used, the training set containing a <code>fix</code> part of the supplied
+data. Note that a separate validation set can be supplied via
+<code>validation.x</code> and <code>validation.y</code>. It is only used for
+<code>sampling = "boot"</code> and <code>sampling = "fix"</code>; in the latter
+case, <code>fix</code> is set to 1.</p>
+</td></tr>
+<tr valign="top"><td><code>sampling.aggregate,sampling.dispersion</code></td>
+<td>
+<p>functions for aggregating the training
+results on the generated training samples (default: mean and
+standard deviation).</p>
+</td></tr>
+<tr valign="top"><td><code>cross</code></td>
+<td>
+<p>number of partitions for cross-validation.</p>
+</td></tr>
+<tr valign="top"><td><code>fix</code></td>
+<td>
+<p>part of the data used for training in fixed sampling.</p>
+</td></tr>
+<tr valign="top"><td><code>nboot</code></td>
+<td>
+<p>number of bootstrap replications.</p>
+</td></tr>
+<tr valign="top"><td><code>boot.size</code></td>
+<td>
+<p>size of the bootstrap samples.</p>
+</td></tr>
+<tr valign="top"><td><code>best.model</code></td>
+<td>
+<p>if <code>TRUE</code>, the best model is trained and
+returned (the best parameter set is used for
+training on the complete training set).</p>
+</td></tr>
+<tr valign="top"><td><code>performances</code></td>
+<td>
+<p>if <code>TRUE</code>, the performance results for all
+parameter combinations are returned.</p>
+</td></tr>
+<tr valign="top"><td><code>error.fun</code></td>
+<td>
+<p>function returning the error measure to be minimized.
+It takes two arguments: a vector of true values and a vector of
+predicted values. If <code>NULL</code>, the misclassification error is used
+for categorical predictions and the mean squared error for numeric
+predictions.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>"tune.control"</code> containing all the above
+parameters (either the defaults or the user specified values).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Meyer<br>
+<a href="mailto:David.Meyer@R-project.org">David.Meyer@R-project.org</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="tune.html">tune</a></code></p>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

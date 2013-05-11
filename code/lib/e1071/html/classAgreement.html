@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Coefficients Comparing Classification Agreement</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for classAgreement {e1071}"><tr><td>classAgreement {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Coefficients Comparing Classification Agreement</h2>
+
+<h3>Description</h3>
+
+<p><code>classAgreement()</code> computes several coefficients of agreement
+between the columns and rows of a 2-way contingency table.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+classAgreement(tab, match.names=FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>tab</code></td>
+<td>
+<p>A 2-dimensional contingency table.</p>
+</td></tr>
+<tr valign="top"><td><code>match.names</code></td>
+<td>
+<p>Flag whether row and columns should be matched by name.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Suppose we want to compare two classifications summarized by the
+contingency table <i>T=[t_{ij}]</i> where <i>i,j=1,&hellip;,K</i> and <i>t_{ij}</i>
+denotes the number of data points which are in class <i>i</i> in the
+first partition and in class <i>j</i> in the second partition. If both
+classifications use the same labels, then obviously the two
+classification agree completely if only elements in the main diagonal
+of the table are non-zero. On the other hand, large off-diagonal
+elements correspond to smaller agreement between the two
+classifications. If <code>match.names</code> is <code>TRUE</code>, the class labels
+as given by the row and column names are matched, i.e. only columns and
+rows with the same dimnames are used for the computation.
+</p>
+<p>If the two classification do not use the same set of labels, or if
+identical labels can have different meaning (e.g., two outcomes of
+cluster analysis on the same data set), then the situation is a little
+bit more complicated. Let <i>A</i> denote the number of all pairs of data
+points which are either put into the same cluster by both partitions or
+put into different clusters by both partitions. Conversely, let <i>D</i>
+denote the number of all pairs of data points that are put into one
+cluster in one partition, but into different clusters by the other
+partition.  Hence, the partitions disagree for all pairs <i>D</i> and
+agree for all pairs <i>A</i>. We can measure the agreement by the Rand
+index <i>A/(A+D)</i> which is invariant with respect to permutations of
+the columns or rows of <i>T</i>.
+</p>
+<p>Both indices have to be corrected for agreement by chance if the sizes
+of the classes are not uniform.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list with components
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>diag</code></td>
+<td>
+<p>Percentage of data points in the main diagonal of <code>tab</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>kappa</code></td>
+<td>
+<p><code>diag</code> corrected for agreement by chance.</p>
+</td></tr>
+<tr valign="top"><td><code>rand</code></td>
+<td>
+<p>Rand index.</p>
+</td></tr>
+<tr valign="top"><td><code>crand</code></td>
+<td>
+<p>Rand index corrected for agreement by chance.</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Friedrich Leisch</p>
+
+
+<h3>References</h3>
+
+<p>J.~Cohen. A coefficient of agreement for nominal scales.
+Educational and Psychological Measurement, 20, 37&ndash;46, 1960.
+</p>
+<p>Lawrence Hubert and Phipps Arabie. Comparing partitions.
+Journal of Classification, 2, 193&ndash;218, 1985.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="matchClasses.html">matchClasses</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## no class correlations: both kappa and crand almost zero
+g1 &lt;- sample(1:5, size=1000, replace=TRUE)
+g2 &lt;- sample(1:5, size=1000, replace=TRUE)
+tab &lt;- table(g1, g2)
+classAgreement(tab)
+
+## let pairs (g1=1,g2=1) and (g1=3,g2=3) agree better
+k &lt;- sample(1:1000, size=200)
+g1[k] &lt;- 1
+g2[k] &lt;- 1
+
+k &lt;- sample(1:1000, size=200)
+g1[k] &lt;- 3
+g2[k] &lt;- 3
+
+tab &lt;- table(g1, g2)
+## both kappa and crand should be significantly larger than before
+classAgreement(tab)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

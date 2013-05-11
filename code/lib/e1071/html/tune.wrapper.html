@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Convenience Tuning Wrapper Functions</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for tune.wrapper {e1071}"><tr><td>tune.wrapper {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Convenience Tuning Wrapper Functions</h2>
+
+<h3>Description</h3>
+
+<p>Convenience tuning wrapper functions, using <code>tune</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+tune.svm(x, y = NULL, data = NULL, degree = NULL, gamma = NULL, coef0 = NULL,
+         cost = NULL, nu = NULL, class.weights = NULL, epsilon = NULL, ...)
+best.svm(x, tunecontrol = tune.control(), ...)
+ 
+tune.nnet(x, y = NULL, data = NULL, size = NULL, decay = NULL,
+          trace = FALSE, tunecontrol = tune.control(nrepeat = 5), 
+          ...)
+best.nnet(x, tunecontrol = tune.control(nrepeat = 5), ...)
+
+tune.rpart(formula, data, na.action = na.omit, minsplit = NULL,
+           minbucket = NULL, cp = NULL, maxcompete = NULL, maxsurrogate = NULL,
+           usesurrogate = NULL, xval = NULL, surrogatestyle = NULL, maxdepth =
+           NULL, predict.func = NULL, ...)
+best.rpart(formula, tunecontrol = tune.control(), ...)
+
+tune.randomForest(x, y = NULL, data = NULL, nodesize = NULL, mtry = NULL, ntree = NULL, ...)
+best.randomForest(x, tunecontrol = tune.control(), ...)
+
+tune.knn(x, y, k = NULL, l = NULL, ...) 
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula, x, y, data</code></td>
+<td>
+<p>formula and data arguments of function to be tuned.</p>
+</td></tr>
+<tr valign="top"><td><code>predict.func</code></td>
+<td>
+<p>predicting function.</p>
+</td></tr>
+<tr valign="top"><td><code>na.action</code></td>
+<td>
+<p>function handling missingness.</p>
+</td></tr>
+<tr valign="top"><td><code>minsplit, minbucket, cp, maxcompete,
+maxsurrogate, usesurrogate, xval,
+surrogatestyle, maxdepth</code></td>
+<td>
+<p><code>rpart</code> parameters.</p>
+</td></tr>
+<tr valign="top"><td><code>degree, gamma, coef0, cost, nu, class.weights, epsilon</code></td>
+<td>
+<p><code>svm</code>
+parameters.</p>
+</td></tr>
+<tr valign="top"><td><code>k, l</code></td>
+<td>
+<p><code>knn</code> parameters.</p>
+</td></tr>
+<tr valign="top"><td><code>mtry, nodesize, ntree</code></td>
+<td>
+<p><code>randomForest</code> parameters.</p>
+</td></tr>
+<tr valign="top"><td><code>size, decay, trace</code></td>
+<td>
+<p>parameters passed to
+<code>nnet</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>tunecontrol</code></td>
+<td>
+<p>object of class <code>"tune.control"</code> containing
+tuning parameters.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Further parameters passed to <code>tune</code>.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>For examples, see the help page of <code>tune()</code>.</p>
+
+
+<h3>Value</h3>
+
+<p><code>tune.foo()</code> returns a tuning object including the best parameter set obtained
+by optimizing over the specified parameter vectors. <code>best.foo()</code>
+directly returns the best model, i.e. the fit of a new model using the
+optimal parameters found by <code>tune.foo</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Meyer<br>
+<a href="mailto:David.Meyer@R-project.org">David.Meyer@R-project.org</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="tune.html">tune</a></code></p>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

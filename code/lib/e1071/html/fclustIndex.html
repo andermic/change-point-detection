@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Fuzzy Cluster Indexes (Validity/Performance Measures)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for fclustIndex {e1071}"><tr><td>fclustIndex {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Fuzzy Cluster Indexes (Validity/Performance Measures)</h2>
+
+<h3>Description</h3>
+
+<p>Calculates the values of several fuzzy validity measures. The values
+of the indexes can be independently used in order to evaluate and compare
+clustering partitions or even to determine the number of clusters
+existing in a data set.</p>
+
+
+<h3>Usage</h3>
+
+<pre>fclustIndex(y, x, index = "all")</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>y</code></td>
+<td>
+<p>An object of a fuzzy clustering result of class <code>"fclust"</code></p>
+</td></tr>
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>Data matrix</p>
+</td></tr>
+<tr valign="top"><td><code>index</code></td>
+<td>
+<p>The validity measures used: <code>"gath.geva"</code>, <code>"xie.beni"</code>,
+<code>"fukuyama.sugeno"</code>, <code>"partition.coefficient"</code>,
+<code>"partition.entropy"</code>, <code>"proportion.exponent"</code>,
+<code>"separation.index"</code> and <code>"all"</code> for all the indexes.</p>
+</td></tr></table>
+
+
+<h3>Details</h3>
+
+<p>The validity measures and a short description of them follows, where
+<i>N</i> is the number of data points, <i>u_{ij}</i> the values of the
+membership matrix, <i>v_j</i> the centers of the clusters and <i>k</i>
+te number of clusters.
+</p>
+
+<dl>
+<dt><B>gath.geva</B>:</dt><dd>
+<p>Gath and Geva introduced 2 main criteria for comparing and finding
+optimal partitions based on the heuristics that a better clustering
+assumes clear separation between the clusters, minimal volume of the
+clusters and maximal number of data points concentrated in the
+vicinity of the cluster centroids. These indexes are only for the
+cmeans clustering algorithm valid.
+For the first, the &ldquo;fuzzy hypervolume&rdquo; we have:
+<i>F_{HV}=&sum;_{j=1}^{c}{[\det(F_j)]}^{1/2}</i>, where
+<i>F_j=\frac{&sum;_{i=1}^N
+	  u_{ij}(x_i-v_j)(x_i-v_j)^T}{&sum;_{i=1}^{N}u_{ij}}</i>, for the
+case when the defuzzification parameter is 2.
+For the second, the &ldquo;average partition density&rdquo;:
+<i>D_{PA}=\frac{1}{k}&sum;_{j=1}^k\frac{S_j}{{[\det(F_j)]}^{1/2}}</i>,
+where <i>S_j=&sum;_{i=1}^N u_{ij}</i>.
+Moreover, the &ldquo;partition density&rdquo; which expresses the general
+partition density according to the physical definition of density
+is calculated by:
+<i>P_D=\frac{S}{F_{HV}}</i>, where <i>S=&sum;_{j=1}^k&sum;_{i=1}^N
+	u_{ij}</i>.
+</p>
+</dd>
+<dt><B>xie.beni</B>:</dt><dd>
+<p>This index is a function of the data set and the centroids of the
+clusters. Xie and Beni explained this index by writing it as a ratio
+of the total variation of the partition and the centroids $(U,V)$
+and the separation of the centroids vectors. The minimum values of
+this index under comparison support the best partitions.
+<i>u_{XB}(U,V;X)=\frac{&sum;_{j=1}^k&sum;_{i=1}^Nu_{ij}^2{||x_i-v_j||}^2}{N(\min_{j\neq l}\{{||v_j-v_l||}^2\})}</i>
+</p>
+</dd>
+<dt><B>fukuyama.sugeno</B>:</dt><dd>
+<p>This index consists of the difference of two terms, the first
+combining the fuzziness in the membership matrix with the
+geometrical compactness of the representation of the data set via
+the prototypes, and the second the fuzziness in its row of the
+partition matrix with the distance from the $i$th prototype to the
+grand mean of the data. The minimum values of this index also
+propose a good partition.
+<i>u_{FS}(U,V;X)=&sum;_{i=1}^{N}&sum;_{j=1}^k
+	(u_{ij}^2)^q(||x_i-v_j||^2-||v_j-\bar v||^2)</i>
+</p>
+</dd>
+<dt><B>partition.coefficient</B>:</dt><dd>
+<p>An index which measures the fuzziness of the partition but without
+considering the data set itself. It is a heuristic measure since it
+has no connection to any property of the data. The maximum values of
+it imply a good partition in the meaning of a least fuzzy
+clustering.
+<i>F(U;k)=\frac{tr (UU^T)}{N}=\frac{&lt;U,U&gt;}{N}=\frac{||U||^2}{N}</i>
+</p>
+
+<ul>
+<li> <i>F(U;k)</i><p> shows the fuzziness or the overlap of the partition
+and depends on <i>kN</i> elements. 
+</p>
+</li>
+<li> <i>1/k&le;q F(U;k)&le;q 1</i><p>, where if <i>F(U;k)=1</i> then <i>U</i> is a hard
+partition and if <i>F(U;k)=1/k</i> then <i>U=[1/k]</i> is the centroid of
+the fuzzy partion space <i>P_{fk}</i>. The converse is also valid.
+</p>
+</li></ul>
+
+</dd>
+<dt><B>partition.entropy</B>:</dt><dd>
+<p>It is a measure that provides information about the membership
+matrix without also considering the data itself. The minimum values
+imply a good partition in the meaning of a more crisp partition.
+<i>H(U;k)=&sum;_{i=1}^{N} h(u_i)/N</i>, where
+<i>h(u)=-&sum;_{j=1}^{k} u_j\,\log _a (u_j)</i> the Shannon's entropy.
+</p>
+
+<ul>
+<li> <i>H(U;k)</i><p> shows the uncertainty of a fuzzy partition and
+depends also on <i>kN</i> elements. Specifically, <i>h(u_i)</i> is
+interpreted as the amount of fuzzy information about the
+membership of <i>x_i</i> in <i>k</i> classes that is retained by column
+<i>u_j</i>. Thus, at <i>U=[1/k]</i> the most information is withheld since
+the membership is the fuzziest possible.
+</p>
+</li>
+<li> <i>0&le;q H(U;k)&le;q \log_a(k)</i><p>, where for <i>H(U;k)=0</i> <i>U</i> is a
+hard partition and for <i>H(U;k)=\log_a(k)</i> <i>U=[1/k]</i>.
+</p>
+</li></ul>
+
+</dd>
+<dt><B>proportion.exponent</B>:</dt><dd>
+<p>It is a measure <i>P(U;k)</i> of fuzziness adept to detect structural variations
+in the partition matrix as it becomes more fuzzier. A crisp cluster
+in the partition matrix can drive it to infinity when the partition
+coefficient and the partition entropy are more sensitive to small
+changes when approaching a hard partition. Its evaluation does not also
+involve the data or the algorithm used to partition them and
+its maximum implies the optimal partition but without knowing what
+maximum is a statistically significant maximum.
+</p>
+
+<ul>
+<li> <i>0&le;q P(U;k)&lt;&infin;</i><p>, since the <i>[0,1]</i> values explode to
+<i>[0,&infin;)</i> due to the natural logarithm. Specifically, <i>P=0</i>
+when and only when <i>U=[1/k]</i>, while <i>P\rightarrow&infin;</i> when
+any column of <i>U</i> is crisp. 
+</p>
+</li>
+<li> <i>P(U;k)</i><p> can easily explode and it is good for partitions
+with large column maximums and at detecting structural
+variations.
+</p>
+</li></ul>
+
+</dd>
+<dt><B>separation.index (known as CS Index)</B>:</dt><dd>
+<p>This index identifies unique cluster structure with well-defined
+properties that depend on the data and a measure of distance. It
+answers the question if the clusters are compact and separated, but
+it rather seems computationally infeasible for big data sets since a
+distance matrix between all the data membership values has to be
+calculated. It also presupposes that a hard partition is derived
+from the fuzzy one.<br>
+<i>D_1(U;k;X,d)=\min_{i+1\,&le;q\,l\,&le;q\,k-1}&le;ft\{\min_{1\,&le;q\,j\,&le;q\,k}&le;ft\{\frac{dis(u_j,u_l)}{\max_{1&le;q m&le;q k}\{dia(u_m)\}}\right\}\right\}</i>, where <i>dia</i>  is the diameter of the subset, <i>dis</i> the distance of
+two subsets, and <i>d</i> a metric.
+<i>U</i> is a CS partition of <i>X</i> <i>\Leftrightarrow D_1&gt;1</i>. When this
+holds then <i>U</i> is unique.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Value</h3>
+
+<p>Returns a vector with the validity measures values.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Evgenia Dimitriadou</p>
+
+
+<h3>References</h3>
+
+<p>James C. Bezdek, <EM>Pattern Recognition with Fuzzy Objective
+Function Algorithms</EM>, Plenum Press, 1981, NY.<br>
+L. X. Xie and G. Beni, <EM>Validity measure for fuzzy
+clustering</EM>, IEEE Transactions on Pattern Analysis and Machine
+Intelligence, vol. <B>3</B>, n. 8, p. 841-847, 1991.<br>
+I. Gath and A. B. Geva, <EM>Unsupervised Optimal Fuzzy
+Clustering</EM>, IEEE Transactions on Pattern Analysis and Machine
+Intelligence, vol. <B>11</B>, n. 7, p. 773-781, 1989.<br>
+Y. Fukuyama and M. Sugeno, <EM>A new method of choosing the
+number of clusters for the fuzzy $c$-means method</EM>, Proc. 5th Fuzzy
+Syst. Symp., p. 247-250, 1989 (in japanese).</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="cmeans.html">cmeans</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre>
+# a 2-dimensional example
+x&lt;-rbind(matrix(rnorm(100,sd=0.3),ncol=2),
+         matrix(rnorm(100,mean=1,sd=0.3),ncol=2))
+cl&lt;-cmeans(x,2,20,verbose=TRUE,method="cmeans")
+resultindexes &lt;- fclustIndex(cl,x, index="all")
+resultindexes   
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

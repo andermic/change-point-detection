@@ -1,7 +1,7 @@
 source("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/common.R")
 source("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/free.living/data/featurize.data.R")
 source("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScript/ms.osu/svm.exp.R")
-library('e1071', lib.loc='/nfs/guille/wong/wonglab3/obesity/2012/cpd')
+library('e1071', lib.loc='/nfs/stak/students/a/andermic/Windows.Documents/Desktop/change-point-detection/code/lib/')
 library(nnet)
 library(rpart)
 #library(glmnet)
@@ -118,6 +118,8 @@ classificationAccuracyCPD <- function(real, pred) {
 
 # Calculate detection times for the given set of predicted and real values
 detectionTime <- function(real, pred) {
+	FREQ <- 30
+
 	lastActivity <- ''
 	curTimeTick <- 1
 	realActivities <- NULL
@@ -129,7 +131,7 @@ detectionTime <- function(real, pred) {
 			if (curActivities[j] != lastActivity) {
 				realActivities <- c(realActivities, curActivities[j])
 				realTimeTicks <- c(realTimeTicks, curTimeTick)  
-				lastActivity <- curActivities[j]				
+				lastActivity <- curActivities[j]
 			} 
 			curTimeTick <- curTimeTick + as.numeric(ratios[j]) * real$Scale[i]
 		}
@@ -161,7 +163,7 @@ detectionTime <- function(real, pred) {
 		}
 	}
 
-	return(data.frame(TotalDetectionTime=totalDetectionTime, DataSize=predTimeTicks[length(predTimeTicks)]))
+	return(totalDetectionTime / length(realActivities) / 30)
 }
 
 
@@ -323,14 +325,15 @@ summarizeCPD <- function(labels, predictionReportPath, confusionMatrixPath, pctC
 	accuracy <- classificationAccuracyCPD(real, pred)
 	dt <- detectionTime(real, pred)
 	#write.csv(data.frame(Accuracy=accuracy), summaryPath, row.names = FALSE)
-	write.csv(data.frame(Accuracy=accuracy, TotalDetectionTime=dt$TotalDetectionTime, DataSize=dt$DataSize), summaryPath, row.names = FALSE)
+	write.csv(data.frame(Accuracy=accuracy, DetectionTime=dt), summaryPath, row.names = FALSE)
 }
 
 
 # Modified from mergeSplitShuffle in function/merge.split.shuffle.R
 mergeSplitShuffleCPD <- function(
 		bestModelResFilePath, 
-		windowSize=NA, trialGroup=NA, scale=NA, formula=NA, alpha=NA, additionalFilter=NA, 
+		windowSize=NA, trialGroup=NA, scale=NA,
+		formula=NA, alpha=NA, additionalFilter=NA, 
 		testDataSet, expectedNumEntries, 
 		accuracySavePath, 
 		meanAccuracySavePath, 
@@ -339,9 +342,7 @@ mergeSplitShuffleCPD <- function(
 		reportSavePath=NA) {
 	
 	allRes <- read.csv(bestModelResFilePath)
-	print(nrow(allRes))
 	filter <- data.frame(Formula=formula, TestDataSet=testDataSet, Alpha=alpha)
-	print(nrow(filter))
 	if (!is.na(windowSize)) {
 		filter <- cbind(filter, data.frame(WindowSize=windowSize))
 	}
@@ -360,10 +361,8 @@ mergeSplitShuffleCPD <- function(
 	#if (!is.na(scale)) {
 	#	res <- res[which(res$Scale==scale),]
 	#}
-	print(nrow(res))
-	print(expectedNumEntries)
 	stopifnot(nrow(res) == expectedNumEntries)
-	allAcc <- data.frame(Accuracy=NULL,TotalDetectionTime=NULL,DataSize=NULL)
+	allAcc <- data.frame(Accuracy=NULL,DetectionTime=NULL)
 	allCm <- NA
 	testReport <- data.frame()
 	for (i in 1 : nrow(res)) {
@@ -393,8 +392,9 @@ mergeSplitShuffleCPD <- function(
 	
 	write.csv(allAcc, accuracySavePath, row.names = FALSE)
 	
-	averageAccuray <- data.frame(MeanAccuracy=mean(allAcc$Accuracy), SDAccuracy=sd(allAcc$Accuracy), MeanTotalDetectionTime=(mean(allAcc$TotalDetectionTime/allAcc$DataSize)*120))
-	write.csv(averageAccuray, meanAccuracySavePath, row.names = FALSE)
+	detectionTimes = allAcc$DetectionTime
+	averageAccuracy <- data.frame(MeanAccuracy=mean(allAcc$Accuracy), SDAccuracy=sd(allAcc$Accuracy), MeanDetectionTime=mean(detectionTimes), SDDetectionTime=sd(detectionTimes))
+	write.csv(averageAccuracy, meanAccuracySavePath, row.names = FALSE)
 	
 	write.csv(allCm, confusionMatrixSavePath, row.names = TRUE)
 	confusionMatrixNumToPct(confusionMatrixSavePath, pctConfusionMatrixSavePath)

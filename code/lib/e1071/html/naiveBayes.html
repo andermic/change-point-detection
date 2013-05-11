@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Naive Bayes Classifier</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for naiveBayes {e1071}"><tr><td>naiveBayes {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Naive Bayes Classifier</h2>
+
+<h3>Description</h3>
+
+<p>Computes the conditional a-posterior probabilities of a categorical
+class variable given independent predictor variables using
+the Bayes rule.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'formula'
+naiveBayes(formula, data, laplace = 0, ..., subset, na.action = na.pass)
+## Default S3 method:
+naiveBayes(x, y, laplace = 0, ...)
+
+
+## S3 method for class 'naiveBayes'
+predict(object, newdata,
+  type = c("class", "raw"), threshold = 0.001, ...)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>A numeric matrix, or a data frame of categorical and/or
+numeric variables.</p>
+</td></tr>
+<tr valign="top"><td><code>y</code></td>
+<td>
+<p>Class vector.</p>
+</td></tr>
+<tr valign="top"><td><code>formula</code></td>
+<td>
+<p>A formula of the form <code>class ~ x1 + x2 +
+      ...</code>. Interactions are not allowed.</p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Either a data frame of predictors (categorical and/or
+numeric) or a contingency table.</p>
+</td></tr>
+<tr valign="top"><td><code>laplace</code></td>
+<td>
+<p>positive double controlling Laplace smoothing. The
+default (0) disables Laplace smoothing.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Currently not used.</p>
+</td></tr>
+<tr valign="top"><td><code>subset</code></td>
+<td>
+<p>For data given in a data frame, an index vector
+specifying the cases to be used in the
+training sample.  (NOTE: If given, this argument must be
+named.)</p>
+</td></tr>
+<tr valign="top"><td><code>na.action</code></td>
+<td>
+<p>A function to specify the action to be taken if <code>NA</code>s are
+found. The default action is not to count them for the
+computation of the probability factors. An
+alternative is na.omit, which leads to rejection of cases
+with missing values on any required variable.  (NOTE: If
+given, this argument must be named.)</p>
+</td></tr>
+<tr valign="top"><td><code>object</code></td>
+<td>
+<p>An object of class <code>"naiveBayes"</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>newdata</code></td>
+<td>
+<p>A dataframe with new predictors (with possibly fewer
+columns than the training data). Note that the column names of
+<code>newdata</code> are matched against the training data ones.</p>
+</td></tr>
+<tr valign="top"><td><code>type</code></td>
+<td>
+<p>If <code>"raw"</code>, the conditional a-posterior
+probabilities for each class are returned, and the class with
+maximal probability else.</p>
+</td></tr>
+<tr valign="top"><td><code>threshold</code></td>
+<td>
+<p>Value replacing cells with 0 probabilities.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The standard naive Bayes classifier (at least this implementation)
+assumes independence of the predictor
+variables, and Gaussian distribution (given the target class) of
+metric predictors.
+For attributes with missing values, the
+corresponding table entries are omitted for prediction.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>"naiveBayes"</code> including components:
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>apriori</code></td>
+<td>
+<p>Class distribution for the dependent variable.</p>
+</td></tr>
+<tr valign="top"><td><code>tables</code></td>
+<td>
+<p>A list of tables, one for each predictor variable. For each
+categorical variable a table giving, for each attribute level, the conditional
+probabilities given the target class. For each numeric variable, a
+table giving, for each target class, mean and standard deviation of
+the (sub-)variable.</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>David Meyer <a href="mailto:David.Meyer@R-project.org">David.Meyer@R-project.org</a>. Laplace smoothing
+enhancement by Jinghao Xue.</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## Categorical data only:
+data(HouseVotes84, package = "mlbench")
+model &lt;- naiveBayes(Class ~ ., data = HouseVotes84)
+predict(model, HouseVotes84[1:10,])
+predict(model, HouseVotes84[1:10,], type = "raw")
+
+pred &lt;- predict(model, HouseVotes84)
+table(pred, HouseVotes84$Class)
+
+## using laplace smoothing:
+model &lt;- naiveBayes(Class ~ ., data = HouseVotes84, laplace = 3)
+pred &lt;- predict(model, HouseVotes84[,-1])
+table(pred, HouseVotes84$Class)
+
+
+## Example of using a contingency table:
+data(Titanic)
+m &lt;- naiveBayes(Survived ~ ., data = Titanic)
+m
+predict(m, as.data.frame(Titanic))
+
+## Example with metric predictors:
+data(iris)
+m &lt;- naiveBayes(Species ~ ., data = iris)
+## alternatively:
+m &lt;- naiveBayes(iris[,-5], iris[,5])
+m
+table(predict(m, iris), iris[,5])
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

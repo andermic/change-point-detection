@@ -310,7 +310,7 @@ public class DecisionTree extends TaskDef {
 
 	private void UQ_30Hz() throws Exception {
 		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/cpd";
-		String day = "2";
+		String day = "3";
 		String datasetStr = "uq_30Hz_day" + day;
 
 		List<String> trialGroupIdList = Arrays.asList("");
@@ -324,7 +324,7 @@ public class DecisionTree extends TaskDef {
 		List<String> formulaNameList = Arrays.asList("AllWoFFT");
 
 		String clusterWorkspace = expRootPath + "/" + datasetStr + "/dt/cluster";
-		Integer clusterJobNum = 50;
+		Integer clusterJobNum = 500;
 		Boolean useCluster = false;
 		
 		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));

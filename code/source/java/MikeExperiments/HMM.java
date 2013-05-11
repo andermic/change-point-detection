@@ -460,7 +460,7 @@ public class HMM extends TaskDef {
 		final int DT = 3;
 		
 		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/hmm";
-		String day = "3";
+		String day = "2";
 		String expName = "uq_30Hz_day" + day + ".HMM";
 		String datasetStr = "uq_30Hz_day" + day;
 		String tvtDataPath = expRootPath + "/" + expName;
@@ -472,7 +472,7 @@ public class HMM extends TaskDef {
 		
 		// This block, along with the tuning parameters, will be customized to each experiment
 		Array windowSizes = array("[1:1:20]");
-		windowSizes = array(Arrays.asList("8","6","4"));
+		windowSizes = array(Arrays.asList("20","18","16","14","12","10"));
 		Var labVisitFileFolder = var(tvtDataPath).cat("/features/").cat("ws").cat(windowSizes);
 		Integer clusterJobNum = 150;
 		int baseClassifier = SVM;

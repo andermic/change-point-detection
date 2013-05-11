@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: The Logistic Function and Derivatives</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for sigmoid {e1071}"><tr><td>sigmoid {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>The Logistic Function and Derivatives</h2>
+
+<h3>Description</h3>
+
+<p>Sigmoid <i>1/(1 + exp(-x))</i>, first and second
+derivative.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+sigmoid(x)
+dsigmoid(x)
+d2sigmoid(x)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>a numeric vector</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Friedrich Leisch</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+plot(sigmoid, -5, 5, ylim = c(-.2, 1))
+plot(dsigmoid, -5, 5, add = TRUE, col = 2)
+plot(d2sigmoid, -5, 5, add = TRUE, col = 3)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

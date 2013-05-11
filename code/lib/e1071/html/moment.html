@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Statistical Moment</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for moment {e1071}"><tr><td>moment {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Statistical Moment</h2>
+
+<h3>Description</h3>
+
+<p>Computes the (optionally centered and/or absolute) sample moment of a
+certain order.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+moment(x, order=1, center=FALSE, absolute=FALSE, na.rm=FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>a numeric vector containing the values whose moment is to be
+computed.</p>
+</td></tr>
+<tr valign="top"><td><code>order</code></td>
+<td>
+<p>order of the moment to be computed, the default is to
+compute the first moment, i.e., the mean.</p>
+</td></tr>
+<tr valign="top"><td><code>center</code></td>
+<td>
+<p>a logical value indicating whether centered moments are
+to be computed.</p>
+</td></tr>
+<tr valign="top"><td><code>absolute</code></td>
+<td>
+<p>a logical value indicating whether absolute moments are
+to be computed.</p>
+</td></tr>
+<tr valign="top"><td><code>na.rm</code></td>
+<td>
+<p>a logical value indicating whether <code>NA</code> values
+should be stripped before the computation proceeds.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>When <code>center</code> and <code>absolute</code> are both <code>FALSE</code>, the
+moment is simply <code>sum(x ^ order) / length(x)</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Kurt Hornik and Friedrich Leisch</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../base/html/mean.html">mean</a></code>,
+<code><a href="../../stats/html/cor.html">var</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre>
+x &lt;- rnorm(100)
+
+## Compute the mean
+moment(x)
+## Compute the 2nd centered moment (!= var)
+moment(x, order=2, center=TRUE)
+
+## Compute the 3rd absolute centered moment
+moment(x, order=3, center=TRUE, absolute=TRUE)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

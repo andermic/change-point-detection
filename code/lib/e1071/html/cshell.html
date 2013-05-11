@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Fuzzy C-Shell Clustering</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for cshell {e1071}"><tr><td>cshell {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Fuzzy C-Shell Clustering</h2>
+
+<h3>Description</h3>
+
+<p>The <EM>c</EM>-shell clustering algorithm, the shell prototype-based version
+(ring prototypes) of the fuzzy <EM>k</EM>means clustering method.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+cshell(x, centers, iter.max=100, verbose=FALSE, dist="euclidean",
+       method="cshell", m=2, radius = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>The data matrix, were columns correspond to the variables and
+rows to observations.</p>
+</td></tr>
+<tr valign="top"><td><code>centers</code></td>
+<td>
+<p>Number of clusters or initial values for cluster centers</p>
+</td></tr>
+<tr valign="top"><td><code>iter.max</code></td>
+<td>
+<p>Maximum number of iterations</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+<p>If <code>TRUE</code>, make some output during learning</p>
+</td></tr>
+<tr valign="top"><td><code>dist</code></td>
+<td>
+<p>Must be one of the following: If <code>"euclidean"</code>, the
+mean square error, if <code>"manhattan"</code>, the mean absolute error is
+computed. Abbreviations are also accepted.</p>
+</td></tr>
+<tr valign="top"><td><code>method</code></td>
+<td>
+<p>Currently, only the <code>"cshell"</code> method; the c-shell fuzzy
+clustering method</p>
+</td></tr>
+<tr valign="top"><td><code>m</code></td>
+<td>
+<p>The degree of fuzzification. It is defined for values greater
+than <EM>1</EM></p>
+</td></tr>
+<tr valign="top"><td><code>radius</code></td>
+<td>
+<p>The radius of resulting clusters</p>
+</td></tr> 
+</table>
+
+
+<h3>Details</h3>
+
+<p>The data given by <code>x</code> is clustered by the fuzzy <EM>c</EM>-shell algorithm.
+</p>
+<p>If <code>centers</code> is a matrix, its rows are taken as the initial cluster
+centers. If <code>centers</code> is an integer, <code>centers</code> rows
+of <code>x</code> are randomly chosen as initial values.
+</p>
+<p>The algorithm stops when the maximum number of iterations (given by
+<code>iter.max</code>) is reached.
+</p>
+<p>If <code>verbose</code> is <code>TRUE</code>, it displays for each iteration the number
+the value of the objective function.
+</p>
+<p>If <code>dist</code> is <code>"euclidean"</code>, the distance between the
+cluster center and the data points is the Euclidean distance (ordinary
+kmeans algorithm). If <code>"manhattan"</code>, the distance between the
+cluster center and the data points is the sum of the absolute values
+of the distances of the coordinates.
+</p>
+<p>If <code>method</code> is <code>"cshell"</code>, then we have the <EM>c</EM>-shell
+fuzzy clustering method.
+</p>
+<p>The parameters <code>m</code> defines the degree of fuzzification. It is
+defined for real values greater than 1 and the bigger it is the more
+fuzzy the membership values of the clustered data points are.
+</p>
+<p>The parameter <code>radius</code> is by default set to <EM>0.2</EM> for every
+cluster.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>cshell</code> returns an object of class <code>"cshell"</code>.
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>centers</code></td>
+<td>
+<p>The final cluster centers.</p>
+</td></tr>
+<tr valign="top"><td><code>size</code></td>
+<td>
+<p>The number of data points in each cluster.</p>
+</td></tr>
+<tr valign="top"><td><code>cluster</code></td>
+<td>
+<p>Vector containing the indices of the clusters where
+the data points are assigned to. The maximum membership value of a
+point is considered for partitioning it to a cluster.</p>
+</td></tr>
+<tr valign="top"><td><code>iter</code></td>
+<td>
+<p>The number of iterations performed.</p>
+</td></tr>
+<tr valign="top"><td><code>membership</code></td>
+<td>
+<p>a matrix with the membership values of the data points
+to the clusters.</p>
+</td></tr>
+<tr valign="top"><td><code>withinerror</code></td>
+<td>
+<p>Returns the sum of square distances within the
+clusters.</p>
+</td></tr> 
+<tr valign="top"><td><code>call</code></td>
+<td>
+<p>Returns a call in which all of the arguments are
+specified by their names.</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Evgenia Dimitriadou</p>
+
+
+<h3>References</h3>
+
+<p>Rajesh N. Dave. <EM>Fuzzy Shell-Clustering and Applications to Circle
+Detection in Digital Images.</EM> Int. J. of General Systems, Vol. <B>16</B>,
+pp. 343-355, 1996.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## a 2-dimensional example
+x&lt;-rbind(matrix(rnorm(50,sd=0.3),ncol=2),
+         matrix(rnorm(50,mean=1,sd=0.3),ncol=2))
+cl&lt;-cshell(x,2,20,verbose=TRUE,method="cshell",m=2)
+print(cl)
+
+# assign classes to some new data
+y&lt;-rbind(matrix(rnorm(13,sd=0.3),ncol=2),
+         matrix(rnorm(13,mean=1,sd=0.3),ncol=2))
+#         ycl&lt;-predict(cl, y, type="both")
+        </pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

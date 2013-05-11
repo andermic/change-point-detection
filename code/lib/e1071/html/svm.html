@@ -1,0 +1,401 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Support Vector Machines</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for svm {e1071}"><tr><td>svm {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Support Vector Machines</h2>
+
+<h3>Description</h3>
+
+<p><code>svm</code> is used to train a support vector machine. It can be used to carry
+out general regression and classification (of nu and epsilon-type), as
+well as density-estimation. A formula interface is provided.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'formula'
+svm(formula, data = NULL, ..., subset, na.action =
+na.omit, scale = TRUE)
+## Default S3 method:
+svm(x, y = NULL, scale = TRUE, type = NULL, kernel =
+"radial", degree = 3, gamma = if (is.vector(x)) 1 else 1 / ncol(x),
+coef0 = 0, cost = 1, nu = 0.5,
+class.weights = NULL, cachesize = 40, tolerance = 0.001, epsilon = 0.1,
+shrinking = TRUE, cross = 0, probability = FALSE, fitted = TRUE, seed = 1L,
+..., subset, na.action = na.omit)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula</code></td>
+<td>
+<p>a symbolic description of the model to be fit.</p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>an optional data frame containing the variables in the model.
+By default the variables are taken from the environment which
+&lsquo;svm&rsquo; is called from.</p>
+</td></tr>
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>a data matrix, a vector, or a sparse matrix (object of class
+<code><a href="../../Matrix/html/Matrix.html">Matrix</a></code> provided by the <span class="pkg">Matrix</span> package,
+or of class <code><a href="../../SparseM/html/matrix.csr.html">matrix.csr</a></code>
+provided by the <span class="pkg">SparseM</span> package, or of class
+<code><a href="../../slam/html/simple_triplet_matrix.html">simple_triplet_matrix</a></code> provided by the <span class="pkg">slam</span>
+package).</p>
+</td></tr>
+<tr valign="top"><td><code>y</code></td>
+<td>
+<p>a response vector with one label for each row/component of
+<code>x</code>. Can be either a factor (for classification tasks)
+or a numeric vector (for regression).</p>
+</td></tr>
+<tr valign="top"><td><code>scale</code></td>
+<td>
+<p>A logical vector indicating the variables to be
+scaled. If <code>scale</code> is of length 1, the value is recycled as
+many times as needed.
+Per default, data are scaled internally (both <code>x</code> and <code>y</code>
+variables) to zero mean and unit variance. The center and scale
+values are returned and used for later predictions.</p>
+</td></tr>
+<tr valign="top"><td><code>type</code></td>
+<td>
+<p><code>svm</code> can be used as a classification
+machine, as a regression machine, or for novelty detection.
+Depending of whether <code>y</code> is
+a factor or not, the default setting for <code>type</code> is <code>C-classification</code> or <code>eps-regression</code>, respectively, but may be overwritten by setting an explicit value.<br>
+Valid options are:
+</p>
+
+<ul>
+<li> <p><code>C-classification</code>
+</p>
+</li>
+<li> <p><code>nu-classification</code>
+</p>
+</li>
+<li> <p><code>one-classification</code> (for novelty detection)
+</p>
+</li>
+<li> <p><code>eps-regression</code>
+</p>
+</li>
+<li> <p><code>nu-regression</code>
+</p>
+</li></ul>
+
+</td></tr>
+<tr valign="top"><td><code>kernel</code></td>
+<td>
+<p>the kernel used in training and predicting. You
+might consider changing some of the following parameters, depending
+on the kernel type.<br>
+</p>
+
+<dl>
+<dt>linear:</dt><dd><i>u'*v</i></dd>
+<dt>polynomial:</dt><dd><i>(gamma*u'*v + coef0)^degree</i></dd>
+<dt>radial basis:</dt><dd><i>exp(-gamma*|u-v|^2)</i></dd>
+<dt>sigmoid:</dt><dd><i>tanh(gamma*u'*v + coef0)</i></dd>
+</dl>
+
+</td></tr>
+<tr valign="top"><td><code>degree</code></td>
+<td>
+<p>parameter needed for kernel of type <code>polynomial</code> (default: 3)</p>
+</td></tr>
+<tr valign="top"><td><code>gamma</code></td>
+<td>
+<p>parameter needed for all kernels except <code>linear</code>
+(default: 1/(data dimension))</p>
+</td></tr>
+<tr valign="top"><td><code>coef0</code></td>
+<td>
+<p>parameter needed for kernels of type <code>polynomial</code>
+and <code>sigmoid</code> (default: 0)</p>
+</td></tr>
+<tr valign="top"><td><code>cost</code></td>
+<td>
+<p>cost of constraints violation (default: 1)&mdash;it is the
+&lsquo;C&rsquo;-constant of the regularization term in the Lagrange formulation.</p>
+</td></tr>
+<tr valign="top"><td><code>nu</code></td>
+<td>
+<p>parameter needed for <code>nu-classification</code>,
+<code>nu-regression</code>, and <code>one-classification</code></p>
+</td></tr>
+<tr valign="top"><td><code>class.weights</code></td>
+<td>
+<p>a named vector of weights for the different
+classes, used for asymmetric class sizes. Not all factor levels have
+to be supplied (default weight: 1). All components have to be named.</p>
+</td></tr>
+<tr valign="top"><td><code>cachesize</code></td>
+<td>
+<p>cache memory in MB (default 40)</p>
+</td></tr>
+<tr valign="top"><td><code>tolerance</code></td>
+<td>
+<p>tolerance of termination criterion (default: 0.001)</p>
+</td></tr>
+<tr valign="top"><td><code>epsilon</code></td>
+<td>
+<p>epsilon in the insensitive-loss function (default: 0.1)</p>
+</td></tr>
+<tr valign="top"><td><code>shrinking</code></td>
+<td>
+<p>option whether to use the shrinking-heuristics
+(default: <code>TRUE</code>)</p>
+</td></tr>
+<tr valign="top"><td><code>cross</code></td>
+<td>
+<p>if a integer value k&gt;0 is specified, a k-fold cross
+validation on the training data is performed to assess the quality
+of the model: the accuracy rate for classification and the Mean
+Squared Error for regression</p>
+</td></tr>
+<tr valign="top"><td><code>fitted</code></td>
+<td>
+<p>logical indicating whether the fitted values should be computed
+and included in the model or not (default: <code>TRUE</code>)</p>
+</td></tr>
+<tr valign="top"><td><code>probability</code></td>
+<td>
+<p>logical indicating whether the model should
+allow for probability predictions.</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+<p>integer seed for libsvm (used for cross-validation and
+probability prediction models).</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>additional parameters for the low level fitting function
+<code>svm.default</code></p>
+</td></tr>
+<tr valign="top"><td><code>subset</code></td>
+<td>
+<p>An index vector specifying the cases to be used in the
+training sample.  (NOTE: If given, this argument must be
+named.)</p>
+</td></tr>
+<tr valign="top"><td><code>na.action</code></td>
+<td>
+<p>A function to specify the action to be taken if <code>NA</code>s are
+found. The default action is <code>na.omit</code>, which leads to rejection of cases
+with missing values on any required variable. An alternative
+is <code>na.fail</code>, which causes an error if <code>NA</code> cases
+are found. (NOTE: If given, this argument must be named.)</p>
+</td></tr>	
+</table>
+
+
+<h3>Details</h3>
+
+<p>For multiclass-classification with k levels, k&gt;2, <code>libsvm</code> uses the
+&lsquo;one-against-one&rsquo;-approach, in which k(k-1)/2 binary classifiers are
+trained; the appropriate class is found by a voting scheme.
+</p>
+<p><code>libsvm</code> internally uses a sparse data representation, which is 
+also high-level supported by the package <span class="pkg">SparseM</span>.
+</p>
+<p>If the predictor variables include factors, the formula interface must be used to get a
+correct model matrix.
+</p>
+<p><code>plot.svm</code> allows a simple graphical
+visualization of classification models.
+</p>
+<p>The probability model for classification fits a logistic distribution
+using maximum likelihood to the decision values of all binary
+classifiers, and computes the a-posteriori class probabilities for the
+multi-class problem using quadratic optimization. The probabilistic
+regression model assumes (zero-mean) laplace-distributed errors for the
+predictions, and estimates the scale parameter using maximum likelihood.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>"svm"</code> containing the fitted model, including:
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>SV</code></td>
+<td>
+<p>The resulting support vectors (possibly scaled).</p>
+</td></tr>
+<tr valign="top"><td><code>index</code></td>
+<td>
+<p>The index of the resulting support vectors in the data
+matrix. Note that this index refers to the preprocessed data (after
+the possible effect of <code>na.omit</code> and <code>subset</code>)</p>
+</td></tr>
+<tr valign="top"><td><code>coefs</code></td>
+<td>
+<p>The corresponding coefficients times the training labels.</p>
+</td></tr>
+<tr valign="top"><td><code>rho</code></td>
+<td>
+<p>The negative intercept.</p>
+</td></tr>
+<tr valign="top"><td><code>sigma</code></td>
+<td>
+<p>In case of a probabilistic regression model, the scale
+parameter of the hypothesized (zero-mean) laplace distribution estimated by
+maximum likelihood.</p>
+</td></tr>
+<tr valign="top"><td><code>probA, probB</code></td>
+<td>
+<p>numeric vectors of length k(k-1)/2, k number of
+classes, containing the parameters of the logistic distributions fitted to
+the decision values of the binary classifiers (1 / (1 + exp(a x + b))).</p>
+</td></tr>
+</table>
+
+
+<h3>Note</h3>
+
+<p>Data are scaled internally, usually yielding better results.
+</p>
+<p>Parameters of SVM-models usually <EM>must</EM> be tuned to yield sensible results!
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Meyer (based on C/C++-code by Chih-Chung Chang and Chih-Jen Lin)<br>
+<a href="mailto:David.Meyer@R-project.org">David.Meyer@R-project.org</a>
+</p>
+
+
+<h3>References</h3>
+
+
+<ul>
+<li>
+<p>Chang, Chih-Chung and Lin, Chih-Jen:<br>
+<EM>LIBSVM: a library for Support Vector Machines</EM><br>
+<a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">http://www.csie.ntu.edu.tw/~cjlin/libsvm</a>
+</p>
+</li>
+<li>
+<p>Exact formulations of models, algorithms, etc. can be found in the
+document:<br>
+Chang, Chih-Chung and Lin, Chih-Jen:<br>
+<EM>LIBSVM: a library for Support Vector Machines</EM><br>
+<a href="http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.ps.gz">http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.ps.gz</a>
+</p>
+</li>
+<li>
+<p>More implementation details and speed benchmarks can be found on:
+Rong-En Fan and Pai-Hsune Chen and Chih-Jen Lin:<br>
+<EM>Working Set Selection Using the Second Order Information for Training SVM</EM><br>
+<a href="http://www.csie.ntu.edu.tw/~cjlin/papers/quadworkset.pdf">http://www.csie.ntu.edu.tw/~cjlin/papers/quadworkset.pdf</a>
+</p>
+</li></ul>
+
+
+
+<h3>See Also</h3>
+
+<p><code><a href="predict.svm.html">predict.svm</a></code>
+<code><a href="plot.svm.html">plot.svm</a></code>
+<code><a href="tune.wrapper.html">tune.svm</a></code>
+<code><a href="../../SparseM/html/matrix.csr.html">matrix.csr</a></code> (in package <span class="pkg">SparseM</span>)
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(iris)
+attach(iris)
+
+## classification mode
+# default with factor response:
+model &lt;- svm(Species ~ ., data = iris)
+
+# alternatively the traditional interface:
+x &lt;- subset(iris, select = -Species)
+y &lt;- Species
+model &lt;- svm(x, y) 
+
+print(model)
+summary(model)
+
+# test with train data
+pred &lt;- predict(model, x)
+# (same as:)
+pred &lt;- fitted(model)
+
+# Check accuracy:
+table(pred, y)
+
+# compute decision values and probabilities:
+pred &lt;- predict(model, x, decision.values = TRUE)
+attr(pred, "decision.values")[1:4,]
+
+# visualize (classes by color, SV by crosses):
+plot(cmdscale(dist(iris[,-5])),
+     col = as.integer(iris[,5]),
+     pch = c("o","+")[1:150 %in% model$index + 1])
+
+## try regression mode on two dimensions
+
+# create data
+x &lt;- seq(0.1, 5, by = 0.05)
+y &lt;- log(x) + rnorm(x, sd = 0.2)
+
+# estimate model and predict input values
+m   &lt;- svm(x, y)
+new &lt;- predict(m, x)
+
+# visualize
+plot(x, y)
+points(x, log(x), col = 2)
+points(x, new, col = 4)
+
+## density-estimation
+
+# create 2-dim. normal with rho=0:
+X &lt;- data.frame(a = rnorm(1000), b = rnorm(1000))
+attach(X)
+
+# traditional way:
+m &lt;- svm(X, gamma = 0.1)
+
+# formula interface:
+m &lt;- svm(~., data = X, gamma = 0.1)
+# or:
+m &lt;- svm(~ a + b, gamma = 0.1)
+
+# test:
+newdata &lt;- data.frame(a = c(0, 4), b = c(0, 4))
+predict (m, newdata)
+
+# visualize:
+plot(X, col = 1:1000 %in% m$index + 1, xlim = c(-5,5), ylim=c(-5,5))
+points(newdata, pch = "+", col = 2, cex = 5)
+
+# weights: (example not particularly sensible)
+i2 &lt;- iris
+levels(i2$Species)[3] &lt;- "versicolor"
+summary(i2$Species)
+wts &lt;- 100 / table(i2$Species)
+wts
+m &lt;- svm(Species ~ ., data = i2, class.weights = wts)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

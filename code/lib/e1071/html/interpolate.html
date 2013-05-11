@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Interpolate Values of Array</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for interpolate {e1071}"><tr><td>interpolate {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Interpolate Values of Array</h2>
+
+<h3>Description</h3>
+
+<p>For each row in matrix <code>x</code>, the hypercube of <code>a</code> containing
+this point is searched. The corners of the hypercube are
+linearly interpolated. By default, <code>dimnames(a)</code> is taken to
+contain the coordinate values for each point in <code>a</code>. This can be
+overridden using <code>adims</code>. If <code>method=="constant"</code>, the value
+of the &ldquo;lower left&rdquo; corner of the hypercube is returned.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+interpolate(x, a, adims=lapply(dimnames(a), as.numeric),
+            method="linear")
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>Matrix of values at which interpolation shall take place.</p>
+</td></tr>
+<tr valign="top"><td><code>a</code></td>
+<td>
+<p>Array of arbitrary dimension.</p>
+</td></tr>
+<tr valign="top"><td><code>adims</code></td>
+<td>
+<p>List of the same structure as <code>dimnames(a)</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>method</code></td>
+<td>
+<p>Interpolation method, one of <code>"linear"</code> or
+<code>"constant"</code>.</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Friedrich Leisch</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../stats/html/approxfun.html">approx</a></code>, <code><a href="../../stats/html/splinefun.html">spline</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre>
+x &lt;- seq(0,3,0.2)
+z &lt;- outer(x,x, function(x,y) sin(x*y))
+dimnames(z) &lt;- list(x,x)
+sin(1.1*2.1)
+interpolate(c(1.1, 2.1),z)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

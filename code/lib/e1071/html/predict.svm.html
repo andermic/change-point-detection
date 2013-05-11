@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Predict Method for Support Vector Machines</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for predict.svm {e1071}"><tr><td>predict.svm {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Predict Method for Support Vector Machines</h2>
+
+<h3>Description</h3>
+
+<p>This function predicts values based upon a model trained by <code>svm</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'svm'
+predict(object, newdata, decision.values = FALSE,
+probability = FALSE, ..., na.action = na.omit)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>object</code></td>
+<td>
+<p>Object of class <code>"svm"</code>, created by <code>svm</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>newdata</code></td>
+<td>
+<p>An object containing the new input data: either a
+matrix or a sparse matrix (object of class
+<code><a href="../../Matrix/html/Matrix.html">Matrix</a></code> provided by the <span class="pkg">Matrix</span> package,
+or of class <code><a href="../../SparseM/html/matrix.csr.html">matrix.csr</a></code>
+provided by the <span class="pkg">SparseM</span> package, or of class
+<code><a href="../../slam/html/simple_triplet_matrix.html">simple_triplet_matrix</a></code> provided by the <span class="pkg">slam</span>
+package). A vector will
+be transformed to a n x 1 matrix.</p>
+</td></tr>
+<tr valign="top"><td><code>decision.values</code></td>
+<td>
+<p>Logical controlling whether the decision values
+of all binary classifiers computed in multiclass classification
+shall be computed and returned.</p>
+</td></tr>
+<tr valign="top"><td><code>probability</code></td>
+<td>
+<p>Logical indicating whether class probabilities
+should be computed and returned. Only possible if the model was
+fitted with the <code>probability</code> option enabled.</p>
+</td></tr>
+<tr valign="top"><td><code>na.action</code></td>
+<td>
+<p>A function to specify the action to be taken if &lsquo;NA&rsquo;s are
+found. The default action is <code>na.omit</code>, which leads to rejection of cases
+with missing values on any required variable. An alternative
+is <code>na.fail</code>, which causes an error if <code>NA</code> cases
+are found. (NOTE: If given, this argument must be named.)</p>
+</td></tr>	
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Currently not used.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A vector of predicted values (for classification: a vector of labels, for density
+estimation: a logical vector). If <code>decision.value</code> is
+<code>TRUE</code>, the vector gets a <code>"decision.values"</code> attribute
+containing a n x c matrix (n number of predicted values, c number of
+classifiers) of all c binary classifiers' decision values. There are k
+* (k - 1) / 2 classifiers (k number of classes). The colnames of
+the matrix indicate the labels of the two classes. If <code>probability</code> is
+<code>TRUE</code>, the vector gets a <code>"probabilities"</code> attribute
+containing a n x k matrix (n number of predicted values, k number of
+classes) of the class probabilities.
+</p>
+
+
+<h3>Note</h3>
+
+<p>If the training set was scaled by <code>svm</code> (done by default), the
+new data is scaled accordingly using scale and center of
+the training data.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Meyer (based on C++-code by Chih-Chung Chang and Chih-Jen Lin)<br>
+<a href="mailto:David.Meyer@R-project.org">David.Meyer@R-project.org</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="svm.html">svm</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(iris)
+attach(iris)
+
+## classification mode
+# default with factor response:
+model &lt;- svm(Species ~ ., data = iris)
+
+# alternatively the traditional interface:
+x &lt;- subset(iris, select = -Species)
+y &lt;- Species
+model &lt;- svm(x, y, probability = TRUE) 
+
+print(model)
+summary(model)
+
+# test with train data
+pred &lt;- predict(model, x)
+# (same as:)
+pred &lt;- fitted(model)
+
+# compute decision values and probabilites
+pred &lt;- predict(model, x, decision.values = TRUE, probability = TRUE)
+attr(pred, "decision.values")[1:4,]
+attr(pred, "probabilities")[1:4,]
+
+## try regression mode on two dimensions
+
+# create data
+x &lt;- seq(0.1, 5, by = 0.05)
+y &lt;- log(x) + rnorm(x, sd = 0.2)
+
+# estimate model and predict input values
+m   &lt;- svm(x, y)
+new &lt;- predict(m, x)
+
+# visualize
+plot   (x, y)
+points (x, log(x), col = 2)
+points (x, new, col = 4)
+
+## density-estimation
+
+# create 2-dim. normal with rho=0:
+X &lt;- data.frame(a = rnorm(1000), b = rnorm(1000))
+attach(X)
+
+# traditional way:
+m &lt;- svm(X, gamma = 0.1)
+
+# formula interface:
+m &lt;- svm(~., data = X, gamma = 0.1)
+# or:
+m &lt;- svm(~ a + b, gamma = 0.1)
+
+# test:
+newdata &lt;- data.frame(a = c(0, 4), b = c(0, 4))
+predict (m, newdata)
+
+# visualize:
+plot(X, col = 1:1000 %in% m$index + 1, xlim = c(-5,5), ylim=c(-5,5))
+points(newdata, pch = "+", col = 2, cex = 5)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Plot SVM Objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for plot.svm {e1071}"><tr><td>plot.svm {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Plot SVM Objects</h2>
+
+<h3>Description</h3>
+
+<p>Generates a scatter plot of the input data of a <code>svm</code> fit for
+classification models by highlighting the classes and support
+vectors. Optionally, draws a filled contour plot of the class regions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'svm'
+plot(x, data, formula, fill = TRUE, grid = 50, slice = list(),
+symbolPalette = palette(), svSymbol = "x", dataSymbol = "o", ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>An object of class <code>svm</code></p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>data to visualize. Should be the same used for fitting.</p>
+</td></tr>
+<tr valign="top"><td><code>formula</code></td>
+<td>
+<p>formula selecting the visualized two dimensions. Only
+needed if more than two input variables are used.</p>
+</td></tr>
+<tr valign="top"><td><code>fill</code></td>
+<td>
+<p>switch indicating whether a contour plot for the class
+regions should be added.</p>
+</td></tr>
+<tr valign="top"><td><code>grid</code></td>
+<td>
+<p>granularity for the contour plot.</p>
+</td></tr>
+<tr valign="top"><td><code>slice</code></td>
+<td>
+<p>a list of named values for the dimensions held
+constant (only needed if more than two variables are
+used). The defaults for unspecified dimensions are 0 (for numeric
+variables) and the first level (for factors). Factor levels can
+either be specified as factors or character vectors of length 1.</p>
+</td></tr>
+<tr valign="top"><td><code>symbolPalette</code></td>
+<td>
+<p>Color palette used for the class the data points and support
+vectors belong to.</p>
+</td></tr>
+<tr valign="top"><td><code>svSymbol</code></td>
+<td>
+<p>Symbol used for support vectors.</p>
+</td></tr>
+<tr valign="top"><td><code>dataSymbol</code></td>
+<td>
+<p>Symbol used for data points (other than support vectors).</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>additional graphics parameters passed to
+<code>filled.contour</code> and <code>plot</code>.</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>David Meyer<br>
+<a href="mailto:David.Meyer@R-project.org">David.Meyer@R-project.org</a></p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="svm.html">svm</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## a simple example
+data(cats, package = "MASS")
+m &lt;- svm(Sex~., data = cats)
+plot(m, cats)
+
+## more than two variables: fix 2 dimensions
+data(iris)
+m2 &lt;- svm(Species~., data = iris)
+plot(m2, iris, Petal.Width ~ Petal.Length,
+     slice = list(Sepal.Width = 3, Sepal.Length = 4))
+
+## plot with custom symbols and colors
+plot(m, cats, svSymbol = 1, dataSymbol = 2, symbolPalette = rainbow(4),
+color.palette = terrain.colors)
+
+
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

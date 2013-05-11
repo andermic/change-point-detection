@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Plot Short Time Fourier Transforms</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for plot.stft {e1071}"><tr><td>plot.stft {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Plot Short Time Fourier Transforms</h2>
+
+<h3>Description</h3>
+
+<p>An object of class <code>"stft"</code> is plotted as a gray scale image.
+The x-axis corresponds to time, the y-axis to frequency.  If the
+default colormap is used, dark regions in the plot correspond to high
+values at the particular time/frequency location.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'stft'
+plot(x, col = gray(63:0/63), ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>An object of class <code>"stft"</code> as obtained by the function
+<code>stft</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>col</code></td>
+<td>
+<p>An optional colormap.  By default 64 gray values are used,
+where white corresponds to the minimum value and black to the
+maximum.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>further arguments to be passed to or from methods.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>No return value. This function is only for plotting.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Andreas Weingessel</p>
+
+
+<h3>See Also</h3>
+
+<p>stft</p>
+
+
+<h3>Examples</h3>
+
+<pre>x&lt;-rnorm(500)
+y&lt;-stft(x)
+plot(y)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

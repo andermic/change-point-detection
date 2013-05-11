@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Bootstrap Samples of LCA Results</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for bootstrap.lca {e1071}"><tr><td>bootstrap.lca {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Bootstrap Samples of LCA Results</h2>
+
+<h3>Description</h3>
+
+<p>This function draws bootstrap samples from a given LCA model and refits
+a new LCA model for each sample. The quality of fit of these models is
+compared to the original model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+bootstrap.lca(l, nsamples=10, lcaiter=30, verbose=FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>l</code></td>
+<td>
+<p>An LCA model as created by <code><a href="lca.html">lca</a></code></p>
+</td></tr>
+<tr valign="top"><td><code>nsamples</code></td>
+<td>
+<p>Number of bootstrap samples</p>
+</td></tr>
+<tr valign="top"><td><code>lcaiter</code></td>
+<td>
+<p>Number of LCA iterations</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+<p>If <code>TRUE</code> some output is printed during the
+computations.</p>
+</td></tr> 
+</table>
+
+
+<h3>Details</h3>
+
+<p>From a given LCA model <code>l</code>, <code>nsamples</code> bootstrap samples are
+drawn. For each sample a new LCA model is fitted. The goodness of fit
+for each model is computed via Likelihood Ratio and Pearson's
+Chisquare. The values for the fitted models are compared with the values
+of the original model <code>l</code>. By this method it can be tested whether
+the data to which <code>l</code> was originally fitted come from an LCA model.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>bootstrap.lca</code> is returned, containing
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>logl, loglsat</code></td>
+<td>
+<p>The LogLikelihood of the models and of the
+corresponding saturated models</p>
+</td></tr>
+<tr valign="top"><td><code>lratio</code></td>
+<td>
+<p>Likelihood quotient of the models and the corresponding
+saturated models</p>
+</td></tr>
+<tr valign="top"><td><code>lratiomean, lratiosd</code></td>
+<td>
+<p>Mean and Standard deviation of
+<code>lratio</code></p>
+</td></tr>
+<tr valign="top"><td><code>lratioorg</code></td>
+<td>
+<p>Likelihood quotient of the original model and the
+corresponding saturated model</p>
+</td></tr>
+<tr valign="top"><td><code>zratio</code></td>
+<td>
+<p>Z-Statistics of <code>lratioorg</code></p>
+</td></tr>
+<tr valign="top"><td><code>pvalzratio, pvalratio</code></td>
+<td>
+<p>P-Values for <code>zratio</code>, computed via normal
+distribution and empirical distribution</p>
+</td></tr>
+<tr valign="top"><td><code>chisq</code></td>
+<td>
+<p>Pearson's Chisq of the models</p>
+</td></tr>
+<tr valign="top"><td><code>chisqmean, chisqsd</code></td>
+<td>
+<p>Mean and Standard deviation of
+<code>chisq</code></p>
+</td></tr>
+<tr valign="top"><td><code>chisqorg</code></td>
+<td>
+<p>Pearson's Chisq of the original model</p>
+</td></tr>
+<tr valign="top"><td><code>zchisq</code></td>
+<td>
+<p>Z-Statistics of <code>chisqorg</code></p>
+</td></tr>
+<tr valign="top"><td><code>pvalzchisq, pvalchisq</code></td>
+<td>
+<p>P-Values for <code>zchisq</code>, computed via normal
+distribution and empirical distribution</p>
+</td></tr>
+<tr valign="top"><td><code>nsamples</code></td>
+<td>
+<p>Number of bootstrap samples</p>
+</td></tr>
+<tr valign="top"><td><code>lcaiter</code></td>
+<td>
+<p>Number of LCA Iterations</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Andreas Weingessel</p>
+
+
+<h3>References</h3>
+
+<p>Anton K. Formann: &ldquo;Die Latent-Class-Analysis&rdquo;, Beltz
+Verlag 1984</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="lca.html">lca</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## Generate a 4-dim. sample with 2 latent classes of 500 data points each.
+## The probabilities for the 2 classes are given by type1 and type2.
+type1 &lt;- c(0.8,0.8,0.2,0.2)
+type2 &lt;- c(0.2,0.2,0.8,0.8)
+x &lt;- matrix(runif(4000),nr=1000)
+x[1:500,] &lt;- t(t(x[1:500,])&lt;type1)*1
+x[501:1000,] &lt;- t(t(x[501:1000,])&lt;type2)*1
+
+l &lt;- lca(x, 2, niter=5)
+bl &lt;- bootstrap.lca(l,nsamples=3,lcaiter=5)
+bl
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

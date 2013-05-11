@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Latent Class Analysis (LCA)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for lca {e1071}"><tr><td>lca {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Latent Class Analysis (LCA)</h2>
+
+<h3>Description</h3>
+
+<p>A latent class analysis with <code>k</code> classes is performed on the data
+given by <code>x</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+lca(x, k, niter=100, matchdata=FALSE, verbose=FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>Either a data matrix of binary observations or a list of
+patterns as created by <code><a href="countpattern.html">countpattern</a></code></p>
+</td></tr>
+<tr valign="top"><td><code>k</code></td>
+<td>
+<p>Number of classes used for LCA</p>
+</td></tr>
+<tr valign="top"><td><code>niter</code></td>
+<td>
+<p>Number of Iterations</p>
+</td></tr>
+<tr valign="top"><td><code>matchdata</code></td>
+<td>
+<p>If <code>TRUE</code> and <code>x</code> is a data matrix, the class
+membership of every data point is returned, otherwise the class
+membership of every pattern is returned.</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+<p>If <code>TRUE</code> some output is printed during the
+computations.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>An object of class <code>"lca"</code> is returned, containing
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>w</code></td>
+<td>
+<p>Probabilities to belong to each class</p>
+</td></tr>
+<tr valign="top"><td><code>p</code></td>
+<td>
+<p>Probabilities of a &lsquo;1&rsquo; for each variable in each class</p>
+</td></tr>
+<tr valign="top"><td><code>matching</code></td>
+<td>
+<p>Depending on <code>matchdata</code> either the class
+membership of each pattern or of each data point</p>
+</td></tr>
+<tr valign="top"><td><code>logl, loglsat</code></td>
+<td>
+<p>The LogLikelihood of the model and of the
+saturated model</p>
+</td></tr>
+<tr valign="top"><td><code>bic, bicsat</code></td>
+<td>
+<p>The BIC of the model and of the
+saturated model</p>
+</td></tr>
+<tr valign="top"><td><code>chisq</code></td>
+<td>
+<p>Pearson's Chisq</p>
+</td></tr>
+<tr valign="top"><td><code>lhquot</code></td>
+<td>
+<p>Likelihood quotient of the model and the saturated
+model</p>
+</td></tr>
+<tr valign="top"><td><code>n</code></td>
+<td>
+<p>Number of data points.</p>
+</td></tr>
+<tr valign="top"><td><code>np</code></td>
+<td>
+<p>Number of free parameters.</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Andreas Weingessel</p>
+
+
+<h3>References</h3>
+
+<p>Anton K. Formann: &ldquo;Die Latent-Class-Analysis&rdquo;, Beltz
+Verlag 1984</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="countpattern.html">countpattern</a></code>,
+<code><a href="bootstrap.lca.html">bootstrap.lca</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## Generate a 4-dim. sample with 2 latent classes of 500 data points each.
+## The probabilities for the 2 classes are given by type1 and type2.
+type1 &lt;- c(0.8,0.8,0.2,0.2)
+type2 &lt;- c(0.2,0.2,0.8,0.8)
+x &lt;- matrix(runif(4000),nr=1000)
+x[1:500,] &lt;- t(t(x[1:500,])&lt;type1)*1
+x[501:1000,] &lt;- t(t(x[501:1000,])&lt;type2)*1
+
+l &lt;- lca(x, 2, niter=5)
+print(l)
+summary(l)
+p &lt;- predict(l, x)
+table(p, c(rep(1,500),rep(2,500)))
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

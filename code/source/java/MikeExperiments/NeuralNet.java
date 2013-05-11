@@ -380,7 +380,7 @@ public class NeuralNet extends TaskDef {
 
 	private void UQ_30Hz() throws Exception {
 		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/cpd";
-		String day = "2";
+		String day = "3";
 		String datasetStr = "uq_30Hz_day" + day;
 
 		List<String> trialGroupIdList = Arrays.asList("");
@@ -394,7 +394,7 @@ public class NeuralNet extends TaskDef {
 		List<String> formulaNameList = Arrays.asList("AllWoFFT");
 
 		String clusterWorkspace = expRootPath + "/" + datasetStr + "/nnet/cluster";
-		Integer clusterJobNum = 100;
+		Integer clusterJobNum = 200;
 		Boolean useCluster = true;
 		
 		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));

@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Bagged Clustering</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for bclust {e1071}"><tr><td>bclust {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Bagged Clustering</h2>
+
+<h3>Description</h3>
+
+<p>Cluster the data in <code>x</code> using the bagged clustering
+algorithm. A partitioning cluster algorithm such as
+<code><a href="../../stats/html/kmeans.html">kmeans</a></code> is run repeatedly on bootstrap samples from the
+original data. The resulting cluster centers are then combined using
+the hierarchical cluster algorithm <code><a href="../../stats/html/hclust.html">hclust</a></code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+bclust(x, centers=2, iter.base=10, minsize=0,
+       dist.method="euclidian",
+       hclust.method="average", base.method="kmeans",
+       base.centers=20, verbose=TRUE,
+       final.kmeans=FALSE, docmdscale=FALSE,
+       resample=TRUE, weights=NULL, maxcluster=base.centers, ...)
+hclust.bclust(object, x, centers, dist.method=object$dist.method,
+              hclust.method=object$hclust.method, final.kmeans=FALSE,
+              docmdscale = FALSE, maxcluster=object$maxcluster)
+## S3 method for class 'bclust'
+plot(x, maxcluster=x$maxcluster, main, ...)
+centers.bclust(object, k)
+clusters.bclust(object, k, x=NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>Matrix of inputs (or object of class <code>"bclust"</code> for plot).</p>
+</td></tr>
+<tr valign="top"><td><code>centers, k</code></td>
+<td>
+<p>Number of clusters.</p>
+</td></tr>
+<tr valign="top"><td><code>iter.base</code></td>
+<td>
+<p>Number of runs of the base cluster algorithm.</p>
+</td></tr>
+<tr valign="top"><td><code>minsize</code></td>
+<td>
+<p>Minimum number of points in a base cluster.</p>
+</td></tr>
+<tr valign="top"><td><code>dist.method</code></td>
+<td>
+<p>Distance method used for the hierarchical
+clustering, see <code><a href="../../stats/html/dist.html">dist</a></code> for available distances.</p>
+</td></tr>
+<tr valign="top"><td><code>hclust.method</code></td>
+<td>
+<p>Linkage method used for the hierarchical
+clustering, see <code><a href="../../stats/html/hclust.html">hclust</a></code> for available methods.</p>
+</td></tr>
+<tr valign="top"><td><code>base.method</code></td>
+<td>
+<p>Partitioning cluster method used as base algorithm.</p>
+</td></tr>
+<tr valign="top"><td><code>base.centers</code></td>
+<td>
+<p>Number of centers used in each repetition of the
+base method.</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+<p>Output status messages.</p>
+</td></tr>
+<tr valign="top"><td><code>final.kmeans</code></td>
+<td>
+<p>If <code>TRUE</code>, a final kmeans step is performed
+using the output of the bagged clustering as initialization.</p>
+</td></tr>
+<tr valign="top"><td><code>docmdscale</code></td>
+<td>
+<p>Logical, if <code>TRUE</code> a <code><a href="../../stats/html/cmdscale.html">cmdscale</a></code>
+result is included in the return value.</p>
+</td></tr>
+<tr valign="top"><td><code>resample</code></td>
+<td>
+<p>Logical, if <code>TRUE</code> the base method is run on
+bootstrap samples of <code>x</code>, else directly on <code>x</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>weights</code></td>
+<td>
+<p>Vector of length <code>nrow(x)</code>, weights for the
+resampling. By default all observations have equal weight.</p>
+</td></tr>
+<tr valign="top"><td><code>maxcluster</code></td>
+<td>
+<p>Maximum number of clusters memberships are to be
+computed for.</p>
+</td></tr>
+<tr valign="top"><td><code>object</code></td>
+<td>
+<p>Object of class <code>"bclust"</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>main</code></td>
+<td>
+<p>Main title of the plot.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Optional arguments top be passed to the base method
+in <code>bclust</code>, ignored in <code>plot</code>.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>First, <code>iter.base</code> bootstrap samples of the original data in
+<code>x</code> are created by drawing with replacement. The base cluster
+method is run on each of these samples with <code>base.centers</code>
+centers. The <code>base.method</code> must be the name of a partitioning
+cluster function returning a list with the same components as the
+return value of <code><a href="../../stats/html/kmeans.html">kmeans</a></code>.
+</p>
+<p>This results in a collection of <code>iter.base *
+	base.centers</code> centers, which are subsequently clustered using
+the hierarchical method <code><a href="../../stats/html/hclust.html">hclust</a></code>. Base centers with less
+than <code>minsize</code> points in there respective partitions are removed
+before the hierarchical clustering.
+</p>
+<p>The resulting dendrogram is then cut to produce <code>centers</code>
+clusters. Hence, the name of the argument <code>centers</code> is a little
+bit misleading as the resulting clusters need not be convex, e.g.,
+when single linkage is used. The name was chosen for compatibility 
+with standard partitioning cluster methods such as
+<code><a href="../../stats/html/kmeans.html">kmeans</a></code>.
+</p>
+<p>A new hierarchical clustering (e.g., using another
+<code>hclust.method</code>) re-using previous base runs can be
+performed by running <code>hclust.bclust</code> on the return value of
+<code>bclust</code>. 
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>bclust</code> and <code>hclust.bclust</code> return objects of class
+<code>"bclust"</code> including the components 
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>hclust</code></td>
+<td>
+<p>Return value of the hierarchical clustering of the
+collection of base centers (Object of class <code>"hclust"</code>).</p>
+</td></tr>
+<tr valign="top"><td><code>cluster</code></td>
+<td>
+<p>Vector with indices of the clusters the inputs are
+assigned to.</p>
+</td></tr>
+<tr valign="top"><td><code>centers</code></td>
+<td>
+<p>Matrix of centers of the final clusters. Only useful,
+if the hierarchical clustering method produces convex clusters.</p>
+</td></tr>
+<tr valign="top"><td><code>allcenters</code></td>
+<td>
+<p>Matrix of all <code>iter.base * base.centers</code>
+centers found in the base runs.</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Friedrich Leisch</p>
+
+
+<h3>References</h3>
+
+<p>Friedrich Leisch. Bagged clustering. Working Paper 51, SFB &ldquo;Adaptive
+Information Systems and Modeling in Economics and Management
+Science&rdquo;, August 1999. <a href="http://www.ci.tuwien.ac.at/~leisch">http://www.ci.tuwien.ac.at/~leisch</a></p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../stats/html/hclust.html">hclust</a></code>, <code><a href="../../stats/html/kmeans.html">kmeans</a></code>,
+<code><a href="boxplot.bclust.html">boxplot.bclust</a></code></p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(iris)
+bc1 &lt;- bclust(iris[,1:4], 3, base.centers=5)
+plot(bc1)
+
+table(clusters.bclust(bc1, 3))
+centers.bclust(bc1, 3)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

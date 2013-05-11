@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Parameter Tuning of Functions Using Grid Search</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for tune {e1071}"><tr><td>tune {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Parameter Tuning of Functions Using Grid Search</h2>
+
+<h3>Description</h3>
+
+<p>This generic function tunes hyperparameters of statistical methods
+using a grid search over supplied parameter ranges.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+tune(method, train.x, train.y = NULL, data = list(), validation.x =
+     NULL, validation.y = NULL, ranges = NULL, predict.func = predict,
+     tunecontrol = tune.control(), ...)
+best.tune(...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>method</code></td>
+<td>
+<p>either the function to be tuned, or a character string
+naming such a function.</p>
+</td></tr>
+<tr valign="top"><td><code>train.x</code></td>
+<td>
+<p>either a formula or a matrix of predictors.</p>
+</td></tr>
+<tr valign="top"><td><code>train.y</code></td>
+<td>
+<p>the response variable if <code>train.x</code> is a predictor
+matrix. Ignored if <code>train.x</code> is a formula.</p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>data, if a formula interface is used. Ignored, if
+predictor matrix and response are supplied directly.</p>
+</td></tr>
+<tr valign="top"><td><code>validation.x</code></td>
+<td>
+<p>an optional validation set. Depending on whether a
+formula interface is used or not, the response can be
+included in <code>validation.x</code> or separately specified using <code>validation.y</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>validation.y</code></td>
+<td>
+<p>if no formula interface is used, the response of
+the (optional) validation set.</p>
+</td></tr>
+<tr valign="top"><td><code>ranges</code></td>
+<td>
+<p>a named list of parameter vectors spanning the sampling
+space. The vectors will usually be created by <code>seq</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>predict.func</code></td>
+<td>
+<p>optional predict function, if the standard <code>predict</code>
+behavior is inadequate.</p>
+</td></tr>
+<tr valign="top"><td><code>tunecontrol</code></td>
+<td>
+<p>object of class <code>"tune.control"</code>, as created by the
+function <code>tune.control()</code>. If omitted, <code>tune.control()</code>
+gives the defaults.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Further parameters passed to the training functions.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>As performance measure, the classification error is used
+for classification, and the mean squared error for regression. It is
+possible to specify only one parameter combination (i.e., vectors of
+length 1) to obtain an error estimation of the specified type
+(bootstrap, cross-classification, etc.) on the given data set. For
+convenience, there
+are several <code>tune.foo()</code> wrappers defined, e.g., for
+<code>nnet()</code>, <code>randomForest()</code>,
+<code>rpart()</code>, <code>svm()</code>, and <code>knn()</code>.
+</p>
+<p>Cross-validation randomizes the data set before building the splits
+which&mdash;once created&mdash;remain constant during the training
+process. The splits can be recovered through the <code>train.ind</code>
+component of the returned object.
+</p>
+
+
+<h3>Value</h3>
+
+<p>For <code>tune</code>, an object of class <code>tune</code>, including the components:
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>best.parameters</code></td>
+<td>
+<p>a 1 x k data frame, k number of parameters.</p>
+</td></tr>
+<tr valign="top"><td><code>best.performance</code></td>
+<td>
+<p>best achieved performance.</p>
+</td></tr>
+<tr valign="top"><td><code>performances</code></td>
+<td>
+<p>if requested, a data frame of all parameter
+combinations along with the corresponding performance results.</p>
+</td></tr>
+<tr valign="top"><td><code>train.ind</code></td>
+<td>
+<p>list of index vectors used for splits into
+training and validation sets.</p>
+</td></tr>
+<tr valign="top"><td><code>best.model</code></td>
+<td>
+<p>if requested, the model trained on the complete training data
+using the best parameter combination.</p>
+</td></tr>
+</table>
+<p><code>best.tune()</code> returns the best model detected by <code>tune</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>David Meyer<br>
+<a href="mailto:David.Meyer@R-project.org">David.Meyer@R-project.org</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="tune.control.html">tune.control</a></code>, <code><a href="plot.tune.html">plot.tune</a></code>,
+<code><a href="tune.wrapper.html">tune.svm</a></code>, <a href="tune.wrapper.html">tune.wrapper</a></p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  data(iris)
+  ## tune `svm' for classification with RBF-kernel (default in svm),
+  ## using one split for training/validation set
+  
+  obj &lt;- tune(svm, Species~., data = iris, 
+              ranges = list(gamma = 2^(-1:1), cost = 2^(2:4)),
+              tunecontrol = tune.control(sampling = "fix")
+             )
+
+  ## alternatively:
+  ## obj &lt;- tune.svm(Species~., data = iris, gamma = 2^(-1:1), cost = 2^(2:4))
+
+  summary(obj)
+  plot(obj)
+
+  ## tune `knn' using a convenience function; this time with the
+  ## conventional interface and bootstrap sampling:
+  x &lt;- iris[,-5]
+  y &lt;- iris[,5]
+  obj2 &lt;- tune.knn(x, y, k = 1:5, tunecontrol = tune.control(sampling = "boot"))
+  summary(obj2)
+  plot(obj2)
+
+  ## tune `rpart' for regression, using 10-fold cross validation (default)
+  data(mtcars)
+  obj3 &lt;- tune.rpart(mpg~., data = mtcars, minsplit = c(5,10,15))
+  summary(obj3)
+  plot(obj3)
+
+  ## simple error estimation for lm using 10-fold cross validation
+  tune(lm, mpg~., data = mtcars)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

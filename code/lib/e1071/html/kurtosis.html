@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Kurtosis</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for kurtosis {e1071}"><tr><td>kurtosis {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Kurtosis</h2>
+
+<h3>Description</h3>
+
+<p>Computes the kurtosis.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+kurtosis(x, na.rm = FALSE, type = 3)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>a numeric vector containing the values whose kurtosis is to
+be computed.</p>
+</td></tr>
+<tr valign="top"><td><code>na.rm</code></td>
+<td>
+<p>a logical value indicating whether <code>NA</code> values
+should be stripped before the computation proceeds.</p>
+</td></tr>
+<tr valign="top"><td><code>type</code></td>
+<td>
+<p>an integer between 1 and 3 selecting one of the algorithms
+for computing skewness detailed below.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>If <code>x</code> contains missings and these are not removed, the skewness
+is <code>NA</code>.
+</p>
+<p>Otherwise, write <i>x_i</i> for the non-missing elements of <code>x</code>,
+<i>n</i> for their number, <i>mu</i> for their mean, <i>s</i> for
+their standard deviation, and
+<i>m_r = &sum;_i (x_i - mu)^r / n</i>
+for the sample moments of order <i>r</i>.
+</p>
+<p>Joanes and Gill (1998) discuss three methods for estimating kurtosis:
+</p>
+
+<dl>
+<dt>Type 1:</dt><dd>
+<i>g_2 = m_4 / m_2^2 - 3</i><p>.
+This is the typical definition used in many older textbooks.</p>
+</dd>
+<dt>Type 2:</dt><dd>
+<i>G_2 = ((n+1) g_2 + 6) * (n-1) / ((n-2)(n-3))</i><p>.
+Used in SAS and SPSS.
+</p>
+</dd>
+<dt>Type 3:</dt><dd>
+<i>b_2 = m_4 / s^4 - 3 = (g_2 + 3) (1 - 1/n)^2 - 3</i><p>.
+Used in MINITAB and BMDP.</p>
+</dd>
+</dl>
+
+<p>Only <i>G_2</i> (corresponding to <code>type = 2</code>) is unbiased under
+normality.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The estimated kurtosis of <code>x</code>.
+</p>
+
+
+<h3>References</h3>
+
+<p>D. N. Joanes and C. A. Gill (1998),
+Comparing measures of sample skewness and kurtosis.
+<EM>The Statistician</EM>, <B>47</B>, 183&ndash;189.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+x &lt;- rnorm(100)
+kurtosis(x)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

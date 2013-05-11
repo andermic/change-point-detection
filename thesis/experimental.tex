@@ -1,0 +1,12 @@
+\chapter{Top-Down Approach}
+\section{Performance Metrics}
+To measure the performance of a time series classification algorithm we used
+two metrics. Accuracy is defined as the number of
+ticks that an algorithm correctly classifies in a time series, over the total number of ticks
+in the time series. In many applications involving streaming accelerometer data
+it is important to quickly detect changes in activity type in real time, so we
+were also interested in our algorithms'' detection time.
+Detection time is defined as the average number of ticks
+required for the algorithm to begin correctly classifying data after a
+true activity change has occurred.
+

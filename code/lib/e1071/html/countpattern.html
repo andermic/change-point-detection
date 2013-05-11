@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Count Binary Patterns</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for countpattern {e1071}"><tr><td>countpattern {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Count Binary Patterns</h2>
+
+<h3>Description</h3>
+
+<p>Every row of the binary matrix <code>x</code> is transformed into a binary
+pattern and these patterns are counted.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+countpattern(x, matching=FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>A matrix of binary observations</p>
+</td></tr>
+<tr valign="top"><td><code>matching</code></td>
+<td>
+<p>If TRUE an additional vector is returned which stores
+which row belongs to which pattern</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A vector of length <code>2\^ncol(x)</code> giving the number of times each
+pattern occurs in the rows of <code>x</code>. The names of this vector are the
+binary patterns. They are sorted according to their numeric value.
+If <code>matching</code> is <code>TRUE</code>, a list of the following two vectors is returned.
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>pat</code></td>
+<td>
+<p>Numbers of patterns as described above.</p>
+</td></tr>
+<tr valign="top"><td><code>matching</code></td>
+<td>
+<p>Vector giving the position of the pattern of each row
+of <code>x</code> in <code>pat</code>.</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Andreas Weingessel</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+xx &lt;- rbind(c(1,0,0),c(1,0,0),c(1,0,1),c(0,1,1),c(0,1,1))
+countpattern(xx)
+countpattern(xx, matching=TRUE)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

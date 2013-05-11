@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Computes the Short Time Fourier Transform of a Vector</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for stft {e1071}"><tr><td>stft {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Computes the Short Time Fourier Transform of a Vector</h2>
+
+<h3>Description</h3>
+
+<p>This function computes the Short Time Fourier Transform
+of a given vector <code>X</code>. 
+</p>
+<p>First, time-slices of length <code>win</code> are
+extracted from the vector. The shift of one time-slice to the next one is
+given by <code>inc</code>. The values of these time-slices are smoothed by
+mulitplying them with a window function specified in <code>wtype</code>. For
+the thus obtained windows, the Fast Fourier Transform is computed.</p>
+
+
+<h3>Usage</h3>
+
+<pre>stft(X, win=min(80,floor(length(X)/10)), inc=min(24,
+floor(length(X)/30)), coef=64, wtype="hanning.window")</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>X</code></td>
+<td>
+<p>The vector from which the stft is computed.</p>
+</td></tr>
+<tr valign="top"><td><code>win</code></td>
+<td>
+<p>Length of the window. For long vectors the default window
+size is 80, for short vectors the window size is chosen so that 10
+windows fit in the vector.</p>
+</td></tr>
+<tr valign="top"><td><code>inc</code></td>
+<td>
+<p>Increment by which the window is shifted. For long vectors
+the default increment is 24, for short vectors the increment is chosen
+so that 30 increments fit in the vector.</p>
+</td></tr> 
+<tr valign="top"><td><code>coef</code></td>
+<td>
+<p>Number of Fourier coefficients</p>
+</td></tr>
+<tr valign="top"><td><code>wtype</code></td>
+<td>
+<p>Type of window used</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Object of type stft. Contains the values of the stft and
+information about the parameters. 
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>values</code></td>
+<td>
+<p>A matrix containing the results of the stft. Each row of
+the matrix contains the <code>coef</code> Fourier coefficients of one
+window.</p>
+</td></tr> 
+<tr valign="top"><td><code>windowsize</code></td>
+<td>
+<p>The value of the parameter <code>win</code></p>
+</td></tr>
+<tr valign="top"><td><code>increment</code></td>
+<td>
+<p>The value of the parameter <code>inc</code></p>
+</td></tr>
+<tr valign="top"><td><code>windowtype</code></td>
+<td>
+<p>The value of the parameter <code>wtype</code></p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Andreas Weingessel</p>
+
+
+<h3>See Also</h3>
+
+<p>plot.stft</p>
+
+
+<h3>Examples</h3>
+
+<pre>x&lt;-rnorm(500)
+y&lt;-stft(x)
+plot(y)
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

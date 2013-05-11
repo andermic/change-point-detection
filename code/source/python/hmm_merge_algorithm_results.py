@@ -1,11 +1,14 @@
 #! /usr/bin/python
 
-INPUT_FOLDER = '/nfs/guille/wong/users/andermic/Desktop/hmm/OSU_YR4_Hip_30Hz.HMM.7cls'
+INPUT_FOLDER = '/nfs/guille/wong/users/andermic/my_exp/hmm/hmm/uq_30Hz_day2'
 CLASS_ALGS = ['nnet']
-OUTPUT_FOLDER = '/nfs/stak/students/a/andermic/Windows.Documents/Desktop/change-point-detection/code/source'
+OUTPUT_FOLDER = '.'
 
 ACC = 'MeanAccuracy'
-DET = 'MeanTotalDetectionTime'
+SDA = 'SDAccuracy'
+DET = 'MeanDetectionTime'
+SDDET = 'SDDetectionTime'
+
 WS = range(1,21)
 
 for cls_alg in CLASS_ALGS:
@@ -19,5 +22,5 @@ for cls_alg in CLASS_ALGS:
         file_dict = {}
         for i in range(len(keys)):
             file_dict[keys[i]] = values[i]
-        output_fobject.write('%s,%f,%f\n' % (ws, file_dict[ACC], file_dict[DET]))
+        output_fobject.write('%s,%f,%f,%f,%f\n' % (ws, file_dict[ACC], file_dict[SDA], file_dict[DET], file_dict[SDDET]))
     output_fobject.close()

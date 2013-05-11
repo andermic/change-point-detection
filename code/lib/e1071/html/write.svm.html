@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Write SVM Object to File</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for write.svm {e1071}"><tr><td>write.svm {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Write SVM Object to File</h2>
+
+<h3>Description</h3>
+
+<p>This function exports an SVM object (trained by <code>svm</code>) to two
+specified files. One is in the format that the
+function 'svm\_load\_model' of libsvm can read. The other is for
+scaling data, containing a data with centers and scales for all variables.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+write.svm(object, svm.file = "Rdata.svm",
+          scale.file = "Rdata.scale", yscale.file = "Rdata.yscale")
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>object</code></td>
+<td>
+<p>Object of class <code>"svm"</code>, created by <code>svm</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>svm.file</code></td>
+<td>
+<p>filename to export the svm object to.</p>
+</td></tr>
+<tr valign="top"><td><code>scale.file</code></td>
+<td>
+<p>filename to export the scaling data of the
+explanatory variables to.</p>
+</td></tr>
+<tr valign="top"><td><code>yscale.file</code></td>
+<td>
+<p>filename to export the scaling data of the dependent
+variable to, if any.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This function is useful when SVM models trained in R shall be used in 
+other environments. The SVM model is saved in the standard format of
+libsvm. The scaling data are written to a separate file because scaling
+data are not included in the standard format of libsvm. The format
+of the scaling data file is a n times 2 matrix: the n-th row
+corresponds to the n-th dimension of the data, the columns being formed
+of the corresponding mean and scale. If scaling information for the
+dependent variable exists (in case of regression models), it is stored
+in yet another file (1 times 2 matrix).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Tomomi TAKASHINA (based on 'predict.svm' by David Meyer)
+<a href="mailto:t.takashina@computer.org">t.takashina@computer.org</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="svm.html">svm</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(iris)
+attach(iris)
+
+## classification mode
+# default with factor response:
+model &lt;- svm (Species~., data=iris)
+
+# export SVM object to file
+write.svm(model, svm.file = "iris-classifier.svm", scale.file = "iris-classifier.scale")
+
+# read scale file
+# the n-th row is corresponding to n-th dimension. The 1st column contains the
+# center value, the 2nd column is the scale value.
+
+read.table("iris-classifier.scale")
+
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

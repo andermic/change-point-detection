@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Find Matched Control Group</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for matchControls {e1071}"><tr><td>matchControls {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Find Matched Control Group</h2>
+
+<h3>Description</h3>
+
+<p>Finds controls matching the cases as good as possible.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+matchControls(formula, data = list(), subset, contlabel = "con",
+               caselabel = NULL, dogrep = TRUE, replace = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula</code></td>
+<td>
+<p>A formula indicating cases, controls and the
+variables to be matched. Details are described below.</p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>an optional data frame containing the variables in the
+model.  By default the variables are taken from the environment
+which <code>matchControls</code> is called from.</p>
+</td></tr>
+<tr valign="top"><td><code>subset</code></td>
+<td>
+<p>an optional vector specifying a subset of observations
+to be used in the matching process.</p>
+</td></tr>
+<tr valign="top"><td><code>contlabel</code></td>
+<td>
+<p>A string giving the label of the control group.</p>
+</td></tr>
+<tr valign="top"><td><code>caselabel</code></td>
+<td>
+<p>A string giving the labels of the cases.</p>
+</td></tr>
+<tr valign="top"><td><code>dogrep</code></td>
+<td>
+<p>If <code>TRUE</code>, then <code>contlabel</code> and
+<code>contlabel</code> are matched using <code><a href="../../base/html/grep.html">grep</a></code>, else
+string comparison (exact equality) is used.</p>
+</td></tr>
+<tr valign="top"><td><code>replace</code></td>
+<td>
+<p>If <code>FALSE</code>, then every control is used only
+once.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The left hand side of the <code>formula</code> must be a factor
+determining whether an observation belongs to the case or the
+control group.  By default, all observations where a grep of
+<code>contlabel</code> matches, are used as possible controls, the rest is
+taken as cases.  If <code>caselabel</code> is given, then only those
+observations are taken as cases.  If <code>dogrep = TRUE</code>, then both
+<code>contlabel</code> and <code>caselabel</code> can be regular expressions.
+</p>
+<p>The right hand side of the <code>formula</code> gives the variables that
+should be matched.  The matching is done using the
+<code><a href="../../cluster/html/daisy.html">daisy</a></code> distance from the <code>cluster</code> package, i.e.,
+a model frame is built from the formula and used as input for
+<code><a href="../../cluster/html/daisy.html">daisy</a></code>. For each case, the nearest control is
+selected. If <code>replace = FALSE</code>, each control is used only
+once.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns a list with components
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>cases</code></td>
+<td>
+<p>Row names of cases.</p>
+</td></tr>
+<tr valign="top"><td><code>controls</code></td>
+<td>
+<p>Row names of matched controls.</p>
+</td></tr>
+<tr valign="top"><td><code>factor</code></td>
+<td>
+<p>A factor with 2 levels indicating cases and controls
+(the rest is set to <code>NA</code>.</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Friedrich Leisch</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+Age.case &lt;- 40 + 5 * rnorm(50)
+Age.cont &lt;- 45 + 10 * rnorm(150)
+Age &lt;- c(Age.case, Age.cont)
+
+Sex.case &lt;- sample(c("M", "F"), 50, prob = c(.4, .6), replace = TRUE)
+Sex.cont &lt;- sample(c("M", "F"), 150, prob = c(.6, .4), replace = TRUE)
+Sex &lt;- as.factor(c(Sex.case, Sex.cont))
+
+casecont &lt;- as.factor(c(rep("case", 50), rep("cont", 150)))
+
+## now look at the group properties:
+boxplot(Age ~ casecont)
+barplot(table(Sex, casecont), beside = TRUE)
+
+m &lt;- matchControls(casecont ~ Sex + Age)
+
+## properties of the new groups:
+boxplot(Age ~ m$factor)
+barplot(table(Sex, m$factor))
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>

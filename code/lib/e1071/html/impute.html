@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Replace Missing Values</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for impute {e1071}"><tr><td>impute {e1071}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Replace Missing Values</h2>
+
+<h3>Description</h3>
+
+<p>Replaces missing values of a matrix or dataframe with the
+medians (<code>what="median"</code>) or means (<code>what="mean"</code>) of the
+respective columns.</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+impute(x, what = c("median", "mean"))
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>A matrix or dataframe.</p>
+</td></tr>
+<tr valign="top"><td><code>what</code></td>
+<td>
+<p>What to impute.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A matrix or dataframe.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Friedrich Leisch</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+x&lt;- matrix(1:10, ncol=2)
+x[c(1,3,7)] &lt;- NA
+print(x)
+print(impute(x))
+</pre>
+
+<hr><div align="center">[Package <em>e1071</em> version 1.6-1 <a href="00Index.html">Index</a>]</div>
+</body></html>
