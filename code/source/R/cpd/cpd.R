@@ -163,6 +163,12 @@ detectionTime <- function(real, pred) {
 		}
 	}
 
+	print('predTimeTicks[length(predTimeTicks)]')
+	print(predTimeTicks[length(predTimeTicks)])
+	print('totalDetectionTime')
+	print(totalDetectionTime)
+	print('length(realActivities)')
+	print(length(realActivities))
 	return(totalDetectionTime / length(realActivities) / 30)
 }
 
@@ -188,7 +194,7 @@ quickTrainValidateCPD <- function(
 
 	if (algorithm == "svm") {	
 		if (kernal=="radial") {
-			stopifnot(!(is.na(gamma) || is.na(Cost)))
+			stopifnot(!(is.na(Gamma) || is.na(Cost)))
 			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, kernel=kernal, gamma=Gamma, cost=Cost)
 		} else if (kernal=="linear") {
 			stopifnot(!is.na(Cost))
@@ -260,7 +266,7 @@ testBestModelCPD <- function(
 	}
 	else if (algorithm == "nnet") {
 		my_data <- data.frame(as.data.frame(featureMatrixNoFFT(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
-		model <- nnet(formula=ActivityClass~., data=my_data, maxit = 100000, MaxNWts=1000000, size=bestModelInfo$NumHiddenUnits, decay=bestModelInfo$WeightDecay)
+		model <- nnet(formula=ActivityClass~., data=my_data, maxit=100000, MaxNWts=1000000, size=bestModelInfo$NumHiddenUnits, decay=bestModelInfo$WeightDecay)
 	}
 	else if (algorithm == "dt") {
 		my_data <- data.frame(as.data.frame(featureMatrixNoFFT(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))

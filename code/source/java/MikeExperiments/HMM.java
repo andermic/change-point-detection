@@ -474,7 +474,7 @@ public class HMM extends TaskDef {
 		Array windowSizes = array("[1:1:20]");
 		windowSizes = array(Arrays.asList("20","18","16","14","12","10"));
 		Var labVisitFileFolder = var(tvtDataPath).cat("/features/").cat("ws").cat(windowSizes);
-		Integer clusterJobNum = 150;
+		Integer clusterJobNum = 100;
 		int baseClassifier = NNET;
 		Boolean useCluster = true;
 

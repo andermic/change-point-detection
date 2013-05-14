@@ -272,8 +272,8 @@ public class DecisionTree extends TaskDef {
 		
 		testBestModel(clusterJobNum, useCluster, formulaName, expPath, cpdAlgorithm, cpdFPR, clusterWorkspace, validateSummaryFile, formula, jobId, trainDataInfoPath, validateDataInfoPath, testDataInfoPath, splitId, labVisitFileFolder, trainingLabVisitFileExt, valiTestLabVisitFileExt, bestModelInfoPath, bestModelSavePath, trainResultPath, validateResultPath, testResultPath, labels);
 		summarizeTest(clusterJobNum, useCluster, clusterWorkspace, jobId, expPath, bestModelId, testResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath, labels);
-		makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, trialGroupId, testDataSets, modelPath);
-		mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
+		//makeTable(formulaName, cpdAlgorithm, cpdFPR, tvtDataPath, splitId, trialGroupId, testDataSets, modelPath);
+		//mergeSplits(modelPath, bestModelId, testDataSets, cpdAlgorithm, cpdFPR, trialGroupId, formulaName, splitId);
 	}
 	
 	private void OSU_YR4_30Hz_Hip() throws Exception {
@@ -310,7 +310,7 @@ public class DecisionTree extends TaskDef {
 
 	private void UQ_30Hz() throws Exception {
 		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/cpd";
-		String day = "3";
+		String day = "2";
 		String datasetStr = "uq_30Hz_day" + day;
 
 		List<String> trialGroupIdList = Arrays.asList("");
