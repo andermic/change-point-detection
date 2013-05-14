@@ -1,5 +1,7 @@
-\chapter{Top-Down Approach}
-\section{Change Point Detection}
+\section{Top-Down Approach}
+\label{sec:topdown}
+
+\subsection{Change Point Detection}
 For this approach, the data was split into non-overlapping segments for
 featurization using techniques from the statistical field of change point detection.
 Change point detection has found application in many problem domains that require analysis of time series data
@@ -50,7 +52,7 @@ algorithm it may not be possible to generate scores right at the very beginning
 of the time series (insufficient reference data) or at the very end of a time
 series (insufficient test data).
 
-\section{Methodology}
+\subsection{Experiments}
 
 There are many different modeling assumptions and associated algorithms
 for generating change point detection scores, and one simple baseline approach that we 
@@ -124,8 +126,15 @@ so instead of running it on every tick of that data, we ran the CV procedure on 
 random ticks drawn from the data. From this we were able
 to empirically identify 0.01 as a plausible $\sigma$, and so fixed $\sigma$
 at that value for our experiments on this dataset.
-Our reference windows were fixed at a length of 10 seconds, and our test
-windows were fixed at a length of 1 second.
+
+Previous research \cite{zheng12} found that on the average a window size of 10
+seconds contained just enough information to discriminate well between OSU Hip activities.
+Since this window size worked well in previous experiments, and since the 
+activities of the UQ dataset were comparable in average length, we decided to
+fix our reference window size at 10 seconds for both datasets. Because we were interested in
+minimizing detection time, and because 1 second was the smallest window that
+we felt could provide some information about an activity, we fixed our test
+window size at 1 second for both datasets.
 
 Once scores were generated, we chose a number of threshold values to determine which
 scores were considered high enough to predict a changepoint.
@@ -134,22 +143,3 @@ change prediction for the change point detection algorithms. A smaller false pos
 corresponded to a higher and more conservative threshold, which split the
 time series into fewer segments for featurization. A larger false positive rate
 corresponded to a lower threshold, which split the time series into more segments.
-
-\section{Results}
-Figure \ref{fig:cpd_perf}, shows accuracy and detection time as a function of the
-false positive rate per second, for the OSU Hip dataset,
-for each of the SVM, Decision Tree, and Neural Net base classifiers.
-
-\begin{figure}
- \centering
- \includegraphics[scale=0.3]{osu_cpd_dt_acc.png}
- \includegraphics[scale=0.3]{osu_cpd_svm_acc.png}
- \includegraphics[scale=0.3]{osu_cpd_nnet_acc.png}
- \includegraphics[scale=0.3]{osu_cpd_dt_det.png}
- \includegraphics[scale=0.3]{osu_cpd_svm_det.png}
- \includegraphics[scale=0.3]{osu_cpd_nnet_det.png}
- \caption{CPD-Based Classification Performance}
- \label{fig:cpd_perf}
-\end{figure}
-
-\section{Discussion}

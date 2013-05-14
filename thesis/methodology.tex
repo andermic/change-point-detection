@@ -57,7 +57,7 @@ standing (laundry, sweeping, and catch), walking (comfortable, brisk and treadmi
 dancing, running, and basketball.
 
 \subsection{UQ}
-(TODO: Describe what research this data has been used for, and provide citation(s))
+% (TODO: Describe what research this data has been used for, and provide citation(s))
 
 This dataset consisted of 23 time series, each containing roughly 10 continuous
 days worth of data from a single subject. Subjects wore an ActiGraph GT3X+
@@ -84,15 +84,15 @@ time series into individual days. We then treated the first day of data that beg
 from each subject as one whole dataset (UQ Day 1), and the second such day as a separate dataset
 (UQ Day 2), and did not use any of the data from the remaining days.
 
-(TODO: Number of events per time series, their mean and median size?)
+% (TODO: Number of events per time series, their mean and median size?)
 
 \section{Featurization}
 To formulate our experiments as classification problems, we split each time series into a set of
 non-overlapping windows and represented each window as a feature vector.
 How we decided where one window ended (and where the next began) varied between
-experiments, and is described in (sub)sections (TODO) and (TODO). Our feature
+experiments, and is described in sections \ref{sec:topdown} and \ref{sec:bottomup}. Our feature
 set was a large collection of statistics that have been shown to be discriminative
-for different types of activities in previous research \cite{li09} \cite{rothney07}
+for activity classification in previous research \cite{li09} \cite{rothney07}
 \cite{staudenmeyer09} \cite{zheng12}. In all we used 18 statistics that were
 uniaxial, i.e. were only a function of the data from a single axis of a given window
 , and 1 biaxial statistic.
@@ -162,8 +162,7 @@ a second metric. Detection time is defined as the average amount of time
 required for an algorithm to begin correctly classifying data after a
 true activity change has occurred.
 
-\input{topdown}
-
-\input(bottomup}
+\input{topdown.tex}
+\input{bottomup.tex}
 
 %\input{results}
