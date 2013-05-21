@@ -19,7 +19,7 @@ a time tick, a window of data that immediately preceeds it (the
 
 \begin{figure}
  \centering
- \includegraphics[scale=0.8]{cpd_ref_test.png}
+ \includegraphics[scale=0.8]{cpd_ref_test_new.png}
  \caption{Change Point Detection}
  \label{fig:cpd_ref_test.png}
 \end{figure}
@@ -33,7 +33,7 @@ Where it is reasonable to assume that the data belongs to a particular
 family of distributions then parametric estimation methods have been employed
 \cite{thatte11}. If no such modeling assumptions are reasonable then 
 non-parametric methods have also been found to be viable \cite{matteson12}.
-Finally, distance-based approaches such as Singular Spectrum Analysis
+Distance-based approaches such as Singular Spectrum Analysis
 generate scores through other metrics of 
 dissimilarity or difference between the reference data and the test data
 \cite{moskvina03}.
@@ -46,13 +46,13 @@ s_i = D(x_{r,i}, x_{t,i})
 Where $s_i$ is the score of the $i$th tick, $x_{r,i}$ is the reference
 data associated with the $i$th tick, $x_{t,i}$ is the test data
 associated with the $i$th tick, and $D(A,B)$ is a function that computes the
-dissimiliarity between a matrix of data $A$ and matrix of data $B$, and is
-particular to the given change point algorithm. Note that for a given
+dissimiliarity between a matrix of data $A$ and matrix of data $B$, and varies
+between change point algorithms. Note that for a given
 algorithm it may not be possible to generate scores right at the very beginning
 of the time series (insufficient reference data) or at the very end of a time
 series (insufficient test data).
 
-\subsection{Experiments}
+\subsection{Experimental Setup}
 
 There are many different modeling assumptions and associated algorithms
 for generating change point detection scores, and one simple baseline approach that we 
@@ -119,13 +119,12 @@ KLIEP with each combination of split and candidate $\sigma$. Then it chooses the
 that, on the average across all of the splits, maximizes the KL divergence (the
 $\max_{\alpha}$ equation above) the most.
 
-For the OSU Hip dataset, we used this
-CV to choose the the kernel width at each individual time tick. This computationally-
+For the OSU Hip dataset, we used this CV procedure io choose the the kernel width at each individual time tick. This computationally
 intensive approach was impractical for the UQ dataset because it is orders of magnitude larger,
 so instead of running it on every tick of that data, we ran the CV procedure on a number of
 random ticks drawn from the data. From this we were able
 to empirically identify 0.01 as a plausible $\sigma$, and so fixed $\sigma$
-at that value for our experiments on this dataset.
+at that value for our experiments on that dataset.
 
 Previous research \cite{zheng12} found that on the average a window size of 10
 seconds contained just enough information to discriminate well between OSU Hip activities.
@@ -136,8 +135,8 @@ minimizing detection time, and because 1 second was the smallest window that
 we felt could provide some information about an activity, we fixed our test
 window size at 1 second for both datasets.
 
-Once scores were generated, we chose a number of threshold values to determine which
-scores were considered high enough to predict a changepoint.
+Once scores were generated, we tested a number of threshold values that determined which
+scores were high enough to be considered a predicted change-point.
 Threshold values were chosen by considering the false positive rates of
 change prediction for the change point detection algorithms. A smaller false positive rate
 corresponded to a higher and more conservative threshold, which split the

@@ -1,10 +1,13 @@
+%TODO: Review thesis outline and make sure I got everything
+%TODO: Consider adding a data lifecycle (pipeline) graph, as in ravi
+
 \chapter{Methodology}
 \section{Overview}
 Each dataset that we tested consisted of multiple time series gathered from
 a number of different subjects, so to perform an experiment on a dataset we began by
 partitioning the dataset into disjoint subsets of training, validation,
 and test data. Each individual time series was then partitioned into
-a set of disjoint windows, and each window was featurized. Once the dataset was
+a set of disjoint windows, and each window was converted into its own feature vector. Once the dataset was
 featurized, the experiment could be treated as a normal classification problem.
 We trained a base classifier using the training set, tuned it (when necessary)
 with the validation set, and obtained results by testing the quality of the
@@ -25,7 +28,7 @@ over two separate visits, while an ActiGraph GT1M accelerometer worn on their hi
 collected triaxial acceleration data at a frequency of 30Hz.
 
 Data was collected from two separate visits to the lab, where the subjects performed 6 activities per visit.
-Children were given breaks in between each activities, and each activity lasted 5-10
+Subjects were given breaks in between each activity and each activity lasted 5-10
 minutes, however, these unlabelled breaks were removed from the version of the dataset that we
 used, and additionally only two minutes of data were available for each subject. Thus, each of
 the 91 time series contained data from six 120 second long activities, for a total of
@@ -49,7 +52,7 @@ $6*120*30 = 21600$ ticks per time series.
  \label{fig:osu_activities}
 \end{figure}
 
-For our experiment, we determined that several of the activities were very similar and that
+We determined that several of the activities were very similar and that
 it would be difficult to discriminate between them, so we combined some of them together to
 create a 7 class version of the data.
 Our classes were lying down, sitting (hand-writing, computer game),
@@ -57,15 +60,15 @@ standing (laundry, sweeping, and catch), walking (comfortable, brisk and treadmi
 dancing, running, and basketball.
 
 \subsection{UQ}
-% (TODO: Describe what research this data has been used for, and provide citation(s))
+%TODO: Describe what research this data has been used for, and provide citation(s)
 
 This dataset consisted of 23 time series, each containing roughly 10 continuous
 days worth of data from a single subject. Subjects wore an ActiGraph GT3X+
 accelerometer during the entire period, which collected triaxial acceleration data at a frequency
 of 30Hz, as well as an activPal inclinometer on their thighs. The inclinometer
-provided what we considered the ground truth of the data by automatically
-delimitting and classifying intervals using the orientation of the subject at any given moment. It 
-classified a horizontal orientation of the thigh as lying down/sitting,
+provided what we considered the ground truth labels of the data by automatically
+delimitting and classifying intervals using the orientation of the subject's thigh at any given moment. It 
+classified a horizontal orientation as lying down/sitting,
 a vertical orientation as standing, and a combination of the two as walking. Figure
 \ref{fig:uq_activities} shows samples of accelerometer data from the 3 activities.
 
@@ -74,7 +77,7 @@ a vertical orientation as standing, and a combination of the two as walking. Fig
  \includegraphics[scale=0.3]{uq_lying.png}
  \includegraphics[scale=0.3]{uq_standing.png}
  \includegraphics[scale=0.3]{uq_walking.png}
- \caption{UQ Day 2 Activity Samples}
+ \caption{UQ Day 1 Activity Samples}
  \label{fig:uq_activities}
 \end{figure}
 
@@ -82,9 +85,9 @@ This dataset was challenging to work with because of its size, as each individua
 contained roughly 25 million ticks of data. To help alleviate this problem, we split each
 time series into individual days. We then treated the first day of data that began at midnight
 from each subject as one whole dataset (UQ Day 1), and the second such day as a separate dataset
-(UQ Day 2), and did not use any of the data from the remaining days.
+(UQ Day 2), and did not use the data from the remaining days.
 
-% (TODO: Number of events per time series, their mean and median size?)
+%TODO: Number of events per time series, their mean and median size?
 
 \section{Featurization}
 To formulate our experiments as classification problems, we split each time series into a set of
@@ -94,8 +97,8 @@ experiments, and is described in sections \ref{sec:topdown} and \ref{sec:bottomu
 set was a large collection of statistics that have been shown to be discriminative
 for activity classification in previous research \cite{li09} \cite{rothney07}
 \cite{staudenmeyer09} \cite{zheng12}. In all we used 18 statistics that were
-uniaxial, i.e. were only a function of the data from a single axis of a given window
-, and 1 biaxial statistic.
+uniaxial, i.e. were only a function of the data from a single axis of a given window,
+and one biaxial statistic.
 The uniaxial statistics were applied to data from each axis separately, and
 the biaxial statistic was applied to data from each of the $C_2^3=3$ possible pairs of
 axes, for a total of $18*3+3 = 57$ features.
@@ -105,7 +108,7 @@ and the sum and the sample mean both act as simple and obvious ways of measuring
 as more intense activities will tend to involve
 higher rates of acceleration during movement. We also used the 10th, 25th (quartile 1),
 50th (median), 75th (quartile 3), and 90th percentiles of the data, as well as signal
-power and log energy as supplemental measures of overall intensity.
+power and log energy as supplemental measures of overall activity intensity.
 
 Another characteristic of an activity is how much it varies in intensity. The sample standard
 deviation, coefficient of variation, peak-to-peak amplitude (max-min), zero crossings
@@ -117,7 +120,7 @@ rhythmic or staccato in intensity (high variance, etc.).
 Skewness, kurtosis, lag-one-autocorrelation, and peak intensity
 were useful for discriminating between
 activities that tend to be similar in their overall intensity and variation in intensity,
-but that show other types of difference in shape. Skewness indicates whether the data is
+but that showed other types of difference in shape. Skewness indicates whether the data is
 more concentrated above or below its mean. Kurtosis indicates that the data is concentrated
 near its mean or conversely that it is fat-tailed. Lag-one-autocorrelation is a measure of
 the general relationship between data ticks and their immediate neighbors in time. Peak
@@ -125,7 +128,7 @@ intensity is the number of times that the data reached its maximum value.
 
 Finally we looked at a single bimodal statistic across each pair of axes, the correlation
 coefficient, which discriminates between activities where acceleration values in one axis
-are predictive of acceleration values in another axis, verses those where that is not the case.
+are predictive of acceleration values in another axis, verses activities where that is not the case.
 
 \section{Base Classifiers}
 
@@ -142,12 +145,12 @@ For the OSU Hip experiments we tuned the
 cost parameter $c$ of the svm on the validation set with 6 values:
 $\{0.01,0.1,1,10,100,1000\}$. The single-layer feed-forward neural network took
 two tuning parameters, and we tuned with each element of the set $H \times W$,
-where $H = \{1,2,...30\}$ was the numbers of nodes in the hidden layer, and 
+where $H = \{1,2, \ldots, 30\}$ was the numbers of nodes in the hidden layer, and 
 $W = \{0,0.5,1\}$ was the weight decay parameters.
 
 Since the UQ datasets were an order of magnitude larger, we tuned them
 slightly differently because of time constraints. Setting the $c$ parameter to
-1000 proved to be prohibitively expensive for the svm model, so we tuned $c$
+1000 proved to be very computationally expensive for the svm model, so we tuned $c$
 from the values $\{0.01,0.1,1,10,100\}$. Running $30*3=90$ tuning experiments
 for the neural networks was also prohibitively expensive, so we drew from
 $H \times W = \{5,10,15\} \times \{0,0.5,1\}$.
@@ -156,13 +159,13 @@ $H \times W = \{5,10,15\} \times \{0,0.5,1\}$.
 To measure the performance of our classification algorithms we used
 two metrics. Accuracy is defined as the number of ticks that an algorithm
 correctly classifies in a time series, over the total number of ticks
-in the time series. Since we were also interested in our algorithms''
-feasibility for activity classification in realtime, we used detection time as
+in the time series. Since we were also interested in our algorithms'
+feasibility for activity classification in real time, we used detection time as
 a second metric. Detection time is defined as the average amount of time
 required for an algorithm to begin correctly classifying data after a
 true activity change has occurred.
 
+%TODO: Expand this section and/or include a picture.
+
 \input{topdown.tex}
 \input{bottomup.tex}
-
-%\input{results}
