@@ -1,38 +1,65 @@
-%TODO: Review thesis outline and make sure I got everything
-%TODO: Consider adding a data lifecycle (pipeline) graph, as in ravi
-
 \chapter{Methodology}
 \section{Overview}
 Each dataset that we tested consisted of multiple time series gathered from
 a number of different subjects, so to perform an experiment on a dataset we began by
-partitioning the dataset into disjoint subsets of training, validation,
+partitioning the set of time series into disjoint subsets of training, validation,
 and test data. Each individual time series was then partitioned into
 a set of disjoint windows, and each window was converted into its own feature vector. Once the dataset was
-featurized, the experiment could be treated as a normal classification problem.
-We trained a base classifier using the training set, tuned it (when necessary)
-with the validation set, and obtained results by testing the quality of the
-resulting tuned model on the testing set.
+featurized, the experiment could be treated as a typical classification problem.
+Base classifiers were built with the training set, and tuned (when necessary)
+on the validation set. 
+To complete the change-point detection experiments (\ref{fig:cpd_lifecycle}),
+the tuned model was evaluated with the testing data. For the HMM experiments
+(\ref{fig:hmm_lifecycle}), the tuned model made predictions on a
+second training set, which were used to build an HMM metamodel. Finally, that
+metamodel was evaluated with the testing data. Following sections describe these
+processes in detail.
 
+\begin{figure}
+ \centering
+ \includegraphics[scale=0.6]{cpd_lifecycle.pdf}
+ \caption{Data Lifecycle for Change-Point Detection Experiments}
+ \label{fig:cpd_lifecycle}
+\end{figure}
 
+\begin{figure}
+ \centering
+ \includegraphics[scale=0.6]{hmm_lifecycle.pdf}
+ \caption{Data Lifecycle for HMM Experiments}
+ \label{fig:hmm_lifecycle}
+\end{figure}
+
+%TODO:Maybe cite example(s) of non-free-living data
 \section{Datasets}
+For our experiments we were interested in testing our algorithms on real-world free-living
+data. In the past, researchers have gathered activity data under unrealistic
+laboratory conditions, and by performing activities themselves instead of using
+independent subjects.
+Unfortunately there are not many such labeled free-living datasets available,
+so we only tested our algorithms on two datasets.
+
 \subsection{OSU Hip}
 Our first dataset was collected by the Nutrition and Exercise Sciences department of
 Oregon State University, and has been used for previous activity detection research
-with the goal of automatically calculating and monitoring energy expenditure
+with the goal of designing a system to calculate and monitor subjects' energy expenditure
 \cite{trost12} \cite{zheng12}.
 This dataset consisted of 91 time series collected over a 2-week period in a
-laboratory environment. The subjects were children between the ages of 5 to 15
-(with a mean age of 11 years, and a standard deviation of 2.7 years).
+laboratory environment, from 50 subjects who were children between the ages of 5 and 15.
 Subjects performed 12 different types of activities (as shown in Figure \ref{fig:osu_activities})
 over two separate visits, while an ActiGraph GT1M accelerometer worn on their hip 
 collected triaxial acceleration data at a frequency of 30Hz.
 
 Data was collected from two separate visits to the lab, where the subjects performed 6 activities per visit.
-Subjects were given breaks in between each activity and each activity lasted 5-10
-minutes, however, these unlabelled breaks were removed from the version of the dataset that we
-used, and additionally only two minutes of data were available for each subject. Thus, each of
-the 91 time series contained data from six 120 second long activities, for a total of
-$6*120*30 = 21600$ ticks per time series.
+The 12 activities were performed in the same order for every other subject.
+In the version of the dataset available to us, we had all 12 activities of
+41 of the subjects, only the first 6 activities of an additional 5 subjects,
+and the last 6 activities of the remaining 4 subjects.
+Subjects were given breaks in between each activity and activities lasted 5-10
+minutes, however, these unlabelled breaks were removed from the version that we
+used. Additionally, only two minutes of data were available for each subject, so 
+time series consisted of six 120 second long activities that were concatenated together,
+qualifying the data as synthetic. Each of the 91 time series contained a total of
+$6*120*30 = 21600$ data ticks.
 
 \begin{figure}
  \centering
@@ -59,35 +86,44 @@ Our classes were lying down, sitting (hand-writing, computer game),
 standing (laundry, sweeping, and catch), walking (comfortable, brisk and treadmill walking),
 dancing, running, and basketball.
 
-\subsection{UQ}
-%TODO: Describe what research this data has been used for, and provide citation(s)
-
+\subsection{LiME}
 This dataset consisted of 23 time series, each containing roughly 10 continuous
-days worth of data from a single subject. Subjects wore an ActiGraph GT3X+
+days worth of data from an individual subject. It was collected by Helen Brown from
+the Univerity of Cambridge, and Gemma Ryde from the University of Stirling, Scotland.
+Subjects wore an ActiGraph GT3X+
 accelerometer during the entire period, which collected triaxial acceleration data at a frequency
 of 30Hz, as well as an activPal inclinometer on their thighs. The inclinometer
 provided what we considered the ground truth labels of the data by automatically
 delimitting and classifying intervals using the orientation of the subject's thigh at any given moment. It 
 classified a horizontal orientation as lying down/sitting,
 a vertical orientation as standing, and a combination of the two as walking. Figure
-\ref{fig:uq_activities} shows samples of accelerometer data from the 3 activities.
+\ref{fig:lime_activities} shows samples of accelerometer data from the 3 activities.
 
 \begin{figure}
  \centering
- \includegraphics[scale=0.3]{uq_lying.png}
- \includegraphics[scale=0.3]{uq_standing.png}
- \includegraphics[scale=0.3]{uq_walking.png}
- \caption{UQ Day 1 Activity Samples}
+ \includegraphics[scale=0.3]{lime_lying.png}
+ \includegraphics[scale=0.3]{lime_standing.png}
+ \includegraphics[scale=0.3]{lime_walking.png}
+ \caption{LiME Day 1 Activity Samples}
  \label{fig:uq_activities}
 \end{figure}
 
 This dataset was challenging to work with because of its size, as each individual time series
 contained roughly 25 million ticks of data. To help alleviate this problem, we split each
-time series into individual days. We then treated the first day of data that began at midnight
-from each subject as one whole dataset (UQ Day 1), and the second such day as a separate dataset
-(UQ Day 2), and did not use the data from the remaining days.
+time series into individual days. We then treated the first 24 hour period of data that began at midnight,
+from each subject, as one whole dataset (LiME Day 1), and the second such period as a separate dataset
+(LiME Day 2). We did not use any data from the remaining days.
 
-%TODO: Number of events per time series, their mean and median size?
+In contrast to the OSU Hip dataset, LiME
+was not synthetic and activity lengths were variable. For LiME Day 1, the
+average activity length was 2977 with a standard deviation of 26428, and the
+median length was 348. The average number of activities per time series was
+871. As would be expected, statistics for LiME Day 2 were comparable: the
+average activity length was 3108 with a standard deviation of 24099, and the
+median length was 348. The average number of activities per time series was 834.
+The medians were relatively small because many of the activities were short,
+while the mean and standard deviations were larger because a few of the
+activities were extremely long (when subjects were sleeping, for example).
 
 \section{Featurization}
 To formulate our experiments as classification problems, we split each time series into a set of
@@ -102,6 +138,37 @@ and one biaxial statistic.
 The uniaxial statistics were applied to data from each axis separately, and
 the biaxial statistic was applied to data from each of the $C_2^3=3$ possible pairs of
 axes, for a total of $18*3+3 = 57$ features.
+
+\begin{table}[h]
+%\small
+%\renewcommand{\arraystretch}{1.8}
+\centering
+\begin{tabular}{|p{8cm}|}  \hline
+Features (from \cite{zheng13})\\ \hline
+1. Sum of values of a period of time: $\sum^T_{i=1} s_i$.\\
+2. Mean: $\mu_s = \frac{1}{T} \sum^T_{i=1} s_i$.\\
+3. Standard deviation: $\sigma_s = \sqrt{\frac{1}{T} \sum^T_{i=1} (s_i - u_s)}$.\\
+4. Coefficients of variation: $c_v = \frac{\sigma_s}{\mu_s}$. \\
+5. Peak-to-peak amplitude: $max \{s_1, ..., s_T\} - min \{s_1, .., s_T\}$.\\
+6-10. Percentiles: $10^{th}, 25^{th}, 50^{th}, 75^{th}, 90^{th}$\\
+11. Interquartile range: difference between the $75^{th}$ and $25^{th}$ percentiles.\\
+12. Lag-one-autocorrelation: $\frac{\sum^{T-1}_{i=1} (s_i - \mu_s)(s_{i+1} - \mu_s)}{\sum^T_{i=1} (s_i - \mu_s)^2}$.\\
+13. Skewness:
+ $\frac{\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^3}
+{(\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^2)^\frac{3}{2}}$,
+ measure of asymmetry of the signal probability distribution.\\
+14. Kurtosis:
+ $\frac{\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^4}
+{(\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^2)^3} - 3$,
+ degree of the peakedness of the signal probability distribution.\\
+15. Signal power: $\sum^T_{i=1} s_i^2$.\\
+16. Log-energy: $\sum^T_{i=1} \log(s_i^2)$.\\
+17. Peak intensity: number of signal peak appearances within a certain period of time.\\
+18. Zero crossings: number of times the signal crosses its median.\\
+19. Correlation between each pair of axes:
+ $\frac{\sum^T_{i=1}(s_i-\mu_s)(v_i-\mu_v)}
+{\sqrt{\sum^T_{i=1}(s_i-\mu_s) \sum^T_{j=1}(v_j-\mu_v)}}$.\\ \hline
+\end{tabular}
 
 One discriminative characteristic of an activity is its overall vigorousness,
 and the sum and the sample mean both act as simple and obvious ways of measuring this,
@@ -130,11 +197,14 @@ Finally we looked at a single bimodal statistic across each pair of axes, the co
 coefficient, which discriminates between activities where acceleration values in one axis
 are predictive of acceleration values in another axis, verses activities where that is not the case.
 
+%TODO: Tie these into related work? If possible.
+%TODO: Expand this section and/or include a picture.
 \section{Base Classifiers}
 
 We tested 3 types of classification models on the featurized versions of our data:
 decision trees, support vector machines, and neural networks. We used R for our
-experiments, and used the `rpart', `e1071', and `nnet' libraries to R to build
+experiments, and used the R libraries `rpart' \cite{rpart}, `e1071' \cite{svm},
+and `nnet' \cite{nnet} to build
 our decision tree, svm, and neural net models, respectively. We treated the
 decision tree as a simple and quick baseline algorithm, and did not tune it in
 any way, ignoring the validation set. For all of the neural net experiments,
@@ -144,16 +214,19 @@ weights was set to 1000000.
 For the OSU Hip experiments we tuned the
 cost parameter $c$ of the svm on the validation set with 6 values:
 $\{0.01,0.1,1,10,100,1000\}$. The single-layer feed-forward neural network took
-two tuning parameters, and we tuned with each element of the set $H \times W$,
-where $H = \{1,2, \ldots, 30\}$ was the numbers of nodes in the hidden layer, and 
+two tuning parameters, and we tuned with each element of the set $N \times W$,
+where $N = \{1,2, \ldots, 30\}$ was the numbers of nodes in the hidden layer, and 
 $W = \{0,0.5,1\}$ was the weight decay parameters.
 
-Since the UQ datasets were an order of magnitude larger, we tuned them
+Since the LiME datasets were an order of magnitude larger, we tuned them
 slightly differently because of time constraints. Setting the $c$ parameter to
 1000 proved to be very computationally expensive for the svm model, so we tuned $c$
 from the values $\{0.01,0.1,1,10,100\}$. Running $30*3=90$ tuning experiments
 for the neural networks was also prohibitively expensive, so we drew from
-$H \times W = \{5,10,15\} \times \{0,0.5,1\}$.
+$N \times W = \{5,10,15\} \times \{0,0.5,1\}$.
+
+\input{topdown.tex}
+\input{bottomup.tex}
 
 \section{Performance Metrics}
 To measure the performance of our classification algorithms we used
@@ -165,7 +238,9 @@ a second metric. Detection time is defined as the average amount of time
 required for an algorithm to begin correctly classifying data after a
 true activity change has occurred.
 
-%TODO: Expand this section and/or include a picture.
-
-\input{topdown.tex}
-\input{bottomup.tex}
+In the change-point detection experiments accuracy and detection time were
+averaged over 30 random splits of the given dataset into training, validation, and
+testing sets. Because the HMM experiments were more computationally
+expensive, accuracy and detection time were averaged over 10 random splits of
+the given dataset into training (base classifier), validation, training (HMM),
+and testing sets.

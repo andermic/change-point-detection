@@ -7,8 +7,8 @@ Once we had created our methodology for splitting up time series using change-
 point detection, we decided to test it against a more standard,
 baseline technique. For this approach, we used the Hidden Markov Model to take
 advantage of the sequential nature of our data. An HMM is a temporal graphical model
-that contains a set of hidden states $H = \{H_0,H_1, \ldots, H_n\}$ as well as a set of
-observed states $O = \{O_1,O_2, \ldots, O_n\}$ (Figure \ref{fig:hmm}). An index
+that contains a set of hidden states $H = \{H_0,H_1, \ldots, H_w\}$ as well as a set of
+observed states $O = \{O_1,O_2, \ldots, O_w\}$ (Figure \ref{fig:hmm}). An index
 of either type of state represents a point in time, such that if there exists
 two indices $i$ and $j$ where $i < j$, $i$ is thought of as having happened
 before $j$. Each hidden state in the model has one of a discrete set of values associated
@@ -23,11 +23,11 @@ its immediate predecessor $H_{i-1}$.
 
 Furthermore, the dependencies between hidden states and their followers
 are assumed to be described by a stationary stochastic process
-known as the \emph{transition model}, \mbox{$T: H^2 \rightarrow [0,1]$}.
+known as the \emph{transition model}, \mbox{$T: X^2 \rightarrow [0,1]$}.
 The dependencies between a hidden state and its adjacent
 observable state are assumed to be part of a separate but also
-stationary stochastic process known as the \emph{sensor model},
-$S: H \times O \rightarrow [0,1]$. In other words, both models can be thought
+stationary stochastic process known as the \emph{observation model},
+$S: X \times Y \rightarrow [0,1]$. In other words, both models can be thought
 of as a function of two values, that outputs the probability of a
 change from the first value to the second via a dependency arc in the HMM.
 Now suppose that we are given a \emph{training HMM} $\langle H,O \rangle$,
@@ -54,7 +54,7 @@ a $\hat{T}$ and an $\hat{S}$ estimated from a training HMM, then the goal we are
 is to use that information (along with the model assumptions)
 to find the most likely values for each state in $H$. There
 exists a dynamic programming solution to this problem known as the Viterbi
-algorithm, which has a runtime that is linear in $n$. \cite{russell10}
+algorithm, which has a runtime that is linear in $w$. \cite{russell10}
 
 \subsection{Experimental Setup}
 

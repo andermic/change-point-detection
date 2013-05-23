@@ -394,8 +394,8 @@ public class NeuralNet extends TaskDef {
 		List<String> formulaNameList = Arrays.asList("AllWoFFT");
 
 		String clusterWorkspace = expRootPath + "/" + datasetStr + "/nnet/cluster";
-		Integer clusterJobNum = 200;
-		Boolean useCluster = true;
+		Integer clusterJobNum = 50;
+		Boolean useCluster = false;
 		
 		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
 		Array cpdFPR = array(Arrays.asList("0.0005", "0.001", "0.005", "0.01"));

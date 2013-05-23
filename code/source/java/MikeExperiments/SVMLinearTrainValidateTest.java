@@ -411,7 +411,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 		String costExp = "[0.01,0.1,1,10,100]";
 		
 		String clusterWorkspace = expRootPath + "/" + datasetStr + "/svm/cluster";
-		Integer clusterJobNum = 100;
+		Integer clusterJobNum = 50;
 		Boolean useCluster = true;
 		
 		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
