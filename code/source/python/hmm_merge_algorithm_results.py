@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
-INPUT_FOLDER = '/nfs/guille/wong/users/andermic/my_exp/hmm/hmm/uq_30Hz_day2'
-CLASS_ALGS = ['nnet']
+INPUT_FOLDER = '/nfs/guille/wong/users/andermic/my_exp/hmm/OSU_YR4_Hip_30Hz.HMM.7cls'
+CLASS_ALGS = ['dt', 'svm', 'nnet']
 OUTPUT_FOLDER = '.'
 
 ACC = 'MeanAccuracy'
