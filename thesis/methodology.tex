@@ -139,36 +139,38 @@ The uniaxial statistics were applied to data from each axis separately, and
 the biaxial statistic was applied to data from each of the $C_2^3=3$ possible pairs of
 axes, for a total of $18*3+3 = 57$ features.
 
+\vspace{1ex}
 \begin{table}[h]
 %\small
 %\renewcommand{\arraystretch}{1.8}
 \centering
-\begin{tabular}{|p{8cm}|}  \hline
-Features (from \cite{zheng13})\\ \hline
-1. Sum of values of a period of time: $\sum^T_{i=1} s_i$.\\
-2. Mean: $\mu_s = \frac{1}{T} \sum^T_{i=1} s_i$.\\
-3. Standard deviation: $\sigma_s = \sqrt{\frac{1}{T} \sum^T_{i=1} (s_i - u_s)}$.\\
-4. Coefficients of variation: $c_v = \frac{\sigma_s}{\mu_s}$. \\
-5. Peak-to-peak amplitude: $max \{s_1, ..., s_T\} - min \{s_1, .., s_T\}$.\\
-6-10. Percentiles: $10^{th}, 25^{th}, 50^{th}, 75^{th}, 90^{th}$\\
-11. Interquartile range: difference between the $75^{th}$ and $25^{th}$ percentiles.\\
-12. Lag-one-autocorrelation: $\frac{\sum^{T-1}_{i=1} (s_i - \mu_s)(s_{i+1} - \mu_s)}{\sum^T_{i=1} (s_i - \mu_s)^2}$.\\
+\begin{tabular}{|p{14cm}|}  \hline
+Features (from \cite{zheng13})\\ \hline \\ [-1ex]
+1. Sum of values of a period of time: $\sum^T_{i=1} x_i$.\\ [2ex]
+2. Mean: $\mu_s = \frac{1}{T} \sum^T_{i=1} x_i$.\\ [2ex]
+3. Standard deviation: $\sigma_x = \sqrt{\frac{1}{T} \sum^T_{i=1} (x_i - \mu_x)}$.\\ [2ex]
+4. Coefficients of variation: $c_v = \frac{\sigma_s}{\mu_x}$. \\ [2ex]
+5. Peak-to-peak amplitude: $max \{x_1, ..., x_T\} - min \{x_1, .., x_T\}$.\\ [2ex]
+6-10. Percentiles: $10^{th}, 25^{th}, 50^{th}, 75^{th}, 90^{th}$.\\ [2ex]
+11. Interquartile range: difference between the $75^{th}$ and $25^{th}$ percentiles.\\ [2ex]
+12. Lag-one-autocorrelation: $\frac{\sum^{T-1}_{i=1} (x_i - \mu_x)(x_{i+1} - \mu_x)}{\sum^T_{i=1} (x_i - \mu_x)^2}$.\\ [2ex]
 13. Skewness:
- $\frac{\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^3}
-{(\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^2)^\frac{3}{2}}$,
- measure of asymmetry of the signal probability distribution.\\
+ $\frac{\frac{1}{T} \sum^T_{i=1} (x_i - \mu_x)^3}
+{(\frac{1}{T} \sum^T_{i=1} (x_i - \mu_x)^2)^\frac{3}{2}}$,
+ asymmetry of the signal probability distribution.\\ [2ex]
 14. Kurtosis:
- $\frac{\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^4}
-{(\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^2)^3} - 3$,
- degree of the peakedness of the signal probability distribution.\\
-15. Signal power: $\sum^T_{i=1} s_i^2$.\\
-16. Log-energy: $\sum^T_{i=1} \log(s_i^2)$.\\
-17. Peak intensity: number of signal peak appearances within a certain period of time.\\
-18. Zero crossings: number of times the signal crosses its median.\\
+ $\frac{\frac{1}{T} \sum^T_{i=1} (x_i - \mu_x)^4}
+{(\frac{1}{T} \sum^T_{i=1} (x_i - \mu_x)^2)^3} - 3$,
+ peakedness of the signal probability distribution.\\ [2ex]
+15. Signal power: $\sum^T_{i=1} x_i^2$.\\ [2ex]
+16. Log-energy: $\sum^T_{i=1} \log(x_i^2)$.\\ [2ex]
+17. Peak intensity: number of signal peak appearances.\\ [2ex]
+18. Zero crossings: number of times the signal crosses its median.\\ [2ex]
 19. Correlation between each pair of axes:
- $\frac{\sum^T_{i=1}(s_i-\mu_s)(v_i-\mu_v)}
-{\sqrt{\sum^T_{i=1}(s_i-\mu_s) \sum^T_{j=1}(v_j-\mu_v)}}$.\\ \hline
+ $\frac{\sum^T_{i=1}(x_i-\mu_x)(v_i-\mu_v)}
+{\sqrt{\sum^T_{i=1}(x_i-\mu_x) \sum^T_{j=1}(v_j-\mu_v)}}$.\\ [2ex] \hline
 \end{tabular}
+\end{table}
 
 One discriminative characteristic of an activity is its overall vigorousness,
 and the sum and the sample mean both act as simple and obvious ways of measuring this,
