@@ -1,6 +1,6 @@
 
 \documentclass[onehalf,11pt]{beavtex}
-\title{Activity Detection on Free-Living Data Using Change Point Detection}
+\title{Activity Detection on Free-Living Data Using Change-Point Detection}
 \author{Michael M. Anderson}
 \degree{Master of Science}
 \doctype{Thesis}
@@ -16,31 +16,50 @@
 \usepackage{graphicx}
 \usepackage{mathtools}
 \usepackage{epstopdf}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{subfigure}
 \graphicspath{ {figures/} }
+%\graphicspath{ {results/} }
 
-%\usepackage{multirow}
 %\usepackage{algorithm}
 %\usepackage{algorithmic}
-%\usepackage{float}
 %\usepackage{times}
 %\usepackage{courier}
 %\usepackage{helvet}
 
 \abstract{
-(Abstract text)
+Activity detection on time series sensor data is a rapidly emerging field with
+a lot of potential real-world application. In previous work researchers have
+unrealistically assumed that they know at which ticks in a time series the
+given subject stops doing one activity and starts doing another. In this thesis
+we explore the feasibility of segmenting realistic free-living time series data
+using techniques from
+change-point detection, and then classifying the predicted segments using
+standard supervised learning techniques. We compare this to the popular
+approach of splitting the time series into small windows of fixed-length,
+predicting on each window with a classifier, and then smoothing over the
+predictions with an HMM. We find that the HMM approach clearly outperforms the
+change-point detection approach, but that change-point detection may be
+promising given a modeling assumption that is appropriate to the data.
 }
 
 \acknowledgements{
-(Acknowledgement text)
+I would like to acknowledge and thank my advisor, Dr. Weng-Keen Wong, for
+providing me with a clear and overarching vision of this project at all stages of its
+development, as well as his general expertise and helpfulness with all of the
+rough patches, sticking points, and unexpected problems that invariably
+accompany an endeavor of this magnitude. I would also like to thank the
+other members of my committee, Dr. Alan Fern, Dr. Raviv Raich, and Dr. Hector
+Vergara, for giving their time to help supervise the final stages of this
+project. Thanks go to all of my family and friends who encouraged and stood by
+me along the way. They are too numerous to name but they know who they are.
 }
 
 \begin{document}
 \maketitle
 \mainmatter
-
-\chapter{Introduction}
-\section{Motivation}
-\section{Previous Research}
 
 %I have done some excellent research \cite{matrix}.
 %\begin{figure}[!ht]
@@ -49,9 +68,11 @@
 %\caption{Go figure.}
 %\end{figure}
 
-\input{methodology.tex}
+%\input{introduction.tex}
+%\input{related.tex}
+%\input{methodology.tex}
 \input{results.tex}
-\input{conclusion.tex}
+%\input{conclusion.tex}
 
 \bibliographystyle{plain}
 \bibliography{thesis}

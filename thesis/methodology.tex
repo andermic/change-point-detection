@@ -8,24 +8,24 @@ a set of disjoint windows, and each window was converted into its own feature ve
 featurized, the experiment could be treated as a typical classification problem.
 Base classifiers were built with the training set, and tuned (when necessary)
 on the validation set. 
-To complete the change-point detection experiments (\ref{fig:cpd_lifecycle}),
+To complete the change-point detection experiments (Figure \ref{fig:cpd_lifecycle}),
 the tuned model was evaluated with the testing data. For the HMM experiments
-(\ref{fig:hmm_lifecycle}), the tuned model made predictions on a
+(Figure \ref{fig:hmm_lifecycle}), the tuned model made predictions on a
 second training set, which were used to build an HMM metamodel. Finally, that
 metamodel was evaluated with the testing data. Following sections describe these
-processes in detail.
+processes in further detail.
 
 \begin{figure}
  \centering
  \includegraphics[scale=0.6]{cpd_lifecycle.pdf}
- \caption{Data Lifecycle for Change-Point Detection Experiments}
+ \caption{Data Lifecycle of Change-Point Detection Experiments}
  \label{fig:cpd_lifecycle}
 \end{figure}
 
 \begin{figure}
  \centering
  \includegraphics[scale=0.6]{hmm_lifecycle.pdf}
- \caption{Data Lifecycle for HMM Experiments}
+ \caption{Data Lifecycle of HMM Experiments}
  \label{fig:hmm_lifecycle}
 \end{figure}
 
@@ -46,11 +46,11 @@ with the goal of designing a system to calculate and monitor subjects' energy ex
 This dataset consisted of 91 time series collected over a 2-week period in a
 laboratory environment, from 50 subjects who were children between the ages of 5 and 15.
 Subjects performed 12 different types of activities (as shown in Figure \ref{fig:osu_activities})
-over two separate visits, while an ActiGraph GT1M accelerometer worn on their hip 
+over two separate visits, while an ActiGraph GT1M accelerometer worn on the hip 
 collected triaxial acceleration data at a frequency of 30Hz.
 
 Data was collected from two separate visits to the lab, where the subjects performed 6 activities per visit.
-The 12 activities were performed in the same order for every other subject.
+Each subject performed the 12 activities in the same order.
 In the version of the dataset available to us, we had all 12 activities of
 41 of the subjects, only the first 6 activities of an additional 5 subjects,
 and the last 6 activities of the remaining 4 subjects.
@@ -105,7 +105,7 @@ a vertical orientation as standing, and a combination of the two as walking. Fig
  \includegraphics[scale=0.3]{lime_standing.png}
  \includegraphics[scale=0.3]{lime_walking.png}
  \caption{LiME Day 1 Activity Samples}
- \label{fig:uq_activities}
+ \label{fig:lime_activities}
 \end{figure}
 
 This dataset was challenging to work with because of its size, as each individual time series
@@ -123,7 +123,7 @@ average activity length was 3108 with a standard deviation of 24099, and the
 median length was 348. The average number of activities per time series was 834.
 The medians were relatively small because many of the activities were short,
 while the mean and standard deviations were larger because a few of the
-activities were extremely long (when subjects were sleeping, for example).
+activities were extremely long (e.g. when subjects were sleeping).
 
 \section{Featurization}
 To formulate our experiments as classification problems, we split each time series into a set of
@@ -199,7 +199,7 @@ Finally we looked at a single bimodal statistic across each pair of axes, the co
 coefficient, which discriminates between activities where acceleration values in one axis
 are predictive of acceleration values in another axis, verses activities where that is not the case.
 
-%TODO: Tie these into related work? If possible.
+%TODO: Tie our choice of base classifiers into related work, if possible.
 %TODO: Expand this section and/or include a picture.
 \section{Base Classifiers}
 

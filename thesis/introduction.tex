@@ -1,0 +1,53 @@
+\chapter{Introduction}
+One of the general goals of the field of artificial intelligence is to build
+computing devices that are ``context-aware'', that act as
+more than just passive number-crunching machines that receive input data through very
+restrictive and wholly human-operated channels such as a keyboard or mouse.
+Context-aware devices are capable of using sensor data to understand the
+environment that they are situated in, such as the locations of nearby objects
+and how the objects are moving \cite{abowd99}. One subfield of context-aware
+computing that has been receiving a lot of attention in recent years is activity
+detection. The goal of activity detection is to build computer + sensor systems
+that are able to determine what activity a human subject is performing at any given
+moment.
+
+Such systems have a variety of real-world applications. Researchers have been
+exploring the feasibility of using both wearable and non-wearable sensor systems to
+monitor the health of elderly patients that have or are at risk of developing
+degenerative physical and mental diseases \cite{fogarty06}. The hope is that 
+eventually sensor-based monitoring systems will aid doctors and family
+members in tracking the decline of subjects over time. Also detection of an
+abnormal activity may indicate that a senior is undergoing a serious medical
+event such as a heart attack or slip-and-fall \cite{wang12}. A second
+application of activity detection is the studying of energy expenditure
+of subjects as they go through the course of their day. The
+traditional method of performing such tracking is with self-reporting by the
+subject of their activities. Wearable sensors offer an alternative approach that
+is not susceptible to misreporting due to bias, poor memory, or other
+confounding factors that a human reporter introduces into the system. One
+approach is to estimate the vigorousness or metabolic equivalent
+(MET) of an activity and calculate energy expenditure directly, while another
+is to attempt to predict the type of activity performed, and calculate energy
+expenditure using knowledge of how vigorous that activity is on the average
+\cite{staudenmeyer09} \cite{trost12}.
+
+Activity detection generally assumes that sensor data will be represented as a
+time series, and that at any given moment in the time series the subject is
+performing one and only one type of activity. Thus the time series is thought
+of as being partitioned into a number of non-overlapping intervals (\emph{windows}), which are
+delimited by moments in time where the subject stopped doing one activity and
+started doing another. In this work we address the problem of performing the
+partition on unlabeled sensor data, i.e. deciding at which point an activity ends and 
+thereby the next activity begins. We use change-point detection, which is a
+field of statistics popular in control theory and other similar applications,
+to predict changes in activity. We call this our top-down approach because we
+begin with an initial time series and split it into smaller pieces using
+change-point detection.
+As a baseline comparison to this method we
+use the well known technique of splitting the time series into small fixed-
+length non-overlapping windows, predicting the activity type of each window
+using a base classifier, treating that prediction as the observable
+state of an HMM, and finally solving the HMM for its hidden states. We call
+this our bottom-up approach, because we begin with small windows of fixed-
+length, and use an HMM to smooth and aggregate those windows together into
+larger activity intervals.

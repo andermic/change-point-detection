@@ -3,13 +3,13 @@
 \section{Top-Down Approach}
 \label{sec:topdown}
 
-\subsection{Change Point Detection}
+\subsection{Change-Point Detection}
 For this approach, the data was split into non-overlapping segments for
 featurization using techniques from the statistical field of change-point detection.
-Change point detection has found application in many problem domains that require analysis of time series data
+Change-point detection has found application in many problem domains that require analysis of time series data
 from dynamic systems, including failure detection \cite{bae13}, quick detection of
 attacks on computer networks \cite{tartakovsky06}, and monitoring of heartbeat fluctuations during
-sleep \cite{staudacher05}. Change point detection assumes that each tick of a time series is a draw from some
+sleep \cite{staudacher05}. Change-point detection techniques assume that each tick of a time series is a draw from some
 process, but that the process may suddenly change as time passes.
 The goal is to predict when these changes have occurred.
 A \emph{score} is generated for each time tick, and if the score is

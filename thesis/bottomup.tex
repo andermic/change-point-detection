@@ -21,25 +21,28 @@ value of an observable state $O_i$ is dependent on the corresponding
 hidden state $H_i$, and that the value of any hidden state $H_i$ is dependent only on
 its immediate predecessor $H_{i-1}$.
 
-Furthermore, the dependencies between hidden states and their followers
-are assumed to be described by a stationary stochastic process
-known as the \emph{transition model}, \mbox{$T: X^2 \rightarrow [0,1]$}.
-The dependencies between a hidden state and its adjacent
-observable state are assumed to be part of a separate but also
-stationary stochastic process known as the \emph{observation model},
-$S: X \times Y \rightarrow [0,1]$. In other words, both models can be thought
-of as a function of two values, that outputs the probability of a
-change from the first value to the second via a dependency arc in the HMM.
-Now suppose that we are given a \emph{training HMM} $\langle H,O \rangle$,
-where the values of all of the hidden states as well as the
-observable states are known. We would estimate $T$ and $S$ by the following:
+Furthermore, the dependencies between hidden states and their followers are
+assumed to be described by a stationary stochastic process known as the
+\emph{transition model}, \mbox{$T: X^2 \rightarrow [0,1]$}. The dependencies
+between a hidden state and its adjacent observable state are assumed to be part
+of a separate but also stationary stochastic process known as the
+\emph{observation model}, $S: X \times Y \rightarrow [0,1]$. In other words, both
+models can be thought of as a function of two values, that output the
+probability of a change from the first value to the second via a dependency
+arc in the HMM. The usual approach to estimating $T$ and $S$ given only
+$O$ is a flavor of expectation maximation known as the Baum-Welch algorithm,
+which is useful for finding $\hat{T}$ and $\hat{S}$ that are locally maximally
+likely. However, suppose a \emph{training HMM} $\langle H_{tr},O_{tr} \rangle$
+with the same model parameters is given, and the values of all of its hidden states as well as its
+observable states are known. $T$ and $S$ are then approximated by the
+following global maximum likelihood estimators:
 
 \[
-\hat{T}(X_i,X_j) = \frac{|\{H_k \in H \, | \, H_k=X_i \; \text{and} \; H_{k+1}=X_j\}|} {|\{H_k \in H \, | \, H_k=X_i\}|}
+\hat{T}(X_i,X_j) = \frac{|\{H_k \in H_{tr} \; | \; H_k=X_i \; \text{and} \; H_{k+1}=X_j\}|} {|\{H_k \in H_{tr} \; | \; H_k=X_i\}|}
 \]
 
 \[
-\hat{S}(X_i,Y_j) = \frac{|\{H_k \in H \, | \, H_k=X_i \; \text{and} \; O_k=Y_j\}|} {|\{H_k \in H \, | \, H_k=X_i\}|}
+\hat{S}(X_i,Y_j) = \frac{|\{H_k \in H \; | \; H_k=X_i \; \text{and} \; O_k=Y_j\}|} {|\{H_k \in H \; | \; H_k=X_i\}|}
 \]
 
 \begin{figure}
@@ -65,6 +68,8 @@ split they were featurized. Classification
 models were built with training data,
 and tuned (in the case of the svm and neural net models) using validation data,
 in the same way that has already been described previously in this chapter.
+
+%TODO: Fix tr1, 2
 
 Unlike the change-point detection experiments, this experiment required
 that the data be split into 4 equal parts (training1, validation, training2,

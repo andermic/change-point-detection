@@ -1,0 +1,456 @@
+%File: formatting-instruction.tex
+\documentclass[letterpaper]{article}
+\usepackage{aaai}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\setlength{\pdfpagewidth}{8.5in}
+\setlength{\pdfpageheight}{11in}
+%\usepackage{ltexpprt} 
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{epstopdf}
+\usepackage{float}
+
+\frenchspacing
+\pdfinfo{
+/Title (Physical Activity Recognition from Accelerometer Data Using a Multi-Scale Ensemble Method)
+/Author (Yonglei Zheng, Weng-Keen Wong, Xinze Guan and Stewart Trost)
+/Keywords (Time series classification, ensemble methods, activity recognition)}
+\setcounter{secnumdepth}{0}  
+ \begin{document}
+% The file aaai.sty is the style file for AAAI Press 
+% proceedings, working notes, and technical reports.
+%
+\title{Physical Activity Recognition from Accelerometer Data Using a Multi-Scale Ensemble Method}
+\author{Yonglei Zheng, Weng-Keen Wong, Xinze Guan \\ School of EECS \\ Oregon State University \\ Corvallis, OR 97331 \\
+\And
+Stewart Trost \\ School of Human Movement Studies \\ University of Queensland \\Brisbane, Queensland, Australia
+}
+\maketitle
+\begin{abstract}
+\begin{quote}
+Accurate and detailed measurement of an individual's physical activity is a key requirement for helping researchers understand the relationship between physical activity and health. Accelerometers have become the method of choice for measuring physical activity due to their small size, low cost, convenience and their ability to provide objective information about physical activity. However, interpreting accelerometer data once it has been collected can be challenging. In this work, we applied machine learning algorithms to the task of physical activity recognition from triaxial accelerometer data. We employed a simple but effective approach of dividing the accelerometer data into short non-overlapping windows, converting each window into a feature vector, and treating each feature vector as an i.i.d training instance for a supervised learning algorithm. In addition, we improved on this simple approach with a multi-scale ensemble method that did not need to commit to a single window size and was able to leverage the fact that physical activities produced time series with repetitive patterns and discriminative features for physical activity occurred at different temporal scales.  
+\end{quote}
+\end{abstract}
+
+\section{Introduction}
+Although physical activity is well-known by the general public to be essential for maintaining a healthy body, researchers continue to seek a better understanding of the relationship between physical activity and health. A key requirement of this research is the accurate and detailed measurement of an individual's physical activity. Researchers can use this data to identify people at risk of certain diseases, evaluate the efficacy of intervention strategies for increasing physical activity and understand why some groups of people are more active than others \cite{BPSO:06}.
+
+Self-reports have traditionally been the means of providing information about physical activity \cite{de2011adults}. However, self-reports are susceptible to subjective factors, such as recall bias and social desirability, thus lacking accuracy. For instance, self-reports tend to overestimate the time spent in unstructured daily physical activities, such as walking \cite{tudor2001challenges}. 
+
+One of the most promising alternatives to self-reports is the use of accelerometers \cite{TMP:05}, which are free from subjective biases. Accelerometers for physical activity monitoring capture acceleration in different planes, with triaxial accelerometers being one of the most common types. Figure \ref{fig:osu_hip_eg} illustrates triaxial accelerometer data collected from seven different activity classes, with the data from each axis shown in a different color or style. Once this data has been collected, the challenge is to interpret this three dimensional time series. Interpreting this data requires two steps. First, if the accelerometer data were collected under free-living conditions, the time series needs to be divided into segments corresponding to one particular type of physical activity. Then, each smaller time series corresponding to a segment needs to be classified as a physical activity type. In our work, we focus on the classification task in the second step because our data has already been segmented by the nature of our data collection process. For future work, we will investigate algorithms for segmenting data obtained under free-living conditions.
+
+The traditional approach in exercise science for classifying a time series into physical activity classes is to use regression-based thresholds called cut-points \cite{BRT:12} which allow researchers to estimate the time spent performing physical activities at different intensity levels. Researchers, however,  have found cut-points to be inaccurate (eg. \cite{staudenmayer2009artificial,trost2012artificial}), and are turning to machine learning methods to identify physical activity types and estimate energy expenditure more accurately.
+
+The basic machine learning task involves classifying a triaxial time series as a single physical activity type. Many approaches to time series classification have been proposed in the machine learning literature \cite{XPK:10} and choosing the right approach depends on the nature of the time series. Two key characteristics of physical activity data (such as the data in Figure \ref{fig:osu_hip_eg}) that we will leverage to improve classification accuracy are its repetitive pattern lasting for the duration of the physical activity and the fact that discriminative features occur at different temporal scales. 
+
+\begin{figure*}[!htb]
+\centering$
+\begin{array}{cccc}
+\includegraphics[width=1.6in]{res/Hip_dance.jpg} &
+\includegraphics[width=1.6in]{res/Hip_lying_down.jpg} &
+\includegraphics[width=1.6in]{res/Hip_running.jpg} & 
+\includegraphics[width=1.6in]{res/Hip_sitting.jpg} \\
+\includegraphics[width=1.6in]{res/Hip_standing_household.jpg} &
+\includegraphics[width=1.6in]{res/Hip_walking.jpg} & 
+\includegraphics[width=1.6in]{res/Hip_basketball.jpg} &
+\\
+\end{array}$
+\caption{An example of 4 seconds of data from all seven classes in the OSU\_Hip dataset. These plots illustrate triaxial accelerometer data collected at 30 Hz, and plot line in a graph represents one axis. The activity types are, from left to right: (top) dancing, lying down, running, sitting, (bottom) standing and household chores, walking and basketball.}
+\label{fig:osu_hip_eg}
+\end{figure*}
+
+%\begin{table*}[ht]
+%%\renewcommand{\arraystretch}{1.3}
+%\begin{center}
+%\begin{tabular}{|p{2in}|p{4in}|}  \hline
+%\centering Activity Class & Description of Activities in this Class \\ \hline
+%\multirow{1}{*}{Lying down} 
+%            & Lie on floor mat or cot in supine position. Awake with arms at side. Instructed to %minimize all bodily  movements. \\ \hline
+%\multirow{2}{*}{Sitting}
+%             & While sitting in a chair at a desk, use a ball point pen and a pad of paper to transcribe a standardized script.  \\
+%             & Sit in chair and play video game.  \\ \hline
+%\multirow{3}{*}{Standing and household chores}
+%             & Throw and catch a ball while standing 5-10 ft from a research assistant. 15 throws per min.         \\ 
+%             & Load a laundry basket with towels and carry it 10 feet; 
+%                                        then they dump out the towels, fold them, load them back in the basket,  and carry it back to the original starting spot.         \\
+%             & Sweep confetti on floor continuously using broom to a specified location and repeating.         \\ \hline 
+%\multirow{3}{*}{Walking}
+%             & Walk at a self-selected comfortable speed around the perimeter of a gymnasium (1 lap = 63 m) .         \\ 
+%             & Walk at a self-selected brisk speed around the perimeter of a gymnasium (1 lap = 63m) .         \\ 
+%             & Walk on a treadmill at speed equal to that achieved during the brisk over-ground walking trial.         \\ \hline 
+%\multirow{1}{*}{Running}
+%             & Run at a self-selected speed around the perimeter of a gymnasium (1 lap = 63m) .         \\ \hline
+%\multirow{1}{*}{Basketball}
+%             & Shoot a basketball using an 8 ft or regulation hoop. Instructed to shoot the ball, 
+%                                        get the rebound and chase after the ball continuously.        \\ \hline
+%\multirow{1}{*}{Dance}
+%             & Follow a simple aerobics video. Routine included simple arm and leg movements.         \\ \hline
+%\end{tabular}
+%\end{center}
+%\caption{Activity class descriptions in OSU physical activity data}
+%\label{tbl:osu_activities}
+%\end{table*}
+
+In this work, we apply machine learning techniques to the task of predicting physical activity type from data collected from a single body-mounted triaxial accelerometer. We show that a straightforward application of supervised learning techniques can produce highly accurate results. To produce even more accurate results, we develop a new algorithm consisting of an ensemble of multi-scale classifiers in which each ensemble member is trained on a set of features computed from subwindows of different sizes from the original time series, thereby leveraging discriminative features from different temporal scales. We evaluated this ensemble method on three accelerometer data sets and found that it improved over standard supervised learning techniques.
+
+\section{Related Work}
+Past work has explored activity recognition using data from a single accelerometer, typically placed at the waist or hip \cite{staudenmayer2009artificial,bonomi2009detection}. A variety of standard supervised learning algorithms have been employed, but Ravi et al. \shortcite{RDML:05} conclude that ensemble methods, especially majority voting, were consistently among the top performing algorithms for activity recognition. An alternative approach is to use data from multiple accelerometers or other sensors for physical activity recognition \cite{BaoIntille:04}. Although multiple sensors can produce more accurate predictions, they are not practical as they would require an individual to wear multiple devices, which may be considered too cumbersome.
+
+Our task specifically involves classifying a numeric time series as a single activity type. A variety of methods that accomplish this task \cite{XPK:10,wang2010experimental} do so by transforming the raw time series into a more efficient representation that preserves its key traits but reduces its dimensionality. Examples of these representations include a symbolic representation \cite{lin2003symbolic} or a feature vector of shapelets \cite{ye2009time}. Once a raw time series has been converted into an efficient representation, supervised learning techniques can be applied to it. One of the most frequently used methods is the k-nearest neighbor (k-NN) algorithm, which can be surprisingly accurate using Euclidean distance  \cite{keogh2003need} or dynamic time warping (DTW) \cite{wang2010experimental}.  These techniques work well when the task is to match the overall shape of a time series, but as we will show, they perform poorly on accelerometer data with repetitive patterns.
+
+Hidden Markov Models (HMMs) have also been used for physical activity recognition \cite{LCKBH:05}. Since HMMs can model transitions between physical activities, they are more suitable for segmenting a time series into a sequence of physical activity types rather than classifying an entire time series as a single activity type.
+
+\section{Methodology}
+A simple and effective approach to the classification task is to cut the time series up into non-overlapping windows of some size $W$. Then, each window can be converted into a feature vector and each feature vector treated as if it were an independent, identically distributed (i.i.d.) data instance. At this point, supervised learning algorithms can be applied to each feature vector. This approach works especially well for time series with repetitive patterns, provided each window contains at least one ``cycle'' of the repetitive pattern. Indeed, this approach has been shown to be effective for physical activity recognition by several researchers, who have all used a variety of machine learning techniques such as neural nets \cite{staudenmayer2009artificial}, decision trees \cite{bonomi2009detection} and support vector machines \cite{su2005estimation}.
+
+Treating each window as an i.i.d data instance requires addressing two key issues. The first important issue is how to convert raw accelerometer data into a feature vector. Features need to capture important aspects of the data that can discriminate between different activity types and be applicable for different subjects. Knowing what these features will be beforehand is very difficult. Therefore, one approach for engineering features is to follow the techniques used in computer vision and create a bag of features \cite{zhang2012motion}, which generates a large set of potentially useful features. In our work, we found that the bag of features approach produced accurate predictions if the algorithm can handle a large number of features by guarding against overfitting (eg. through regularization of its parameters). Furthermore, since the ultimate goal is to deploy physical activity recognition algorithms in real time, the step of converting raw accelerometer data to a feature vector needs to be efficient. We use a large number of coarse-grained summary statistics as features that can all be computed in linear time from a window of data (Table \ref{tbl:features}).
+
+The second issue involves determining  the window size $W$, which is seldom addressed even though it affects the accuracy of the algorithm \cite{trost2012artificial}. The larger the window size, the longer it takes to identify the activity. For instance, if the window size were 60 seconds, then one must wait for a full 60 seconds worth of data to be accumulated before the prediction can take place. On the other hand, the smaller the window size, the less information is available to make an informed prediction of the activity type. If the features are summary statistics over the window (eg. the mean), then the window size also has an effect on the quality of the computed features. Having the wrong window size can cause the feature representation to oversmooth/undersmooth aspects of the data that are needed to discriminate between physical activity types.
+
+\begin{table}[h]
+%\small
+%\renewcommand{\arraystretch}{1.8}
+\centering
+\begin{tabular}{|p{8cm}|}  \hline
+Features \\ \hline
+1. Sum of values of a period of time: $\sum^T_{i=1} s_i$.\\ 
+2. Mean: $\mu_s = \frac{1}{T} \sum^T_{i=1} s_i$.\\ 
+3. Standard deviation: $\sigma_s = \sqrt{\frac{1}{T} \sum^T_{i=1} (s_i - u_s)}$.\\ 
+4. Coefficients of variation: $c_v = \frac{\sigma_s}{\mu_s}$. \\  
+5. Peak-to-peak amplitude: $max \{s_1, ..., s_T\} - min \{s_1, .., s_T\}$.\\ 
+6-10. Percentiles: $10^{th}, 25^{th}, 50^{th}, 75^{th}, 90^{th}$\\
+11. Interquartile range: difference between the $75^{th}$ and $25^{th}$ percentiles.\\  
+12. Lag-one-autocorrelation: $\frac{\sum^{T-1}_{i=1} (s_i - \mu_s)(s_{i+1} - \mu_s)}{\sum^T_{i=1} (s_i - \mu_s)^2}$.\\
+13. Skewness: 
+ $\frac{\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^3}
+{(\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^2)^\frac{3}{2}}$, 
+ measure of asymmetry of the signal probability distribution.\\  
+14. Kurtosis: 
+ $\frac{\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^4}
+{(\frac{1}{T} \sum^T_{i=1} (s_i - \mu_s)^2)^3} - 3$, 
+ degree of the peakedness of the signal probability distribution.\\ 
+15. Signal power: $\sum^T_{i=1} s_i^2$.\\  
+16. Log-energy: $\sum^T_{i=1} \log(s_i^2)$.\\  
+17. Peak intensity: number of signal peak appearances within a certain period of time.\\ 
+18. Zero crossings: number of times the signal crosses its median.\\  
+19. Correlation between each pair of axes: 
+ $\frac{\sum^T_{i=1}(s_i-\mu_s)(v_i-\mu_v)}
+{\sqrt{\sum^T_{i=1}(s_i-\mu_s) \sum^T_{j=1}(v_j-\mu_v)}}$.\\ \hline 
+\end{tabular}
+
+\caption{Time series features used in our representation of each window where the time series is denoted as $s_1, ..., s_T$ and $T$ is the length of the window}
+\label{tbl:features}
+\end{table}
+
+\subsection{Algorithm}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.7\linewidth,trim=7cm 0.5cm 7cm 0.5cm]{res/decompose_osu.jpg}
+\caption{Decomposing a time series of a 10-second walk (shown on top) into 1, 5 and 10-second overlapping subwindows (shown on the bottom). The subwindows shift by 1 second. }
+\label{fig:decompose_osu}
+\end{figure*}
+
+%\begin{figure}[htb]
+%\centering
+%\includegraphics[width=\linewidth]{res/swem_diagram.jpg}
+%\includegraphics[width=\linewidth, trim=6cm 0cm 6cm 0cm]{res/swem_diagram.eps}
+%\caption{An overview of the structure of the Subwindow Ensemble Model (SWEM)}
+%\label{fig:mss}
+%\end{figure}
+
+We now describe the Subwindow Ensemble Model (SWEM), which is designed to leverage a key aspect of physical activity recognition -- that physical activity types have discriminative features at different temporal scales. The SWEM consists of an ensemble of classifiers, with each classifier trained on a different feature representation of the data. Each feature representation corresponds to a set of features generated from different temporal scales of the time series. With this approach, we avoid committing to one particular window size at the expense of having to perform feature generation and classifier training for as many times as we have ensemble members. At the end, the predictions by each ensemble member are combined via majority vote to produce an overall prediction for a time series.
+
+Algorithm~\ref{alg:train} provides pseudocode for how the ensemble members in the SWEM are trained. The $\textsc{SWEMMemberTrain}$ function accepts as input labeled time series data and a list of subwindow sizes. If we use Figure ~\ref{fig:decompose_osu} as a running example, we have $L = {1, 5, 10}$, corresponding to  subwindows of 1, 5 and 10 seconds length. The for loop in line 2 iterates over the subwindow sizes. In lines 4-10, we decompose each time series $t$ into overlapping subwindows of size $l$; the overlap occurs because each subwindow of size $l$ is shifted over by 1 second, as in Figure ~\ref{fig:decompose_osu}. Line 5 retrieves the class label of time series $t$. Lines 6-9 takes each subwindow of size $l$, converts it to a feature vector with the $\textsc{Featurize}$ function, and adds the feature vector with the class label to the training data. The $\textsc{Build-Model}$ function in Line 11 trains the ensemble member with the training data and adds the trained ensemble member to the set $M$.
+
+\begin{algorithm}[h]
+\caption{\textsc{SWEMMemberTrain}$(T, L)$ }
+\label{alg:train}
+\textbf{Input}% Inputs section
+\begin{algorithmic}[1]
+\STATE $T$: dataset of labeled time series for training.
+\STATE $L$: subwindow sizes.
+\end{algorithmic}
+\textbf{Output}% Ouput section
+\begin{algorithmic}[1]
+\STATE $M$: the ensemble members. 
+\end{algorithmic}
+\textbf{Procedure}% Procedure section
+\begin{algorithmic}[1]
+\STATE $ M \leftarrow \{\} $
+\FOR {$\text{each } l \text{ {\bf in} } L $}
+	\STATE $ training\_data \leftarrow \{\} $
+	\FOR {$\text{ each time series } t \text{ {\bf in} } T$}
+		\STATE $label \leftarrow \textsc{Class-Label}(t)$
+		\FOR {$\text{each subwindow } s  \text{ of } t \text{ with length } l $}
+			\STATE $x \leftarrow \textsc{Featurize}(s)$
+			\STATE $ training\_data \leftarrow training\_data \cup (x,label)$
+		\ENDFOR
+	\ENDFOR
+	\STATE $ M \leftarrow M \cup \textsc{Build-Model}(training\_data) $
+\ENDFOR
+\STATE {\bf return} $M$
+\end{algorithmic}
+\end{algorithm}
+
+%The training of the stacking meta-model is shown in Algorithm ~\ref{alg:stacking-train}. The for %loop in lines 4-11 iterates over ensemble members. Give an ensemble member $m$, we retrieve %its associated subwindow length $l$ in line 5. Then, in lines 7-9, we extract all possible %subwindows of length $l$ from the time series $t$. Each subwindow $s$ is converted into a %feature vector through the \textsc{Featurize} function, and we predict its class label using %ensemble member $m$. The predictions over all subwindows of size $l$ are stored in $p$. In line %10, the overall classification for the time series $t$ using ensemble member $m$ (corresponding %to temporal scale $l$) is obtained by a majority vote on p. Lines 12 and 13 form training instances %for the meta-model. The features of these training instances consist of the predictions by each %ensemble member (stored in the vector $v$) and the associated class label of time series $t$. %Finally, in line 15, the meta model is trained.
+
+%\begin{algorithm}[h]
+%\caption{\textsc{SWEMMetaTrain}$(M, T, c)$ }
+%\label{alg:stacking-train}
+%\textbf{Input}% Inputs section
+%\begin{algorithmic}[1]
+%\STATE $M$: the ensemble members generated by $\textsc{SWEMMemberTrain}$. 
+%\STATE $T$: dataset of time series for training.
+%\end{algorithmic}
+%\textbf{Output}% Ouput section
+%\begin{algorithmic}[1]
+%\STATE $meta$: the meta model. 
+%\end{algorithmic}
+%\textbf{Procedure}% Procedure section
+%\begin{algorithmic}[1]
+%\STATE $ training\_data \leftarrow \{\} $
+%\FOR {$\text{ each time series } t \text{ {\bf in} } T$}
+%	\STATE $label \leftarrow \textsc{Class-Label}(t) $, $v \leftarrow \{\}$
+%	\FOR {$\text{each ensemble member } m \text{ from } M $}
+%		\STATE $l \leftarrow \textsc{SubwindowLength}(m) $
+%		\STATE $p \leftarrow \{\}$
+%		\FOR {$\text{each subwindow } s \text{ of } t \text{ with length } l$}
+%			\STATE $p \leftarrow p \cup \textsc{Predict}(m, \textsc{Featurize}(s))$
+%		\ENDFOR
+%		\STATE $v[m] \leftarrow \textsc{MajorityVote}(p)$
+%	\ENDFOR
+%	\STATE $x \leftarrow \textsc{Feature-Vector}(v) $
+%	\STATE $training\_data \leftarrow training\_data \cup (x, label)$
+%\ENDFOR
+%\STATE $meta \leftarrow \textsc{Build-Model}(training\_data)$ 
+%\STATE {\bf return} $meta$ 
+%\end{algorithmic}
+%\end{algorithm}
+
+\begin{algorithm}[h]
+\caption{\textsc{SWEMPredict}$(M, t)$ }
+\label{alg:stacking-predict}
+\textbf{Input}% Inputs section
+\begin{algorithmic}[1]
+\STATE $M$: the ensemble members generated by $\textsc{SWEMMemberTrain}$. 
+\STATE $t$: the time series to be predicted. 
+\end{algorithmic}
+\textbf{Output}% Output section
+\begin{algorithmic}[1]
+\STATE $prediction$: the prediction of time series $t$. 
+\end{algorithmic}
+\textbf{Procedure}% Procedure section
+\begin{algorithmic}[1]
+\STATE $v \leftarrow \{\} $
+\FOR {$\text{each ensemble member } m \text{ in } M $}
+	\STATE $l \leftarrow \textsc{SubwindowLength}(m)$, 
+	\STATE $p \leftarrow \{\}$
+	\FOR {$\text{each subwindow } s  \text{ of } t \text{ with length } l $}
+		\STATE $p \leftarrow p \cup \textsc{Predict}(m, \textsc{Featurize}(s))$
+	\ENDFOR
+	\STATE $v[m] \leftarrow \textsc{MajorityVote}(p)$
+\ENDFOR
+\STATE $prediction \leftarrow \textsc{MajorityVote}(v)$
+\STATE {\bf return} $prediction$
+\end{algorithmic}
+\end{algorithm}
+
+Algorithm~\ref{alg:stacking-predict} describes how SWEM classifies a new time series. In lines 2-9, the $\textsc{SWEM-Predict}$ function collects the predictions by an ensemble member over subwindows of size $l$. In line 3, we retrieve the length $l$ of the subwindow associated with ensemble member $m$. The for loop in lines 5-7 converts all subwindows of length $l$ in $T$ into a feature vector, predicts the class of each subwindow feature vector, and adds the predictions to $p$. In line 8, the prediction by a single ensemble member $m$ for the entire time series $t$  is obtained by a majority vote over $p$, which stores the predicted class labels for each subwindow. Finally, in line 10, the overall prediction by the ensemble is produced by a majority vote over the predictions by each ensemble member.
+
+The SWEM algorithm trades off speed for accuracy. If there are $|M|$ ensemble members in SWEM, then the process of training an ensemble member and predicting with it needs to be repeated $|M|$ times during the SWEM algorithm. Ensemble members dealing with smaller subwindow sizes will take longer to run because there are more small subwindows within a time series than large subwindows. Fortunately, each ensemble member can be handled independently of the others during training and prediction, allowing us to exploit parallel processing and thereby making the SWEM algorithm efficient in practice.
+
+\section{Evaluation}
+\subsection{Datasets}
+The SWEM was evaluated on three accelerometer-based physical activity datasets -- two datasets were from Oregon State University (OSU) and the third was from the Human Activity Sensing Consortium (HASC). 
+
+The OSU datasets contained data recorded by triaxial accelerometers at a 30 Hz sampling rate. Participants of ages 5-15 were asked to perform seven different types of physical activities for 2 minutes each in a controlled lab environment. The seven activity classes included: lying down, sitting, standing and household chores, walking, running, basketball and dance. The OSU\_Wrist dataset contains data collected from 18 participants with wrist-mounted accelerometers while the OSU\_Hip dataset contained data from 53 participants with hip-mounted accelerometers. Figure~\ref{fig:osu_hip_eg} shows an example of all seven classes in the OSU\_Hip dataset. Data from the OSU\_Wrist dataset is similar and not shown due to space limitations. The two minutes of data were cut up into 10-second time windows. Thus, the classification task involves classifying each 10-second window as an activity type. In past work, Trost et al. \shortcite{trost2012artificial} found that 10-second time windows were a good compromise between collecting enough data to predict the activity class and having a fast enough detection time. 
+
+%\begin{figure*}[ht]
+%\begin{center}$
+%\begin{array}{ccc}
+%\includegraphics[width=1.75in]{res/HASC_jog.jpg} &
+%\includegraphics[width=1.75in]{res/HASC_skip.jpg} &
+%\includegraphics[width=1.75in]{res/HASC_stay.jpg} \\
+%\includegraphics[width=1.75in]{res/HASC_stdown.jpg} &
+%\includegraphics[width=1.75in]{res/HASC_stup.jpg} &
+%\includegraphics[width=1.75in]{res/HASC_walk.jpg} \\
+%\end{array}$
+%\end{center}
+%\caption{An example of 10 seconds of data from all six classes in the HASC dataset. These plots illustrate triaxial accelerometer data collected at 100 Hz, and each color in a plot represents one axis. The activity types are, from left to right: (top) jog, skip, stay, (bottom) stair-down, stair-up, and walk.}
+%\label{fig:hasc_eg}
+%\end{figure*}
+
+The third dataset used in our experiments consists of the ``Sample Data'' from the Human Activity Sensing Consortium (HASC) 2011 challenge\footnote{Available at http://hasc.jp/hc2011/download-en.html} \cite{kawaguchi2011hasc}. The data were collected from seven subjects with triaxial accelerometers at a 100 Hz sampling rate. Six activities, namely stay, walk, jog, skip, stUp (stair-up) and stDown (stair-down), were performed by all subjects in a controlled lab environment. As with the OSU data, we divide the HASC time series data into windows of length 10 seconds.
+
+\subsection{Experiments}
+The SWEM consisted of 10 ensemble members, with each ensemble member corresponding to a subwindow of length 1, 2, 3, etc. up to  10 seconds. Features 1-18 were extracted from each axis, and Feature 19 (the correlation between axes) was extracted from each pair of axes, resulting in a total of 57 features. The ensemble members for the SWEM were linear support vector machines, implemented using LibSVM \cite{chang2011libsvm}.
+
+The dataset was randomly split by subject into three non-overlapping subsets for training, validation and testing. Each algorithm in our experiments was trained on the training set, each trained model was tuned on the validation set, and parameter settings achieving the highest performance on the validation set were chosen as the parameters for the final model evaluated on the test set. For the SVMs used in SWEM, the $C$ parameter was tuned over values 0.01, 0.1, 1, 10, 100 and 1000. Each algorithm was evaluated using 30 training-validation-testing splits and the average macro-F1 was reported. 
+
+We compared the performance of SWEM against the following algorithms. First, 1-nearest neighbor is a commonly used baseline for time series classification algorithms. We applied a 1-nearest neighbor algorithm on the raw time series with both a Euclidean distance metric (1NN\_EUC) and with Dynamic Time Warping (1NN\_DTW). In addition, we applied a 1-nearest neighbor algorithm on the SAX representation of the time series with both a Euclidean distance metric (1NN\_EUC\_SAX) and with Dynamic Time Warping (1NN\_DTW\_SAX). For SAX, we tuned the number of segments (10, 50, 100) and the number of symbols (5, 10, 20) but found that the results did not change much. Finally, we also applied a linear SVM, implemented with LibSVM \cite{chang2011libsvm}, with the $C$ parameter tuned on the validation set. We chose an SVM because it was one of the best performing algorithms on the physical activity data as compared to other supervised learning techniques. Since artificial neural networks (ANNs) are commonly used in the exercise science literature, we include results from a feed-forward neural network with a single hidden layer. The {\it nnet} \cite{nnet} package in R was used as the ANN implementation in our experiment. We tuned the number of hidden units (1-30) and decay weights (0, 0.5, and 1). We also attempted to represent the data with shapelets \cite{ye2009time}, but the training phase of the shapelet algorithm, which is computationally expensive, did not finish running on our full dataset.
+
+\section{Discussion}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|p{0.95in}|p{0.6in}|p{0.7in}|p{0.4in}|}  \hline
+{\bf Algorithm}      & {\bf OSU\_Hip} & {\bf OSU\_Wrist} & {\bf HASC} \\ \hline
+%SWEM\_GL1 & 0.937 & 0.904 & 0.800 \\ \hline
+SWEM\_SVM & {\bf 0.942}\dag & {\bf 0.896}\dag & {\bf 0.820}\dag \\ \hline
+SVM & 0.937 & 0.886 & 0.794 \\ \hline
+ANN & 0.919 & 0.787 & 0.738 \\ \hline
+1NN\_EUC & 0.572 & 0.456 & 0.648 \\ \hline
+1NN\_DTW & 0.561 & 0.494 & 0.648 \\ \hline
+1NN\_EUC\_SAX & 0.142 & 0.147 & 0.169 \\ \hline
+1NN\_DTW\_SAX & 0.143 & 0.143 & 0.169 \\ \hline
+\end{tabular}
+\caption{Average macro-F1 scores of the various algorithms on the three datasets. The bold font marks the model with the highest average macro-F1 and the symbol $\dag$ indicates that the improvement by SWEM is statistically significant (Wilcoxon signed rank test, p-value $<$ 0.05) above all the other algorithms.}
+\label{tbl:multi_vs_1nn}
+\end{table}
+
+%\section{Results}
+%\subsection{The Subwindow Ensemble Model vs the 1-Nearest Neighbor Models}
+%\begin{table*}[h]
+%\begin{center}
+%\begin{tabular}{|c|c|c|c|}  \hline
+%Dataset      & Model       & Mean of Accuracy & SD of Accuracy \\ \hline
+%\multirow{4}{*}{OSU\_Hip}
+%             & SWEM\_GL1   & 0.9367           & 0.0164         \\
+%             & SWEM\_SVM   & \bf 0.9465           & 0.0109         \\
+%             & NN\_EUC     & 0.4669           & 0.0308         \\
+%             & NN\_DTW     & 0.4499           & 0.0354         \\ \hline
+%\multirow{4}{*}{OSU\_Wrist}
+%             & SWEM\_GL1   & 0.9038           & 0.0244         \\
+%             & SWEM\_SVM   & \bf 0.9106           & 0.0198         \\
+%             & NN\_EUC     & 0.5089           & 0.0864         \\
+%             & NN\_DTW     & 0.5510           & 0.0602         \\ \hline
+%\multirow{4}{*}{HASC}
+%             & SWEM\_GL1   & 0.7970	          & 0.0301         \\
+%             & SWEM\_SVM   & \bf 0.8165	          & 0.0291         \\
+%             & NN\_EUC     & 0.5480           & 0.0304         \\
+%             & NN\_DTW     & 0.5485           & 0.0298         \\ \hline
+%\multirow{4}{*}{UCR\_ECG200}
+%             & SWEM\_GL1   & \bf 0.9979           & 0.0068 \\
+%             & SWEM\_SVM   & \bf 0.9979           & 0.0068 \\
+%             & NN\_EUC     & 0.8760           & 0.0414         \\
+%             & NN\_DTW     & 0.7948           & 0.0357         \\ \hline   
+%\multirow{4}{*}{UCR\_CricketX}
+%             & SWEM\_GL1   & 0.5803           & 0.0240         \\
+%             & SWEM\_SVM   & 0.6343           & 0.0225         \\
+%             & NN\_EUC     & 0.5507           & 0.0221         \\
+%             & NN\_DTW     & \bf 0.7291       & 0.0253         \\ \hline     
+%\multirow{4}{*}{UCR\_Sony}
+%             & SWEM\_GL1   & 0.9220           & 0.0134         \\
+%             & SWEM\_SVM   & 0.9187           & 0.0119         \\
+%             & NN\_EUC     & \bf 0.9663       & 0.0096         \\
+%             & NN\_DTW     & 0.9547           & 0.0148         \\ \hline  
+%\end{tabular}
+%\end{center}
+%\caption{Average classification accuracies of the Subwindow Ensemble Model and the 1-Nearest Neighbor Models. The bold font marks the model with the highest classification accuracy on the corresponding dataset. }
+%\label{tbl:multi_vs_1nn}
+%\end{table*}
+
+%\begin{figure*}[t]
+%\centering
+%\includegraphics[width=\linewidth]{res/multi_vs_1nn.eps}
+%\caption{Mean Classification Accuracies of the Subwindow Ensemble Model and the 1-Nearest Neighbor Models}
+%\label{fig:multi_vs_1nn}
+%\end{figure*}
+
+Table~\ref{tbl:multi_vs_1nn} illustrates the results of the experiments. The SWEM\_SVM was the best performing model on the OSU\_Hip (0.942), OSU\_Wrist (0.896) and HASC (0.820) datasets. SVMs and ANNs performed reasonably well, with SVMs being superior to ANNs, especially on the OSU\_Wrist dataset. Although SWEM\_SVM resulted in a slight improvement over SVM, both SWMs and ANNs were provided with an informed value of $W=10$, which helped their performance. In general, finding an appropriate value for this window size is difficult to do. The SWEM\_SVM algorithm, in contrast, removes the need to commit to a particular window size and it can exploit features of the data from different subwindow sizes. The nearest neighbor methods performed poorly because they tried to match the overall shape of the time series. In addition, the SAX representation also performed poorly because the aggregation caused many of the discriminative details to be smoothed out. 
+
+%In order to determine which {\it individual} activity types were more accurately predicted by the %multi-scale ensemble, we inspect the confusion matrices of SWEM\_SVM vs SVM (not included due %to lack of space). The majority of activity types were more accurately predicted by SWEM\_SVM %than SVM, with gains in accuracy by SWEM\_SVM over SVM for basketball in OSU\_Hip (0.027), %dance in OSU\_Wrist (0.038) and stair up in HASC (0.051). Dance in OSU\_Wrist was a %particularly difficult activity to recognize as it had the lowest accuracy out of all the activity %types. There were only four activity types, however, where SVM was more accurate than %SWEM\_SVM, and these improvements were extremely minor (0.001-0.009 in accuracy).
+
+We can gain further insight into the benefits of the multi-scale approach of SWEM\_SVM by comparing its performance to that of its individual ensemble members by removing the meta-layer performing a majority vote. In doing so, we report results as if we had made a prediction by using only a single temporal scale. Tables ~\ref{tbl:actacc_osu_hip_svm} to ~\ref{tbl:actacc_hasc_svm} compare the classification accuracies of SWEM\_SVM against each individual ensemble member on the OSU\_Hip, OSU\_Wrist and HASC datasets. We refer to each ensemble member as SWEM\_SVM followed by the size of the subwindow eg. SWEM\_SVM1 for a 1 second subwindow. Note that SWEM\_SVM10 is the largest possible subwindow size and these results are identical to applying an SVM to each window of data (ie. the results in Table \ref{tbl:multi_vs_1nn}).
+
+Our results show that ensemble members of different subwindow sizes performed better for certain activities than others. These results confirmed our hypothesis that discriminative features existed at different temporal scales for the various activity types. For example, on the OSU\_Hip dataset, subwindows of size 8 and 9 produced the best results for lying, sitting, and walking while subwindows of size 1 produced the best results for standing and running. Similarly, on the HASC dataset, the best results for walking were produced with a subwindow size of 9 while the smaller subwindow sizes produced more accurate predictions for stay, jog, skip, stUp and stDown. Some ensemble members performed better than SWEM\_SVM for specific activities, but over all activities, SWEM\_SVM always had a higher average accuracy than individual ensemble members.
+
+\begin{table*}[!htpb]
+\small
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}  \hline
+\multicolumn{1}{|c|}{\multirow{2}{*}{Model}} & 
+\multicolumn{1}{|c|}{\multirow{2}{*}{Macro-F1}} &
+\multicolumn{7}{|c|}{Classification Accuracy of Each Physical Activity} \\ \cline{3-9}
+         &       & lying      & sitting    & standing   & walking    & running    & basketball & dance \\ \hline
+SWEM\_SVM & 0.9424   & 0.9806     & 0.9423     & 0.9678     & 0.9541     & 0.9823     & 0.9419     & 0.8041 \\ \hline
+SWEM\_SVM1 & 0.9090   & 0.9709     & 0.9294     & {\bf 0.9893} & 0.9488     & {\bf 0.9876} & 0.7398     & 0.6931 \\ 
+SWEM\_SVM2 & 0.9339   & 0.9735     & 0.9271     & 0.9836     & 0.9543     & 0.9844     & 0.8931     & 0.7648 \\ 
+SWEM\_SVM3 & 0.9357   & 0.9719     & 0.9365     & 0.9727     & 0.9502     & 0.9870     & 0.9283     & 0.7756 \\ 
+SWEM\_SVM4 & 0.9355   & 0.9800     & 0.9265     & 0.9709     & 0.9533     & 0.9810     & 0.9178     & 0.7861 \\ 
+SWEM\_SVM5 & 0.9345   & 0.9780     & 0.9357     & 0.9564     & 0.9494     & 0.9811     & {\bf 0.9407} & 0.7931 \\ 
+SWEM\_SVM6 & 0.9361   & 0.9787     & 0.9299     & 0.9609     & 0.9572     & 0.9798     & 0.9306     & 0.7911 \\ 
+SWEM\_SVM7 & {\bf 0.9373}   & 0.9802     & 0.9353     & 0.9519     & 0.9565     & 0.9798     & 0.9378     & {\bf 0.8131} \\ 
+SWEM\_SVM8 & 0.9371   & {\bf 0.9819} & 0.9296     & 0.9608     & {\bf 0.9615} & 0.9776     & 0.9206     & 0.7991 \\ 
+SWEM\_SVM9 & 0.9383   & 0.9817     & {\bf 0.9374} & 0.9572     & 0.9567     & 0.9789     & 0.9359     & 0.8104 \\ 
+SWEM\_SVM10 & 0.9369   & 0.9772     & 0.9318     & 0.9666     & 0.9599     & 0.9776     & 0.9161     & 0.7978 \\ \hline
+\end{tabular}
+\caption{Macro-F1 and classification accuracies of the overall SWEM\_SVM algorithm and of each ensemble member on the OSU\_Hip dataset. The bold font marks the best performing subwindow size overall and for each activity.}
+\label{tbl:actacc_osu_hip_svm}
+\end{table*}
+
+\begin{table*}[!htpb]
+\small
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}  \hline
+\multicolumn{1}{|c|}{\multirow{2}{*}{Model}} & 
+\multicolumn{1}{|c|}{\multirow{2}{*}{Macro-F1}} &
+\multicolumn{7}{|c|}{Classification Accuracy of Each Physical Activity} \\ \cline{3-9}
+          &       & lying      & sitting    & standing   & walking    & running    & basketball & dance \\ \hline
+SWEM\_SVM & 0.8961 & 0.7993     & 0.9522     & 0.9389     & 0.9562 & 0.8345     & 0.9072     & 0.7722 \\ \hline 
+SWEM\_SVM1 & 0.8538 & 0.7368     & \bf 0.9608 & \bf 0.9767 & 0.9639     & \bf 0.8565 & 0.4300     & 0.7257 \\ 
+SWEM\_SVM2 & 0.8808 & 0.7708     & 0.9571     & 0.9618     & \bf 0.9700 & 0.8547     & 0.7206     & 0.7243 \\ 
+SWEM\_SVM3 & 0.8902 & 0.7924     & 0.9481     & 0.9464     & 0.9583     & 0.8507     & 0.8461     & 0.7694 \\ 
+SWEM\_SVM4 & 0.8897 & 0.7778     & 0.9559     & 0.9455     & 0.9563     & 0.8426     & 0.8828     & 0.7403 \\
+SWEM\_SVM5 & {\bf 0.8911} & \bf{0.8021} & 0.9438     & 0.9368     & 0.9514     & 0.8281     & \bf 0.9194 & \bf 0.7701 \\ 
+SWEM\_SVM6 & 0.8903 & 0.7875     & 0.9549     & 0.9382     & 0.9534     & 0.8299     & 0.9056     & 0.7535 \\ 
+SWEM\_SVM7 & 0.8889 & 0.8007     & 0.9549     & 0.9239     & 0.9522     & 0.8218     & 0.9150     & 0.7611 \\ 
+SWEM\_SVM8 & 0.8887 & 0.7764     & 0.9605     & 0.9378     & 0.9567     & 0.8235     & 0.8933     & 0.7410 \\ 
+SWEM\_SVM9 & 0.8872 & 0.7903     & \bf 0.9608 & 0.9192     & 0.9518     & 0.8241     & 0.9050     & 0.7576 \\ 
+SWEM\_SVM10 & 0.8859 & 0.7819    & 0.9590     & 0.9340     & 0.9575     & 0.8148     & 0.8822     & 0.7312 \\ \hline
+\end{tabular}
+\caption{Macro-F1 and activity classification accuracies of the overall SWEM\_SVM algorithm and of each ensemble member on the OSU\_Wrist dataset. The bold font marks the highest accuracy of a single subwindow model for each activity.}
+\label{tbl:actacc_osu_wrist_svm}
+\end{table*}
+
+\begin{table*}[!htbp]
+\small
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|}  \hline
+\multicolumn{1}{|c|}{\multirow{2}{*}{Model}} & 
+\multicolumn{1}{|c|}{\multirow{2}{*}{Macro-F1}} & 
+\multicolumn{6}{|c|}{Classification Accuracy of Each Physical Activity} \\ \cline{3-8}
+             &    & stay       & walk       & jog        & skip       & stUp       & stDown \\ \hline
+SWEM\_SVM & 0.8200 & 0.9956     & 0.7656     & 0.7989     & 0.8400    & 0.7111     & 0.7878 \\ \hline 
+SWEM\_SVM1 & 0.8134 & \bf 1.0000 & 0.7456     & \bf 0.8122 & 0.8267     & 0.6800     & 0.8033 \\ 
+SWEM\_SVM2 & {\bf 0.8173} & 0.9989     & 0.7367     & 0.7956     & \bf 0.8456 & 0.7067     & \bf 0.8067 \\ 
+SWEM\_SVM3 & 0.8151 & \bf 1.0000 & 0.7389     & 0.8044     & 0.8178     & \bf 0.7211 & 0.7922 \\ 
+SWEM\_SVM4 & 0.8076 & 0.9989     & 0.7378     & 0.7911     & 0.8267     & 0.6978     & 0.7800 \\ 
+SWEM\_SVM5 & 0.8056 & 0.9944     & 0.7489     & 0.8000     & 0.8244     & 0.7000     & 0.7489 \\ 
+SWEM\_SVM6 & 0.8025 & 0.9933     & 0.7322     & 0.7889     & 0.8322     & 0.7000     & 0.7556 \\ 
+SWEM\_SVM7 & 0.7934 & 0.9944     & 0.7389     & 0.8033     & 0.8156     & 0.6567     & 0.7367 \\ 
+SWEM\_SVM8 & 0.7935 & 0.9867     & 0.7233     & 0.7878     & 0.8344     & 0.6689     & 0.7444 \\ 
+SWEM\_SVM9 & 0.7996 & 0.9878     & \bf 0.7767 & 0.8078     & 0.8111     & 0.6767     & 0.7167 \\ 
+SWEM\_SVM10 & 0.7940 & 0.9811    & 0.7311     & 0.7944     & 0.8256     & 0.6689     & 0.7500 \\ \hline
+\end{tabular}
+\caption{Macro-F1 scores and activity classification accuracies of the overall SWEM\_SVM algorithm and of each ensemble member on the HASC dataset. The bold font marks the highest classification accuracy of a single subwindow model for each activity.}
+\label{tbl:actacc_hasc_svm}
+\end{table*}
+
+Finally, we also experimented with using stacking \cite{Wolpert:92} instead of majority vote to combine the predictions made by individual ensemble members into an overall prediction. However, we found that stacking produced similar results to majority vote. An important advantage that majority vote has over stacking is that no additional training is needed for the meta-layer. In order to train a stacking algorithm properly, the meta-layer needs to be trained on training data that is separate from the data used to train the individual ensemble members. If training data is limited, creating a second training set may not be possible.
+
+\section{Conclusion}
+We proposed the Subwindow Ensemble Model which used an ensemble of classifiers trained on features made up of coarse summary statistics computed from different temporal scales. The SWEM outperformed other baseline algorithms and it had the additional benefit of not needing to commit to a single window size $W$. The SWEM algorithm achieved very accurate results ($\geq 90$\% for OSU data, $>80$\% for HASC), which suggests that the algorithm could be viable for deployment. For future work, we will investigate the challenge of deploying physical activity recognition algorithms in real time on free-living data. Since free-living data consists of a mixture of different activities performed throughout an individual's day, we will explore algorithms for segmenting the data and classifying these segments into physical activity types. 
+
+\section{Acknowledgements}
+This study was supported by funding by the Eunice Kennedy Shriver National Institute of Child Health and Human Development (NICHD R01 55400).
+
+\bibliographystyle{aaai}
+\bibliography{iaai.swem}
+
+\end{document}
