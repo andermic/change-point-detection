@@ -43,15 +43,17 @@ for idata = 1:3
             hold on;
             errorbar([(1:size(FPRS,2))'-.15, (1:size(FPRS,2))'+.15], vals, stds*1.96/sqrt(30), 'black', 'linestyle', 'none')
             set(gca, 'XTick', 1:size(FPRS,2), 'XTickLabel', FPRS_STR);
-            xlabel('False Positive Rate / s');
-            ylabel(strcat(METRICS{imet}, ' (s)'));
+            xlabel('False Positives / s');
+            if imet == 1
+                ylabel(strcat(METRICS{imet}, ' (%)'));
+                ym = 100;
+            else
+                ylabel(strcat(METRICS{imet}, ' (s)'));
+                ym = max(max(vals+stds*1.96/sqrt(30)))*1.1;
+            end
             figsub = num2str(idata);
             figsubsub = num2str((ialg - 1)*2 + imet);
             title(strcat('Figure 4.', figsub, '.', figsubsub, ': ', CLASS_ALG_STRS{ialg}, METRICS{imet}));
-            ym = max(max(vals+stds/sqrt(30)))*1.2;
-            %if imet == 1 && ymax < 100
-            %    ymax = 100;
-            %end
             axis([.5 size(FPRS,2)+.5 0 ym]);
             legend('CC', 'KLIEP');
             saveas(gcf, strcat(ROOT_OUTPUT_FOLDER, '/', DATASET_FILE_STRS{idata}, '_cpd_', CLASS_ALGS{ialg}, '_', lower(METRICS{imet}(2:4)), '.eps'));
@@ -78,10 +80,18 @@ for idata = 1:3
             f = bar(vals);
             set(f(:,1), 'facecolor', [0.8 0.8 0.8]);
             hold on;
-            errorbar(1:size(WSES,2), vals, stds/sqrt(10), 'black', 'linestyle', 'none');
+            lower_bars = stds*1.96/sqrt(10);
+            lower_bars(lower_bars > vals) = vals(lower_bars > vals) *.99;
+            errorbar(1:size(WSES,2), vals, lower_bars, stds*1.96/sqrt(10), 'black', 'linestyle', 'none');
             set(gca, 'XTick', 1:size(WSES,2), 'XTickLabel', WSES_STR);
             xlabel('Window Sizes (s)');
-            ylabel(strcat(METRICS{imet}, ' (s)'));
+            if imet == 1
+                ylabel(strcat(METRICS{imet}, ' (%)'));
+                ym = 100;
+            else
+                ylabel(strcat(METRICS{imet}, ' (s)'));
+                ym = max(max(vals+stds*1.96/sqrt(10)))*1.1;
+            end
             figsub = num2str(idata + 3);
             figsubsub = num2str((ialg - 1)*2 + imet);
             title(strcat('Figure 4.', figsub, '.', figsubsub, ': ', CLASS_ALG_STRS{ialg}, METRICS{imet}));
@@ -89,9 +99,9 @@ for idata = 1:3
             %if imet == 1 && ymax < 100
             %    ymax = 100;
             %end
-            %a = axis();
-            %a(4) = ymax;
-            %axis(a);
+            a = axis();
+            a(4) = ym;
+            axis(a);
             saveas(f, strcat(ROOT_OUTPUT_FOLDER, '/', DATASET_FILE_STRS{idata}, '_hmm_', CLASS_ALGS{ialg}, '_', lower(METRICS{imet}(2:4)), '.eps'));
             hold off;
         end

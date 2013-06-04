@@ -42,11 +42,11 @@ dissimilarity or difference between the reference data and the test data
 Notationally, we say that for each tick $i$ in a time series:
 
 \[
-s_i = D(x_{ri}, x_{ti})
+s(i) = D(X_r(i), X_t(i))
 \]
 
-Where $s_i$ is the score of the $i$th tick, $x_{ri}$ is the reference
-data associated with the $i$th tick, $x_{ti}$ is the test data
+Where $s(i)$ is the score of the $i$th tick, $X_r(i)$ is the reference
+data associated with the $i$th tick, $X_t(i)$ is the test data
 associated with the $i$th tick, and $D(A,B)$ is a function that computes the
 dissimiliarity between a matrix of data $A$ and matrix of data $B$, and varies
 between change-point algorithms. Note that for a given
@@ -58,17 +58,18 @@ series (insufficient test data).
 
 There are many different modeling assumptions and associated algorithms
 for generating change-point detection scores, and one simple baseline approach that we 
-wanted to test was the Shewhart Control Chart. This approach assumes that the reference data is drawn from a
+wanted to test was the Shewhart Control Chart \cite{shewhart26}.
+This approach assumes that the reference data is drawn from a
 multivariate normal distribution, and that scores are calculated by the Mahalanobis
 distance of the target time tick from the estimated multivariate normal:
 
 \[
-s_i = \sqrt{(\bar{x}_{ri} - x_i)^T \, S_{ri}^{-1} \, (\bar{x}_{ri} - x_i)}
+s(i) = \sqrt{[\bar{X}_r(i) - X(i)]_T \; \frac{1}{S_r(i)} \; [\bar{X}_r(i) - X(i)]}
 \]
 
-where $\bar{x}_{ri}$ is the sample mean of the reference data, $S_{ri}$
-is the sample covariance matrix of the reference data, and $x_i=x_{ti}$ is
-the $i$th data point \cite{shewhart26}.
+where $\bar{X}_r(i)$ is the sample mean of the reference data, $S_r(i)$
+is the sample covariance matrix of the reference data, and $X(i)=X_t(i)$ is
+the $i$th data point.
 
 We were also interested in testing the performance of a newer and more
 sophisticated change-point detection algorithm: the
@@ -84,33 +85,34 @@ Instead, KLIEP estimates the importance directly using a non-parametric model.
 Let the estimate of the importance $\hat{R}$ be represented by this model:
 
 \[
-\hat{R} = \frac{p_{t}}{\hat{p}_{r}} = \sum_{j=1}^{n_{t}} \alpha_j K_G(x,x_{tj})
+\hat{R} = \frac{p_t}{\hat{p}_r} = \sum_{i=1}^{T_t} \alpha_j K_G(X_{rt},X_t(j))
 \]
 
-Where $p_{r}$ and $p_{t}$ are the probability densities of the reference data and the test
-data, $n_{t}$ is the number of ticks in the test window, $\alpha$ is a
-vector of model parameters to solve for, $x$ is the concatenation of the reference and the
-test data, $x_{tj}$ is the $j$th element of the test data,
-and $K_G(A,B)$ is the Gaussian kernel with width $\sigma$:
+Where $p_r$ and is the probability density of the reference data,
+$p_t$ is the probability density of the test
+data, $T_t$ is the number of ticks in the test window, $\alpha$ is a
+vector of model parameters to solve for, $X_{rt}$ is the concatenation of the reference and the
+test data, $X_t(i)$ is the $i$th element of the test data,
+and $K_G[A,B]$ is the Gaussian kernel with width $\sigma$:
 
 \[
-K_G(A,B) = \exp \left(-\frac{||A-B||^2}{2\sigma^2}\right)
+K_G[A,B] = \exp \left(-\frac{||A-B||^2}{2\sigma^2}\right)
 \]
 
-Now solve for $\alpha$ so that the empirical KL divergence between $\hat{p}_{t}$ and
-$p_{t} = p_{r}\hat{R}$ is minimized, which is equivalent to the following convex optimization
+Now solve for $\alpha$ so that the empirical KL divergence between $\hat{p}_t$ and
+$p_t = \hat{R}p_r$ is minimized, which is equivalent to the following convex optimization
 problem:
 
 \[
 \begin{dcases}
- \max_{\alpha} \quad \sum_{j=1}^{n_t} \, \log \left( \sum_{k=1}^{n_t} \alpha_k K_G(x_{tj}, x_{tk}) \right) \\
- \,\, \text{s.t.} \quad\, \frac{1}{n_r} \sum_{j=1}^{n_r} \sum_{k=1}^{n_t} \alpha_k K_G(x_{rj},x_{tk}) = 1 \\
- \qquad \quad \text{and} \; \alpha_1 \ldots \alpha_{n_t} \ge 1
+ \max_{\alpha} \quad \sum_{j=1}^{T_t} \, \log \left( \sum_{k=1}^{T_t} \alpha_k K_G[X_t(j), X_t(k)] \right) \\
+ \,\, \text{s.t.} \quad\, \frac{1}{T_r} \sum_{j=1}^{T_r} \sum_{k=1}^{T_t} \alpha_k K_G[X_r(j),X_t(k)] = 1 \\
+ \qquad \quad \text{and} \; \alpha_1 \ldots \alpha_{T_t} \ge 1
 \end{dcases}
 \]
 
 Finally, the scores that we wish to generate are just the estimate of the importance given by the
-solution to the complex optimization problem, i.e. $s_i = \hat{R}_i$.
+solution to the complex optimization problem, i.e. $s(i) = \hat{R}(i)$.
 
 Since this approach uses a Gaussian kernel, it requires the selection of
 a kernel width $\sigma$ for each time tick. We used an implementation of
@@ -132,7 +134,7 @@ Our selection of reference and test window sizes were informed by two considerat
 first that the window sizes contain enough data to accurately model the
 reference and test distributions, and second that the window sizes were small enough
 to detect activity changes at realtime speeds.
-Previous research \cite{zheng12} found that a refernce window size of 10
+Previous research \cite{zheng12} found that a reference window size of 10
 seconds contained just enough information to discriminate well between OSU Hip activities.
 Since this window size worked well in previous experiments, and since the 
 activities of the UQ dataset were comparable in average length, we decided to

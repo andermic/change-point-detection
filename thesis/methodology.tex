@@ -38,7 +38,7 @@ independent subjects.
 Unfortunately there are not many such labeled free-living datasets available,
 so we only tested our algorithms on two datasets.
 
-\subsection{OSU Hip}
+\subsection{Synthetic Data (OSU Hip)}
 Our first dataset was collected by the Nutrition and Exercise Sciences department of
 Oregon State University, and has been used for previous activity detection research
 with the goal of designing a system to calculate and monitor subjects' energy expenditure
@@ -110,7 +110,7 @@ a vertical orientation as standing, and a combination of the two as walking. Fig
 
 This dataset was challenging to work with because of its size, as each individual time series
 contained roughly 25 million ticks of data. To help alleviate this problem, we split each
-time series into individual days. We then treated the first 24 hour period of data that began at midnight,
+time series into individual days. We then treated the first full 24 hour period of data that began at midnight,
 from each subject, as one whole dataset (LiME Day 1), and the second such period as a separate dataset
 (LiME Day 2). We did not use any data from the remaining days.
 
@@ -140,63 +140,69 @@ the biaxial statistic was applied to data from each of the $C_2^3=3$ possible pa
 axes, for a total of $18*3+3 = 57$ features.
 
 \vspace{1ex}
-\begin{table}[h]
+\begin{table}[H]
 %\small
 %\renewcommand{\arraystretch}{1.8}
 \centering
-\begin{tabular}{|p{14cm}|}  \hline
-Features (from \cite{zheng13})\\ \hline \\ [-1ex]
-1. Sum of values of a period of time: $\sum^T_{i=1} x_i$.\\ [2ex]
-2. Mean: $\mu_s = \frac{1}{T} \sum^T_{i=1} x_i$.\\ [2ex]
-3. Standard deviation: $\sigma_x = \sqrt{\frac{1}{T} \sum^T_{i=1} (x_i - \mu_x)}$.\\ [2ex]
-4. Coefficients of variation: $c_v = \frac{\sigma_s}{\mu_x}$. \\ [2ex]
-5. Peak-to-peak amplitude: $max \{x_1, ..., x_T\} - min \{x_1, .., x_T\}$.\\ [2ex]
-6-10. Percentiles: $10^{th}, 25^{th}, 50^{th}, 75^{th}, 90^{th}$.\\ [2ex]
-11. Interquartile range: difference between the $75^{th}$ and $25^{th}$ percentiles.\\ [2ex]
-12. Lag-one-autocorrelation: $\frac{\sum^{T-1}_{i=1} (x_i - \mu_x)(x_{i+1} - \mu_x)}{\sum^T_{i=1} (x_i - \mu_x)^2}$.\\ [2ex]
-13. Skewness:
- $\frac{\frac{1}{T} \sum^T_{i=1} (x_i - \mu_x)^3}
-{(\frac{1}{T} \sum^T_{i=1} (x_i - \mu_x)^2)^\frac{3}{2}}$,
+\begin{tabular}{|p{15cm}|}  \hline
+F1. Sum of values of a period of time: $\sum^T_{i=1} x(i)$.\\ [2ex]
+F2. Mean: $\mu_x = \frac{1}{T} \sum^T_{i=1} x(i)$.\\ [2ex]
+F3. Standard deviation: $\sigma_x = \sqrt{\frac{1}{T} \sum^T_{i=1} [x(i) - \mu_x]}$.\\ [2ex]
+F4. Coefficients of variation: $\frac{\sigma_x}{\mu_x}$. \\ [2ex]
+F5. Peak-to-peak amplitude: $max \{x(1), ..., x(T)\} - min \{x(1), .., x(T)\}$.\\ [2ex]
+F6-10. Percentiles: $10^{th}, 25^{th}, 50^{th}, 75^{th}, 90^{th}$.\\ [2ex]
+F11. Interquartile range: difference between the $75^{th}$ and $25^{th}$ percentiles.\\ [2ex]
+F12. Lag-one-autocorrelation: $\frac{\sum^{T-1}_{i=1} [x(i) - \mu_x][x(i+1) - \mu_x]}{\sum^T_{i=1} [x(i) - \mu_x]^2}$.\\ [2ex]
+F13. Skewness:
+ $\frac{\frac{1}{T} \sum^T_{i=1} [x(i) - \mu_x]^3}
+{(\frac{1}{T} \sum^T_{i=1} [x(i) - \mu_x]^2)^\frac{3}{2}}$,
  asymmetry of the signal probability distribution.\\ [2ex]
-14. Kurtosis:
- $\frac{\frac{1}{T} \sum^T_{i=1} (x_i - \mu_x)^4}
-{(\frac{1}{T} \sum^T_{i=1} (x_i - \mu_x)^2)^3} - 3$,
+F14. Kurtosis:
+ $\frac{\frac{1}{T} \sum^T_{i=1} [x(i) - \mu_x]^4}
+{(\frac{1}{T} \sum^T_{i=1} [x(i) - \mu_x]^2)^3} - 3$,
  peakedness of the signal probability distribution.\\ [2ex]
-15. Signal power: $\sum^T_{i=1} x_i^2$.\\ [2ex]
-16. Log-energy: $\sum^T_{i=1} \log(x_i^2)$.\\ [2ex]
-17. Peak intensity: number of signal peak appearances.\\ [2ex]
-18. Zero crossings: number of times the signal crosses its median.\\ [2ex]
-19. Correlation between each pair of axes:
- $\frac{\sum^T_{i=1}(x_i-\mu_x)(v_i-\mu_v)}
-{\sqrt{\sum^T_{i=1}(x_i-\mu_x) \sum^T_{j=1}(v_j-\mu_v)}}$.\\ [2ex] \hline
+F15. Signal power: $\sum^T_{i=1} x(i)^2$.\\ [2ex]
+F16. Log-energy: $\sum^T_{i=1} \log[x(i)^2]$.\\ [2ex]
+F17. Peak intensity: number of signal peak appearances.\\ [2ex]
+F18. Zero crossings: number of times the signal crosses its median.\\ [2ex]
+F19. Correlation between each pair of axes:
+ $\frac{\sum^T_{i=1}[x(i)-\mu_x][v(i)-\mu_v]}
+{\sqrt{\sum^T_{i=1}[x(i)-\mu_x] \sum^T_{j=1}[v(j)-\mu_v]}}$.\\ [2ex] \hline
 \end{tabular}
+\caption{Statistics used to convert time series windows into feature vectors
+(taken from \cite{zheng13}). $T$ is the number of ticks in the given time
+series, $x$ and $v$ are individual axes of the time series data, and $x(i)$
+is the $i$th data tick of $x$.}
 \end{table}
 
-One discriminative characteristic of an activity is its overall vigorousness,
-and the sum and the sample mean both act as simple and obvious ways of measuring this,
-as more intense activities will tend to involve
-higher rates of acceleration during movement. We also used the 10th, 25th (quartile 1),
-50th (median), 75th (quartile 3), and 90th percentiles of the data, as well as signal
-power and log energy as supplemental measures of overall activity intensity.
+
+%Features (from \cite{zheng13})\\ \hline \\ [-1ex]
+
+One discriminative characteristic of an activity is its overall vigorousness.
+The sum [F1] and the sample mean [F2] both act as simple and obvious ways
+of measuring vigorousness, as more intense activities will tend to involve
+higher rates of acceleration during movement. We also used the 10th [F6], 25th [F7],
+50th [F8], 75th [F9], and 90th [F10] percentiles of the data, as well as signal
+power [F15] and log energy [F16] as supplemental measures of overall activity intensity.
 
 Another characteristic of an activity is how much it varies in intensity. The sample standard
-deviation, coefficient of variation, peak-to-peak amplitude (max-min), zero crossings
-(the number of times the data crosses its median), as well as the
-interquartile range (75th\% - 25th\%) were useful for discriminating between activities
+deviation [F3], coefficient of variation [F4], peak-to-peak amplitude [F5],
+number of zero crossings [F18], as well as the
+interquartile range [F11] were useful for discriminating between activities
 with a consistent level of intensity (low variance, etc.) and activities that were more
 rhythmic or staccato in intensity (high variance, etc.). 
 
-Skewness, kurtosis, lag-one-autocorrelation, and peak intensity
+Lag-one-autocorrelation [F12], Skewness [F13], kurtosis [F14], and peak intensity [F17]
 were useful for discriminating between
 activities that tend to be similar in their overall intensity and variation in intensity,
 but that showed other types of difference in shape. Skewness indicates whether the data is
 more concentrated above or below its mean. Kurtosis indicates that the data is concentrated
 near its mean or conversely that it is fat-tailed. Lag-one-autocorrelation is a measure of
 the general relationship between data ticks and their immediate neighbors in time. Peak
-intensity is the number of times that the data reached its maximum value. 
+intensity is the number of times that the data repeatedly reached its maximum value. 
 
 Finally we looked at a single bimodal statistic across each pair of axes, the correlation
-coefficient, which discriminates between activities where acceleration values in one axis
+coefficient [F19], which discriminates between activities where acceleration values in one axis
 are predictive of acceleration values in another axis, verses activities where that is not the case.
 
 %TODO: Tie our choice of base classifiers into related work, if possible.
@@ -207,9 +213,9 @@ We tested 3 types of classification models on the featurized versions of our dat
 decision trees, support vector machines, and neural networks. We used R for our
 experiments, and used the R libraries `rpart' \cite{rpart}, `e1071' \cite{svm},
 and `nnet' \cite{nnet} to build
-our decision tree, svm, and neural net models, respectively. We treated the
-decision tree as a simple and quick baseline algorithm, and did not tune it in
-any way, ignoring the validation set. For all of the neural net experiments,
+our decision tree, svm, and neural net models, respectively. Default rpart values
+were used for the decision tree experiments, hence there were no parameters tuned and
+and the validation set was ignored. For the neural net experiments, 
 the maximum number of iterations was set to 100000, and the maximum number of
 weights was set to 1000000.
 
@@ -239,6 +245,47 @@ feasibility for activity classification in real time, we used detection time as
 a second metric. Detection time is defined as the average amount of time
 required for an algorithm to begin correctly classifying data after a
 true activity change has occurred.
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.45]{performance.pdf}
+ \caption{An example time series with 20 ticks of data, from a dataset with
+  three classes: A, B, and C. Four true class labels with
+  corresponding windows are shown above the x-axis, and four predicted class
+  labels with their corresponding windows are shown below the x-axis.}
+ \label{fig:performance}
+\end{figure}
+
+To illustrate the metrics, an example section of a time series is shown in
+Figure \ref{fig:performance}. Accuracy can be computed by counting the number of
+correctly predicted ticks for each true window separately, summing the counts,
+and dividing by the total number of ticks.
+
+\[
+\text{Accuracy} = \frac{\text{Correct}_{\text{A1}} + \text{Correct}_{\text{B}} + \text{Correct}_{\text{C}} + \text{Correct}_{\text{A2}}}{(\text{Total number of ticks})} =
+\]
+
+\[
+\frac{3 + 3 + 0 + 4}{20} = 50\%
+\]
+
+Detection time is computed by counting how many ticks are required after a true
+window has begun for the prediction algorithm to start correctly
+predicting the class. The counts are summed, and then divided by the number of
+true activities. Over the true window beginning at tick 1 (class A), the algorithm predicts A
+immediately, so the detection time for that window is 0. Over the second true
+window beginning at tick 4 (class B), the algorithm does not start predicting
+B until tick 6 so the detection time for that window is $6-4=2$. Over the third
+true window starting at tick 9 (class C),
+the algorithm never predicts C, so the detection time for that window is 3, the
+full length of the window. Over the fourth true window starting at tick 12 (class A), the
+algorithm starts to predict C at tick 14, but does not predict A until tick 16,
+so the detection time for that window is $16 - 12 = 4$. Thus the detection time
+for the entire time series is:
+
+\[
+\frac{(0 + 2 + 3 + 4) \; \text{ticks}}{4 \; \text{windows}} = \frac{9}{4} \; \text{ticks per window}
+\]
 
 In the change-point detection experiments accuracy and detection time were
 averaged over 30 random splits of the given dataset into training, validation, and

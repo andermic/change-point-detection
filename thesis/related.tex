@@ -1,37 +1,40 @@
 \chapter{Related Work}
-As mentioned in the previous chapter sensor systems may consist
+As mentioned in the previous chapter, sensor systems may consist
 of environmental or wearable devices. Some examples of environmental
 sensors that activity detection researchers have used to
 gather data are microphones \cite{fogarty06}, weight detection
 panels \cite{rowan05}, cameras \cite{duong05}, and water usage detectors
 \cite{fogarty06}. Researchers will generally place environmental sensors
-along with their subjects inside of a house, and attempt to predict
-for activity types like various household chores, etc.
+inside of a house, have subjects live in the house for a period of time, and
+attempt to predict for activity types like cooking, watching TV, etc.
 
 Various wearable devices have been tried as well, such as RFID gloves
 \cite{rowan05}, but the most popular wearable for activity detection
 purposes is the accelerometer. Besides being inexpensive, accelerometers
-tend to be small and lightweight, and so are fairly unobtrusive and user-
-friendly. Accelerometers also gather data at a high frequency, and as such make
-for a good way to get ahold of a sizeable amount of data in a fairly short
-amount of time.
+tend to be small and lightweight, and so are fairly unobtrusive and
+user-friendly. Accelerometers also gather data at a high frequency, and as such
+may be used to collect a sizeable amount of data in a relatively short amount
+of time.
 
 Whether or not an accelerometer will be discriminative for a
 set of activity types depends partially on where the accelerometer is worn on
-the subjects' body. For example, an accelerometer worn on the ankle will be
+a subject's body. For example, an accelerometer worn on the ankle will be
 more discriminative for the activity of cycling than it would be if it was worn
 on the hip, and different types of arm movements will likely be
 discriminated only by an accelerometer worn on the arm. For this reason some
 researchers have opted to use multiple accelerometer systems to capture
 movement information from different parts of the body \cite{bao04}
-\cite{devries11}.
+\cite{devries11}. However, this approach can be cumbersome for the wearer, so a
+single accelerometer is preferred when it is reasonable to assume that it will
+be discriminative over the relevant set of activities.
 
-Sensor data from activities tends to be noisy and not very amenable to a
+Activity sensor data tends to be noisy and not amenable to a
 deterministic or rule-based analysis, so activity types are typically modeled
 probabilistically, and activity detection is usually formulated as a supervised
 learning problem. The various common supervised learning algorithms are all
-familiar to the activity detection literature though neural networks are
+familiar to the activity detection literature, though neural networks are
 especially popular, such as in \cite{aminian95} \cite{song07} \cite{staudenmeyer09}.
-More complicated metamodeling schemes have also been attempted, such as plurality voting with bagged,
-boosted, and stacked classifiers \cite{ravi05}; and the use of conditional
-random fields \cite{vankasteren08}.
+More complicated metamodeling approaches have also been tried, such as
+plurality voting with bagged, boosted, and stacked classifiers \cite{ravi05};
+conditional random fields \cite{vankasteren08}; and HMMs
+\cite{lester05} \cite{pober06}.

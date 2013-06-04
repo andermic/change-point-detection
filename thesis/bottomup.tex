@@ -56,8 +56,8 @@ Finally, if all of the values of $O$ are known, and we are given
 a $\hat{T}$ and an $\hat{S}$ estimated from a training HMM, then the goal we are interested in
 is to use that information (along with the model assumptions)
 to find the most likely values for each state in $H$. There
-exists a dynamic programming solution to this problem known as the Viterbi
-algorithm, which has a runtime that is linear in $w$. \cite{russell10}
+exists a polynomial-time dynamic programming solution to this problem known as
+the Viterbi algorithm. \cite{russell10}
 
 \subsection{Experimental Setup}
 
@@ -69,11 +69,9 @@ models were built with training data,
 and tuned (in the case of the svm and neural net models) using validation data,
 in the same way that has already been described previously in this chapter.
 
-%TODO: Fix tr1, 2
-
 Unlike the change-point detection experiments, this experiment required
-that the data be split into 4 equal parts (training1, validation, training2,
-and testing) rather than 3. 
+that the data be split into 4 equal parts: training (classifier), validation,
+training (HMM), and testing) rather than 3. 
 Here we formulated the problem of making predictions on the testing set in terms
 of an HMM, first by treating the second training set as a training HMM. Each
 window of the second training set was treated as a time index ${1,2, \ldots, n}$.
