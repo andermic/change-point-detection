@@ -182,8 +182,10 @@ performed somewhat more poorly and erratically across the board.
 
 Our results clearly show that the HMM approach outperformed the change-point
 detection approach, both in terms of accuracy and detection time, regardless of
-the dataset and base classifier. HMMs likely did better because they are trained
-on labelled data. By contrast, change-point detection algorithms are unaware of
+the dataset and base classifier. Figure \ref{compare_cpd_hmm} shows a side-by-
+side comparison of the top-down and bottom-up approaches. 
+HMMs likely did better because they are trained
+on labelled data. Change-point detection algorithms on the other hand are unaware of
 true activity labels---they merely signal a change when they detect a distance or
 dissimilarity between reference and test data. As such, change-point detection
 algorithms have trouble accurately segmenting free-living data, and noisy
@@ -222,5 +224,5 @@ problem has used neural networks exclusively.
   correspond to average window sizes of \{10, 12, 14, 16, 18, 20\}. Both
   graphs show decision tree results, and both show results from each of the
   three datasets clustered together over a single false positive rate.}
- \label{fig:compare_acc}
+ \label{fig:compare_cpd_hmm}
 \end{figure}
