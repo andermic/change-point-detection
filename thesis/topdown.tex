@@ -5,19 +5,21 @@
 
 \subsection{Change-Point Detection}
 For this approach, the data was split into non-overlapping segments for
-featurization using techniques from the statistical field of change-point detection.
-Change-point detection has found application in many problem domains that require analysis of time series data
-from dynamic systems, including failure detection \cite{bae13}, quick detection of
-attacks on computer networks \cite{tartakovsky06}, and monitoring of heartbeat fluctuations during
-sleep \cite{staudacher05}. Change-point detection techniques assume that each tick of a time series is a draw from some
-process, but that the process may suddenly change as time passes.
+featurization using techniques from the statistical field of change-point
+detection. Change-point detection has found application in many problem domains
+that require analysis of time series data from dynamic systems, including
+failure detection \cite{bae13}, quick detection of attacks on computer networks
+\cite{tartakovsky06}, and monitoring of heartbeat fluctuations during
+sleep \cite{staudacher05}. Change-point detection techniques assume that each
+tick of a time series is a draw from some probability
+distribution, but that the distribution may suddenly change as time passes.
 The goal is to predict when these changes have occurred.
 A \emph{score} is generated for each time tick, and if the score is
 above a given threshold a change is predicted to have occurred between that tick
-and its immediate predecessor. To generate a score at
-a time tick, a window of data that immediately preceeds it (the
-\emph{reference data}) is compared to it along with a window of data that immediately follows it
-(the \emph{test data}), as shown in Figure \ref{fig:cpd_ref_test}.
+and its immediate predecessor. To generate a score at a time tick, a window of
+data that immediately preceeds it (the \emph{reference data}) is compared to it
+along with a window of data that immediately follows it (the \emph{test data}), 
+as shown in Figure \ref{fig:cpd_ref_test}.
 
 \begin{figure}
  \centering
@@ -56,12 +58,31 @@ series (insufficient test data).
 
 \subsection{Experimental Setup}
 
+Each dataset that we tested consisted of multiple time series gathered from
+a number of different subjects. To perform an experiment on a dataset we
+began by partitioning the set of time series into disjoint subsets of training,
+validation, and testing data. Each individual time series was then partitioned
+into a set of non-overlapping windows, and each window was converted into its
+own feature vector. Once the dataset was featurized, the experiment could be
+treated as a typical classification problem. Classifiers were built with the
+training set, and tuned (when necessary) on the validation set. 
+Finally, the tuned model was evaluated by prediction on the testing set.
+A visualization of the data lifecycle is shown in Figure
+\ref{fig:cpd_lifecycle}.
+ 
+\begin{figure}
+ \centering
+ \includegraphics[scale=0.6]{cpd_lifecycle.pdf}
+ \caption{Data Lifecycle of Change-Point Detection Experiments}
+ \label{fig:cpd_lifecycle}
+\end{figure}
+
 There are many different modeling assumptions and associated algorithms
-for generating change-point detection scores, and one simple baseline approach that we 
-wanted to test was the Shewhart Control Chart \cite{shewhart26}.
-This approach assumes that the reference data is drawn from a
-multivariate normal distribution, and that scores are calculated by the Mahalanobis
-distance of the target time tick from the estimated multivariate normal:
+for generating change-point detection scores, and one simple baseline approach
+that we wanted to test was the Shewhart Control Chart \cite{shewhart26}.
+This approach assumes that the reference data is drawn from a multivariate
+normal distribution, and that scores are calculated by the Mahalanobis distance
+of the target time tick from the estimated multivariate normal:
 
 \[
 s(i) = \sqrt{[\bar{X}_r(i) - X(i)]_T \; \frac{1}{S_r(i)} \; [\bar{X}_r(i) - X(i)]}
@@ -123,10 +144,11 @@ KLIEP with each combination of split and candidate $\sigma$. Then it chooses the
 that, on the average across all of the splits, maximizes the KL divergence (the
 $\max_{\alpha}$ equation above) the most.
 
-For the OSU Hip dataset, we used this CV procedure io choose the the kernel width at each individual time tick. This computationally
-intensive approach was impractical for the UQ dataset because it is orders of magnitude larger,
-so instead of running it on every tick of that data, we ran the CV procedure on a number of
-random ticks drawn from the data. From this we were able
+For the OSU Hip dataset, we used this CV procedure to choose the kernel width.
+This computationally intensive approach was
+impractical for the UQ dataset because it is orders of magnitude larger,
+so instead of running it on every tick of that data, we ran the CV procedure on
+a small sample of data. From this smaller sample we were able
 to empirically identify 0.01 as a plausible $\sigma$, and so fixed $\sigma$
 at that value for our experiments on that dataset.
 
@@ -148,5 +170,5 @@ scores were high enough to be considered a predicted change-point.
 Threshold values were chosen by considering the false positive rates of
 change prediction for the change-point detection algorithms. A smaller false positive rate
 corresponded to a higher and more conservative threshold, which split the
-time series into fewer segments for featurization. A larger false positive rate
+time series into fewer segments. A larger false positive rate
 corresponded to a lower threshold, which split the time series into more segments.

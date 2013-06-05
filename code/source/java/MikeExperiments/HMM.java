@@ -475,7 +475,7 @@ public class HMM extends TaskDef {
 		windowSizes = array(Arrays.asList("20","18","16","14","12","10"));
 		Var labVisitFileFolder = var(tvtDataPath).cat("/features/").cat("ws").cat(windowSizes);
 		Integer clusterJobNum = 60;
-		int baseClassifier = DT;
+		int baseClassifier = SVM;
 		Boolean useCluster = true;
 
 		List<String> tuningParams = Collections.emptyList();

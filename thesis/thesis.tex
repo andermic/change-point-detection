@@ -1,6 +1,6 @@
 
 \documentclass[onehalf,11pt]{beavtex}
-\title{Activity Detection on Free-Living Data Using Change-Point Detection}
+\title{Physical Activity Recognition of Free-Living Data Using Change-Point Detection Algorithms and Hidden Markov Models}
 \author{Michael M. Anderson}
 \degree{Master of Science}
 \doctype{Thesis}
@@ -30,30 +30,32 @@
 %\usepackage{helvet}
 
 \abstract{
-Activity detection on time series sensor data is a rapidly emerging field with
-a lot of potential real-world application. In previous work researchers have
-unrealistically assumed that they know at which ticks in a time series the
-given subject stops doing one activity and starts doing another. In this thesis
-we explore the feasibility of segmenting realistic free-living time series data
-using techniques from
-change-point detection, and then classifying the predicted segments using
-standard supervised learning techniques. We compare this to the popular
-approach of splitting the time series into small windows of fixed-length,
-predicting on each window with a classifier, and then smoothing over the
-predictions with an HMM. We find that the HMM approach clearly outperforms the
-change-point detection approach, but that change-point detection may be
-promising given a modeling assumption that is appropriate to the data.
+Physical activity recognition using accelerometer data is a rapidly emerging
+field with many real-world applications. Much of the previous work in this area
+has assumed that the accelerometer data has already been segmented into pure
+activities, and the activity recognition task has been to classify these
+segments. In reality, activity recognition would need to be applied to
+"free-living" data, which is collected over a long, continuous time period and
+would consist of a mixture of activities. In this thesis, we explore two
+approaches for segmenting realistic free-living time series data. In the first
+approach, we apply a top-down strategy in which we segment free-living data
+using change-point detection algorithms and then classify the resulting segments
+using supervised learning techniques. In the second approach, we employ a
+bottom-up strategy in which we split the time series into small fixed-length
+windows, classify these windows, and then smooth the predictions using an HMM.
+Our results clearly show that the bottom-up approach is far superior to the
+top-down approach in both accuracy and timeliness of detection.
 }
 
 \acknowledgements{
 I would like to acknowledge and thank my advisor, Dr. Weng-Keen Wong, for
 providing me with a clear and overarching vision of this project at all stages of its
-development, as well as his general expertise and helpfulness with all of the
+development, as well as for his general expertise and helpfulness with all of the
 rough patches, sticking points, and unexpected problems that invariably
 accompany an endeavor of this magnitude. I would also like to thank the
-other members of my committee, Dr. Alan Fern, Dr. Raviv Raich, and Dr. Hector
+other members of my committee, Dr. Prasad Tadepalli, Dr. Raviv Raich, and Dr. Hector
 Vergara, for giving their time to help supervise the final stages of this
-project. Thanks go to all of my family and friends who encouraged and stood by
+project. Finally, thanks go to all of my family and friends who encouraged and stood by
 me along the way. They are too numerous to name but they know who they are.
 }
 
@@ -68,9 +70,9 @@ me along the way. They are too numerous to name but they know who they are.
 %\caption{Go figure.}
 %\end{figure}
 
-%\input{introduction.tex}
-%\input{related.tex}
-%\input{methodology.tex}
+\input{introduction.tex}
+\input{related.tex}
+\input{methodology.tex}
 \input{results.tex}
 \input{conclusion.tex}
 

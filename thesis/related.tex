@@ -26,7 +26,10 @@ researchers have opted to use multiple accelerometer systems to capture
 movement information from different parts of the body \cite{bao04}
 \cite{devries11}. However, this approach can be cumbersome for the wearer, so a
 single accelerometer is preferred when it is reasonable to assume that it will
-be discriminative over the relevant set of activities.
+be discriminative over the relevant set of activities. Further research has
+leveraged the accelerometers found in smart phones that subjects
+are likely to carry with them anyway as data collection devices
+\cite{bao04} \cite{choudhury08} \cite{kwapitz10}
 
 Activity sensor data tends to be noisy and not amenable to a
 deterministic or rule-based analysis, so activity types are typically modeled
@@ -36,5 +39,12 @@ familiar to the activity detection literature, though neural networks are
 especially popular, such as in \cite{aminian95} \cite{song07} \cite{staudenmeyer09}.
 More complicated metamodeling approaches have also been tried, such as
 plurality voting with bagged, boosted, and stacked classifiers \cite{ravi05};
-conditional random fields \cite{vankasteren08}; and HMMs
-\cite{lester05} \cite{pober06}.
+conditional random fields \cite{blanke10} \cite{gu09} \cite{vankasteren08} \cite{wu09}; and HMMs
+\cite{gu09} \cite{lester05} \cite{pober06} \cite{wu09}.
+
+In the past few years researchers have started to focus on the feasibility of
+online activity detection \cite{gu09} \cite{keogh01} \cite{wu09}, and have
+started to recognize the need to test on realistic free-living data \cite{kwapitz10}
+\cite{strohrmann11}. Our contribution is to compare different change-point detection
+techniques for window segmentation with the state-of-the-art (in terms of
+accuracy) HMM approach on free-living data in an online setting.
