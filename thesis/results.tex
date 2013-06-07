@@ -180,13 +180,22 @@ performed somewhat more poorly and erratically across the board.
 
 \section{Discussion}
 
-Our results clearly show that the HMM approach outperformed the change-point
+Our results show that the HMM approach outperformed the change-point
 detection approach, both in terms of accuracy and detection time, regardless of
-the dataset and base classifier. Figure \ref{fig:compare_cpd_hmm} shows a
-side-by-side comparison of the top-down and bottom-up approaches. 
-HMMs likely did better because they are trained
-on labelled data. Change-point detection algorithms on the other hand are unaware of
-true activity labels---they merely signal a change when they detect a distance or
+the dataset and base classifier. For a given false positive rate, change-point
+detection algorithms split a time series into windows of a certain average size,
+which decreases as the false positive rate increases. From this it is possible
+to relate false positive rates from the CPD experiments to the window sizes of
+the HMM experiments. HMM false positive rates per second of
+\{0.033, 0.028, 0.024, 0.021, 0.019, 0.017\} correspond to average
+window sizes of \{10, 12, 14, 16, 18, 20\}. Figure \ref{fig:compare_cpd_hmm}
+shows a side-by-side comparison of the top-down and bottom-up approaches, using
+this conversion. 
+
+HMMs likely
+did better because they perform the segmentation after being trained on labelled
+data. Change-point detection algorithms on the other hand are unaware of true
+activity labels---they merely signal a change when they detect a distance or
 dissimilarity between reference and test data. As such, change-point detection
 algorithms have trouble accurately segmenting free-living data, and noisy
 segmentation results in poor performance.
@@ -211,17 +220,15 @@ problem has used neural networks exclusively.
 
 \begin{figure}[h]
  \centering
- \includegraphics[scale=0.55]{cpd_hmm_compare_acc.pdf}
- \includegraphics[scale=0.3]{vspace.png}
- \includegraphics[scale=0.55]{cpd_hmm_compare_det.pdf}
+ %\includegraphics[scale=0.3]{vspace.png}
+ \includegraphics[scale=0.4]{dt_cpd_hmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{dt_cpd_hmm_compare_det.pdf} 
+ \includegraphics[scale=0.4]{svm_cpd_hmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{svm_cpd_hmm_compare_det.pdf}
+ \includegraphics[scale=0.4]{nnet_cpd_hmm_compare_acc.pdf} \hspace{1em}
+ \includegraphics[scale=0.4]{nnet_cpd_hmm_compare_det.pdf}
  \caption{Comparison of change-point detection and HMMs in terms of accuracy
-  and detection time. For a given false positive rate, change-point detection
-  algorithms split a time series into windows of a certain average size, which
-  decreases as the false positive rate increases. From this it is possible to relate
-  false positive rates from the CPD experiments to the window sizes of the
-  HMM experiments. Here is the HMM data with false positive rates of 
-  \{0.033, 0.028, 0.024, 0.021, 0.019, 0.017\} that would
-  correspond to average window sizes of \{10, 12, 14, 16, 18, 20\}. Both
+  and detection time. Both
   graphs show decision tree results, and both show results from each of the
   three datasets clustered together over a single false positive rate.}
  \label{fig:compare_cpd_hmm}

@@ -5,6 +5,7 @@ function [ data ] = expand_uq( trunc_file, dup_file, se_file, day)
 %   truncFile   - Path to the truncated file
 %   dupFile     - Path to the duplicates file
 %   se_file     - Path to the start_and_end_file
+%   day         - (Optional) Day number
 %
 %   out:
 %   data        - The expanded data

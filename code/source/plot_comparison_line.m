@@ -8,22 +8,24 @@ CLASS_ALG_STRS = {' Decision Tree', ' SVM', ' Neural Network'};
 CPD_ALGS = {'cc', 'kliep'};
 METRICS = {' Accuracy', ' Detection Time'};
 
+FPRS = [0.0005 0.001 0.005 0.01];
 FPRS_STR = {'0.005' '0.01' '0.05' '0.1'};
 WSES = 10:2:20;
 WSES_STR = {'0.033' '0.028' '0.024' '0.021' '0.019' '0.017'};
 
-REF_WINDOW_SIZE = 1;
+TEST_WINDOW_SIZE = 1;
 
 addpath(ROOT_INPUT_FOLDER);
-for imet = 1:2
+for iclass=1:3
+  for imet = 1:2
     data = zeros(3,size(FPRS,2)+size(WSES,2),3);
     for idata = 1:3
-        input_file = strcat(ROOT_INPUT_FOLDER, '/cpd/', DATASETS{1}{idata}, '/', 'dt_cc_results.csv');
+        input_file = strcat(ROOT_INPUT_FOLDER, '/cpd/', DATASETS{1}{idata}, '/', CLASS_ALGS{iclass}, '_cc_results.csv');
         cc = csvread(input_file, 1);
-        input_file = strcat(ROOT_INPUT_FOLDER, '/cpd/', DATASETS{1}{idata}, '/', 'dt_kliep_results.csv');
+        input_file = strcat(ROOT_INPUT_FOLDER, '/cpd/', DATASETS{1}{idata}, '/', CLASS_ALGS{iclass}, '_kliep_results.csv');
         kliep = csvread(input_file, 1);
-        kliep(:,4) = kliep(:,4) + REF_WINDOW_SIZE;
-        input_file = strcat(ROOT_INPUT_FOLDER, '/hmm/', DATASETS{2}{idata}, '/', 'dt_results.csv');
+        kliep(:,4) = kliep(:,4) + TEST_WINDOW_SIZE;
+        input_file = strcat(ROOT_INPUT_FOLDER, '/hmm/', DATASETS{2}{idata}, '/', CLASS_ALGS{iclass}, '_results.csv');
         hmm = csvread(input_file, 1);
         
         cc_indices = [];
@@ -89,8 +91,11 @@ for imet = 1:2
         ylabel(strcat(METRICS{imet}, ' (s)'));
     end
     axis([.5 size(FPRS,2)+size(WSES,2)+.5 0 ym]);
-    title(strcat('Change-Point Detection vs. HMM: Decision Tree', METRICS(imet)));
+    title(strcat('Change-Point Detection vs. HMM:', CLASS_ALG_STRS{iclass}, METRICS(imet)));
     legend('OSU Hip', 'LiME Day 1', 'LiME Day 2');
-    saveas(gcf, strcat(ROOT_OUTPUT_FOLDER, '/', 'cpd_hmm_compare_', lower(METRICS{imet}(2:4)), '.eps'));
+    saveas(gcf, strcat(ROOT_OUTPUT_FOLDER, '/', CLASS_ALGS{iclass}, '_cpd_hmm_compare_', lower(METRICS{imet}(2:4)), '.eps'));
     hold off;
+    break
+  end
+  break
 end

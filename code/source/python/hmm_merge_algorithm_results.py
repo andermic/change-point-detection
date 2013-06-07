@@ -7,8 +7,8 @@ DATASET = 'UQ'
 #ROOT_INPUT_FOLDER = 'results/hmm'
 ROOT_INPUT_FOLDER = '/nfs/guille/wong/users/andermic/my_exp/hmm'
 CLASS_ALGS = ['dt','nnet','svm']
-DAY = 3
-ROOT_OUTPUT_FOLDER = 'results/aggregate/hmm'
+DAY = 2
+ROOT_OUTPUT_FOLDER = 'results/hmm'
 
 CLASS_ALGS = ['dt', 'svm', 'nnet']
 OUTPUT_FOLDER = '.'

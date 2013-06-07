@@ -404,7 +404,7 @@ public class HMM extends TaskDef {
 		final int NNET = 2;
 		final int DT = 3;
 		
-		String expRootPath = "/nfs/guille/wong/users/andermic/Desktop/hmm";
+		String expRootPath = "/nfs/guille/wong/wonglab3/obesity/2012/hmm";
 		String expName = "OSU_YR4_Hip_30Hz.HMM.7cls";
 		String datasetStr = "OSU_YR4_Hip_30Hz";
 		String tvtDataPath = expRootPath + "/" + expName;
@@ -417,11 +417,11 @@ public class HMM extends TaskDef {
 				"basketball", "dance"));
 		
 		// This block, along with the tuning parameters, will be customized to each experiment
-		Array windowSizes = array("[1:1:20]");
+		Array windowSizes = array("[10:2:6]");
 		Var labVisitFileFolder = var(tvtDataPath).cat("/features/").cat("ws").cat(windowSizes);
 		Integer clusterJobNum = 100;
-		int baseClassifier = NNET;
-		Boolean useCluster = true;
+		int baseClassifier = SVM;
+		Boolean useCluster = false;
 
 		List<String> tuningParams = Collections.emptyList();
 		List<Array> tuningParamVals = Collections.emptyList();
@@ -474,9 +474,9 @@ public class HMM extends TaskDef {
 		Array windowSizes = array("[1:1:20]");
 		windowSizes = array(Arrays.asList("20","18","16","14","12","10"));
 		Var labVisitFileFolder = var(tvtDataPath).cat("/features/").cat("ws").cat(windowSizes);
-		Integer clusterJobNum = 60;
-		int baseClassifier = SVM;
-		Boolean useCluster = true;
+		Integer clusterJobNum = 5;
+		int baseClassifier = DT;
+		Boolean useCluster = false;
 
 		List<String> tuningParams = Collections.emptyList();
 		List<Array> tuningParamVals = Collections.emptyList();

@@ -14,10 +14,10 @@ We generated a synthetic, free-living dataset using physical activity data
 collected by the Nutrition and Exercise Sciences department of
 Oregon State University \cite{trost12} \cite{zheng12}.
 This dataset consisted of 91 time series collected over a 2-week period in a
-laboratory environment, from 50 subjects who were children between the ages of 5 and 15.
-Subjects performed 12 different types of activities (as shown in Figure \ref{fig:osu_activities})
-over two separate lab visits, while an ActiGraph GT1M accelerometer worn on the hip 
-collected triaxial acceleration data at a frequency of 30Hz.
+laboratory environment, from 50 children between the ages of 5 and 15. Subjects
+performed 12 different types of activities  over two separate lab visits, with
+a hip-worn ActiGraph GT1M accelerometer that collected triaxial acceleration
+data at a frequency of 30Hz (see top graph of Figure \ref{fig:timeseries}).
 
 Data was collected from two separate visits to the lab, where the subjects performed 6 activities per visit.
 Each subject performed the 12 activities in the same order.
@@ -33,21 +33,30 @@ Each of the 91 time series contained a total of $6*120*30 = 21600$ data ticks.
 
 \begin{figure}
  \centering
- \includegraphics[scale=0.3]{osu_lying.png}
- \includegraphics[scale=0.3]{osu_writing.png}
- \includegraphics[scale=0.3]{osu_laundry.png}
- \includegraphics[scale=0.3]{osu_catch.png}
- \includegraphics[scale=0.3]{osu_comf_walking.png}
- \includegraphics[scale=0.3]{osu_dancing.png}
- \includegraphics[scale=0.3]{osu_computer.png}
- \includegraphics[scale=0.3]{osu_sweeping.png}
- \includegraphics[scale=0.3]{osu_brisk_walking.png}
- \includegraphics[scale=0.3]{osu_basketball.png}
- \includegraphics[scale=0.3]{osu_running.png}
- \includegraphics[scale=0.3]{osu_treadmill.png}
- \caption{OSU Hip Activity Samples}
- \label{fig:osu_activities}
+ \includegraphics[scale=0.27]{osu_timeseries.pdf}
+ \includegraphics[scale=0.27]{lime_timeseries.pdf}
+ \caption{Sample data from the OSU Hip and LiME datasets. Both datasets are
+ triaxial and each axis is shown in a different color.}
+ \label{fig:timeseries}
 \end{figure}
+
+%\begin{figure}
+% \centering
+% \includegraphics[scale=0.3]{osu_lying.png}
+% \includegraphics[scale=0.3]{osu_writing.png}
+% \includegraphics[scale=0.3]{osu_laundry.png}
+% \includegraphics[scale=0.3]{osu_catch.png}
+% \includegraphics[scale=0.3]{osu_comf_walking.png}
+% \includegraphics[scale=0.3]{osu_dancing.png}
+% \includegraphics[scale=0.3]{osu_computer.png}
+% \includegraphics[scale=0.3]{osu_sweeping.png}
+% \includegraphics[scale=0.3]{osu_brisk_walking.png}
+% \includegraphics[scale=0.3]{osu_basketball.png}
+% \includegraphics[scale=0.3]{osu_running.png}
+% \includegraphics[scale=0.3]{osu_treadmill.png}
+% \caption{OSU Hip Activity Samples}
+% \label{fig:osu_activities}
+%\end{figure}
 
 We determined that several of the activities were very similar and that
 it would be difficult to discriminate between them. As a result, we combined some of them together to
@@ -66,17 +75,18 @@ of 30Hz, as well as an activPal inclinometer on their thighs. The inclinometer
 provided what we considered the ground truth labels of the data by automatically
 delimitting and classifying intervals using the orientation of the subject's thigh at any given moment. It 
 classified a horizontal orientation as lying down/sitting,
-a vertical orientation as standing, and a combination of the two as walking. Figure
-\ref{fig:lime_activities} shows samples of accelerometer data from the 3 activities.
+a vertical orientation as standing, and a combination of the two as walking.
+The bottom graph of Figure \ref{fig:timeseries} shows a time series segment
+from the dataset that contains all 3 activities.
 
-\begin{figure}
- \centering
- \includegraphics[scale=0.3]{lime_lying.png}
- \includegraphics[scale=0.3]{lime_standing.png}
- \includegraphics[scale=0.3]{lime_walking.png}
- \caption{LiME Day 1 Activity Samples}
- \label{fig:lime_activities}
-\end{figure}
+%\begin{figure}
+% \centering
+% \includegraphics[scale=0.3]{lime_lying.png}
+% \includegraphics[scale=0.3]{lime_standing.png}
+% \includegraphics[scale=0.3]{lime_walking.png}
+% \caption{LiME Day 1 Activity Samples}
+% \label{fig:lime_activities}
+%\end{figure}
 
 This dataset was challenging to work with because of its size, as each individual time series
 contained roughly 25 million ticks of data. To help alleviate this problem, we split each

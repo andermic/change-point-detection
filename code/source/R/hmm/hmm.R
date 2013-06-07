@@ -6,31 +6,40 @@ source("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScri
 trainSupervised <- function(stateAlphabet, emissionAlphabet, stateSample, emissionSample) {
 	stopifnot(length(stateSample) == length(emissionSample))
 	
-	transProbs = matrix(1, length(stateAlphabet), length(stateAlphabet))
-	emissionProbs = matrix(1, length(stateAlphabet), length(emissionAlphabet))
-	sourceCounts = rep(0,length(stateAlphabet))
-	dimnames(transProbs) = list(stateAlphabet, stateAlphabet)
-	dimnames(emissionProbs) = list(stateAlphabet, emissionAlphabet)
-	names(sourceCounts) = stateAlphabet
+	transProbs <- matrix(1, length(stateAlphabet), length(stateAlphabet))
+	emissionProbs <- matrix(1, length(stateAlphabet), length(emissionAlphabet))
+	sourceCounts <- rep(0,length(stateAlphabet))
+	dimnames(transProbs) <- list(stateAlphabet, stateAlphabet)
+	dimnames(emissionProbs) <- list(stateAlphabet, emissionAlphabet)
+	names(sourceCounts) <- stateAlphabet
 	
 	for (i in 1:(length(stateSample)-1)) {
-		source = stateSample[i]
-		dest = stateSample[i+1]
-		transProbs[source, dest] = transProbs[source, dest] + 1
+		source = as.character(stateSample[i])
+		dest = as.character(stateSample[i+1])
+		transProbs[source, dest] <- transProbs[source, dest] + 1
 
-		e = emissionSample[i]
-		emissionProbs[source,e] = emissionProbs[source,e] + 1
+		e <- as.character(emissionSample[i])
+		emissionProbs[source,e] <- emissionProbs[source,e] + 1
 		
-		sourceCounts[source] = sourceCounts[source] + 1
+		sourceCounts[source] <- sourceCounts[source] + 1
 	}
+	print("transProbs")
+	print(transProbs)
+	print("")
+	print("emissionProbs")
+	print(emissionProbs)
+	print("")
+	print("sourceCounts")
+	print(sourceCounts)
+	print("")
 	transProbs = transProbs/(sourceCounts + length(stateAlphabet))
 
-	source = stateSample[length(stateSample)]
-	e = emissionSample[length(emissionSample)]
-	emissionProbs[source,e] = emissionProbs[source,e] + 1
-	sourceCounts[source] = sourceCounts[source] + 1
+	source <- as.character(stateSample[length(stateSample)])
+	e <- as.character(emissionSample[length(emissionSample)])
+	emissionProbs[source,e] <- emissionProbs[source,e] + 1
+	sourceCounts[source] <- sourceCounts[source] + 1
 	
-	emissionProbs = emissionProbs/(sourceCounts + length(emissionAlphabet))
+	emissionProbs <- emissionProbs/(sourceCounts + length(emissionAlphabet))
 
 	return(initHMM(States=as.factor(stateAlphabet), Symbols=as.factor(emissionAlphabet), transProbs=transProbs, emissionProbs=emissionProbs))
 }
@@ -53,6 +62,7 @@ predictHMM <- function(
 	print('training hmm')	
 	training.data <- read.csv(trainHMMResultPath)
 	hmm <- trainSupervised(labels, labels, training.data$Real.ActivityClass, training.data$Predict)
+	print(hmm)
 	
 	print('predicting on the hmm testing data with the base classifier')
 	load(bestModelSavePath)
