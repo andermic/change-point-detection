@@ -1,5 +1,5 @@
 \chapter{Introduction}
-One of the general goals of the field of artificial intelligence is to build
+One of the general goals of artificial intelligence is to build
 computing devices that are ``context-aware'', that act as
 more than just passive number-crunching machines that receive input data through very
 restrictive and wholly human-operated channels such as a keyboard or mouse.
@@ -11,21 +11,21 @@ detection. The goal of activity detection is to build computer plus sensor syste
 that are able to determine what activity a human subject is performing at any given
 moment.
 
-Such systems have a variety of real-world applications. Researchers have been
+Such systems have a variety of real-world applications. Research is 
 exploring the feasibility of using both wearable and non-wearable sensor systems to
 monitor the health of elderly patients that have or are at risk of developing
 degenerative physical and mental diseases \cite{fogarty06}. The goal is to 
-eventually build sensor-based monitoring systems that can aid doctors and family
-members in tracking the decline of subjects over time. Also, detection of an
+build sensor-based monitoring systems that can aid doctors and family
+members in tracking the decline of patients over time. Also, detection of an
 abnormal activity may indicate that a senior is undergoing a serious medical
-event such as a heart attack or slip-and-fall \cite{wang12}. Another
-application of activity detection is to track the energy expenditure
+event such as a heart attack or slip-and-fall \cite{wang12}.
+Another application of activity detection is to track the energy expenditure
 of subjects as they go through the course of their day. The
 traditional method of performing such tracking is with self-reporting by the
 subject of their activities. Wearable sensors offer an alternative approach that
 is not susceptible to misreporting due to bias, poor memory, or other
 confounding factors that a human reporter introduces into the system. One
-approach is to estimate the vigorousness or metabolic equivalent
+approach is to use sensor data to estimate the vigorousness or metabolic equivalent
 (MET) of an activity and calculate energy expenditure directly \cite{staudenmeyer09},
 while another is to attempt to predict the type of activity performed, and calculate energy
 expenditure using knowledge of how vigorous that activity is generally \cite{trost12}.
@@ -39,18 +39,17 @@ and started performing another. Previous work has treated activity detection as 
 offline problem, and has rarely considered performance metrics other than accuracy.
 In this work we are interested in the feasibility of partitioning and
 classifying a time series on free-living data in real time. In addition to
-accuracy we will also evaluate our algorithms in terms of the amount of time
+accuracy, we will also evaluate our algorithms in terms of the amount of time
 required to detect that an activity change has occurred.
 
-To predict changes in activity and partition the data, we used change-point detection,
-which is a field of statistics popular in control theory and other similar
+We used change-point detection to partition time series data into activity windows for classification.
+Change-point detection is a field of statistics popular in control theory and other similar
 applications. We call this our top-down approach, because this
 method takes as input an initial time series and partitions it into smaller pieces using
 change-point detection. As an alternate approach we
-used the well known technique of partitioning the time series into small fixed-length
+used the well-known technique of partitioning the time series into small fixed-length,
 non-overlapping windows, predicting the activity type of each window
 using a base classifier, treating that prediction as the observable
-state of an HMM, and finally solving the HMM for its hidden states. We call
+state of an HMM, and then finally solving the HMM for its hidden states. We call
 this our bottom-up approach, because we begin with small windows of fixed-length,
-and use an HMM to aggregate windows and smooth them together into
-larger activity intervals.
+and use an HMM to smooth windows together into larger activity intervals.

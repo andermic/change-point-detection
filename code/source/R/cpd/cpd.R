@@ -182,7 +182,7 @@ quickTrainValidateCPD <- function(
 		validateDataInfoPath, 
 		labVisitFileFolder,
 		trainingLabVisitFileExt,
-		valiTestLabVisitFileExt=trainingLabVisitFileExt,
+		valiLabVisitFileExt=trainingLabVisitFileExt,
 		kernal="linear",
 		validateSummaryPath,
 		Gamma=NA,
@@ -213,7 +213,7 @@ quickTrainValidateCPD <- function(
 	}
 	print("Model trained")
 
-	validate.data <- readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt, scale)
+	validate.data <- readData(validateDataInfoPath, labVisitFileFolder, valiLabVisitFileExt, scale)
     write.csv(featureMatrixNoFFT(validate.data, formula), 'test.csv')
 	pred <- predict(model, featureMatrixNoFFT(validate.data, formula), type='class')
 	real <- data.frame(ActivityClass=validate.data$ActivityClass, ActivityRatios=validate.data$ActivityRatio, Scale=validate.data$Scale)
@@ -232,7 +232,8 @@ testBestModelCPD <- function(
 		testDataInfoPath, 
 		labVisitFileFolder,
         trainingLabVisitFileExt,
-		valiTestLabVisitFileExt=trainingLabVisitFileExt,
+		valiLabVisitFileExt=trainingLabVisitFileExt,
+		testLabVisitFileExt=trainingLabVisitFileExt,
 		kernal,
 		bestModelInfoSavePath,
 		bestModelSavePath,
@@ -290,12 +291,12 @@ testBestModelCPD <- function(
 		bestModelInfo <- NA  # Since nnet package uses random initial weights when building models, accuracy is variable and should not be verified
 	}
 	summarizeModelCPD(model, formula, windowSize, 
-			readData(validateDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
+			readData(validateDataInfoPath, labVisitFileFolder, valiLabVisitFileExt), 
 			validateReportPath, bestModelInfo)
 	
 	print("Test model on testing data")
 	summarizeModelCPD(model, formula, windowSize, 
-			readData(testDataInfoPath, labVisitFileFolder, valiTestLabVisitFileExt), 
+			readData(testDataInfoPath, labVisitFileFolder, testLabVisitFileExt), 
 			testReportPath)
 }
 

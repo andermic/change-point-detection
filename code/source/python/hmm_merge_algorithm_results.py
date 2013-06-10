@@ -4,14 +4,12 @@ from make_path import make_path
 
 #DATASET = 'OSU_HIP'
 DATASET = 'UQ'
-#ROOT_INPUT_FOLDER = 'results/hmm'
 ROOT_INPUT_FOLDER = '/nfs/guille/wong/users/andermic/my_exp/hmm'
 CLASS_ALGS = ['dt','nnet','svm']
 DAY = 2
 ROOT_OUTPUT_FOLDER = 'results/hmm'
 
 CLASS_ALGS = ['dt', 'svm', 'nnet']
-OUTPUT_FOLDER = '.'
 
 ACC = 'MeanAccuracy'
 SDA = 'SDAccuracy'

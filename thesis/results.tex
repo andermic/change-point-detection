@@ -75,8 +75,8 @@ time were small and within confidence bounds.
  \includegraphics[scale=0.4]{osu_cpd_nnet_det.pdf}
  \caption{OSU Hip Results. Graphs are organized into rows by base classifier,
   and columns by evaluation metric. Change-point detection results were averaged over
-  30 splits into training, testing, and validation datasets,
-  along with error bars showing a 95\% confidence interval.}
+  30 splits into training, testing, and validation datasets. Error bars show a
+  95\% confidence interval around the average.}
  \label{fig:osu_cpd}
 \end{figure}
 
@@ -90,8 +90,8 @@ time were small and within confidence bounds.
  \includegraphics[scale=0.4]{lime1_cpd_nnet_det.pdf}
  \caption{LiME Day 1 Results. Graphs are organized into rows by base classifier,
   and columns by evaluation metric. Change-point detection results were averaged over
-  30 splits into training, testing, and validation datasets,
-  along with error bars showing a 95\% confidence interval.}
+  30 splits into training, testing, and validation datasets. Error bars show a
+  95\% confidence interval around the average.}
  \label{fig:lime1_cpd}
 \end{figure}
 
@@ -105,8 +105,8 @@ time were small and within confidence bounds.
  \includegraphics[scale=0.4]{lime2_cpd_nnet_det.pdf}
  \caption{LiME Day 2 Results. Graphs are organized into rows by base classifier,
   and columns by evaluation metric. Change-point detection results were averaged over
-  30 splits into training, testing, and validation datasets,
-  along with error bars showing a 95\% confidence interval.}
+  30 splits into training, testing, and validation datasets. Error bars show a
+  95\% confidence interval around the average.}
  \label{fig:lime2_cpd}
 \end{figure}
 
@@ -120,14 +120,17 @@ corresponding to discrete time ``ticks'' in an HMM,
 and results for windows of length $\{10, 12, 14, 16, 18, 20\}$
 seconds are shown.
 
-For both the SVM and decision tree classifiers, accuracy was high and
-detection time was low across all three datasets. Accuracy and detection
-time were also stable with respect to window size. Further experiments on the
-OSU Hip dataset showed that the HMM when paired with these classifiers
-tends to be stable with window sizes that are greater than a few seconds,
-which seems to be the amount of time required to be informative. Neural networks
-performed somewhat more poorly and erratically across the board.
-
+For all three base classifiers, accuracy was high and
+stable with respect to window size, over all three datasets. Detection
+time was also fairly stable in the OSU Hip experiments, though as would
+generally be expected it increased somewhat with window size in the LiME
+experiments. Further experiments [results not shown] on the
+OSU Hip dataset showed that the accuracy and detection time of our HMM approach 
+tends to be poor for very small window sizes, but that it stabilizes with window sizes
+that are greater than roughly 5 seconds. This gives a strong indication that
+5 seconds is the amount of information necessary for the classifiers to become as
+discriminative as they can be, at least on that dataset.
+ 
 \begin{figure}[H]
  \centering
  \includegraphics[scale=0.4]{osu_hmm_dt_acc.pdf} \hspace{1em}\vspace{1em}
@@ -139,8 +142,8 @@ performed somewhat more poorly and erratically across the board.
  \caption{OSU Hip HMM Results.
   Graphs are organized into rows by base classifier, and columns by evaluation
   metric. HMM results were averaged over 10 splits into training
-  (base classifier), validation, training (HMM), and testing datasets, along with 
-  error bars showing a 95\% confidence interval.}
+  (base classifier), validation, training (HMM), and testing datasets. Error
+  bars show a 95\% confidence interval around the average.}
  \label{fig:osu_hmm}
 \end{figure}
 
@@ -155,8 +158,8 @@ performed somewhat more poorly and erratically across the board.
  \caption{LiME Day 1 HMM Results.
   Graphs are organized into rows by base classifier, and columns by evaluation
   metric. HMM results were averaged over 10 splits into training
-  (base classifier), validation, training (HMM), and testing datasets, along with 
-  error bars showing a 95\% confidence interval.}
+  (base classifier), validation, training (HMM), and testing datasets. Error
+  bars show a 95\% confidence interval around the average.}
  \label{fig:lime1_hmm}
 \end{figure}
 
@@ -171,8 +174,8 @@ performed somewhat more poorly and erratically across the board.
  \caption{LiME Day 2 HMM Results.
   Graphs are organized into rows by base classifier, and columns by evaluation
   metric. HMM results were averaged over 10 splits into training
-  (base classifier), validation, training (HMM), and testing datasets, along with 
-  error bars showing a 95\% confidence interval.}
+  (base classifier), validation, training (HMM), and testing datasets. Error
+  bars show a 95\% confidence interval around the average.}
  \label{fig:lime2_hmm}
 \end{figure}
 
@@ -180,9 +183,7 @@ performed somewhat more poorly and erratically across the board.
 
 \section{Discussion}
 
-Our results show that the HMM approach outperformed the change-point
-detection approach, both in terms of accuracy and detection time, regardless of
-the dataset and base classifier. For a given false positive rate, change-point
+For a given false positive rate, change-point
 detection algorithms split a time series into windows of a certain average size,
 which decreases as the false positive rate increases. From this it is possible
 to relate false positive rates from the CPD experiments to the window sizes of
@@ -191,9 +192,12 @@ the HMM experiments. HMM false positive rates per second of
 window sizes of \{10, 12, 14, 16, 18, 20\}. Figure \ref{fig:compare_cpd_hmm}
 shows a side-by-side comparison of the top-down and bottom-up approaches, using
 this conversion. 
+Our results show that the HMM approach outperformed the change-point
+detection approach, both in terms of accuracy (Figures 4.7.1, 4.7.3, 4.7.5)
+and detection time (Figures 4.7.2, 4.7.4, 4.7.6), regardless of
+the dataset and base classifier.
 
-HMMs likely
-did better because they perform the segmentation after being trained on labelled
+HMMs likely did better because they segment data after being trained on labelled
 data. Change-point detection algorithms on the other hand are unaware of true
 activity labels---they merely signal a change when they detect a distance or
 dissimilarity between reference and test data. As such, change-point detection
@@ -201,20 +205,20 @@ algorithms have trouble accurately segmenting free-living data, and noisy
 segmentation results in poor performance.
 
 A contributing factor to the particularly high accuracy and low detection time
-results attained for the OSU Hip experiments was that the data consisted of
-activities that were synthetically glued together. The same group of activities
-were performed in the same order by each of the 50 subjects in this dataset,
-making transitions from one activity to the other very predictable for a
-temporal model. By contrast, the LiME datasets consisted of unsynthetic data
-gathered from a large set of unstructured and variable-length activities,
+results generally attained for the OSU Hip experiments was that the data
+consisted of activities that were synthetically glued together. The same group
+of activities were performed in the same order by each of the 50 subjects in
+this dataset, making transitions from one activity to the other very predictable
+for a temporal model. By contrast, the LiME datasets consisted of unsynthetic
+data gathered from a large set of unstructured and variable-length activities,
 so the activity transitions were not as predictable and are more indicative of
 an application of our techniques in the real world.
 
 %TODO (Compare LiME 1 with LiME 2 in this paragraph or the next one.)
 
-A final point of interest was that SVM clearly outperformed the other two
-base classifiers, and that the faster and simpler decision tree model did fairly
-well against neural networks. This result is significant because much of the
+A final point of interest was that SVM (Figures 4.7.3 and 4.7.4) clearly outperformed the other two
+base classifiers, and that the faster and simpler decision tree model (Figures 4.7.1 and 4.7.2) matched up
+well against neural networks (Figures 4.7.5 and 4.7.6). This result is significant because much of the
 previous research that has formulated activity detection as a supervised learning
 problem has used neural networks exclusively.
 
@@ -227,9 +231,11 @@ problem has used neural networks exclusively.
  \includegraphics[scale=0.4]{svm_cpd_hmm_compare_det.pdf}
  \includegraphics[scale=0.4]{nnet_cpd_hmm_compare_acc.pdf} \hspace{1em}
  \includegraphics[scale=0.4]{nnet_cpd_hmm_compare_det.pdf}
- \caption{Comparison of change-point detection and HMMs in terms of accuracy
-  and detection time. Both
-  graphs show decision tree results, and both show results from each of the
-  three datasets clustered together over a single false positive rate.}
+ \caption{Comparison of change-point detection and HMM results.
+  Graphs are organized into rows by base classifier, and columns by evaluation
+  metric. Results for false positives per second of \{0.005, 0.01, 0.05, 0.1\} are change-point
+  detection experiments, while results for false positives per second of
+  \{0.017, 0.019, 0.021, 0.024, 0.028, 0.033\} are HMM experiments. Error bars
+  show a 95\% confidence interval.}
  \label{fig:compare_cpd_hmm}
 \end{figure}

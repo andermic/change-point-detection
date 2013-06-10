@@ -14,6 +14,7 @@ WSES = 10:2:20;
 WSES_STR = {'0.033' '0.028' '0.024' '0.021' '0.019' '0.017'};
 
 TEST_WINDOW_SIZE = 1;
+SUB_FIG = ' 4.7';
 
 addpath(ROOT_INPUT_FOLDER);
 for iclass=1:3
@@ -91,7 +92,8 @@ for iclass=1:3
         ylabel(strcat(METRICS{imet}, ' (s)'));
     end
     axis([.5 size(FPRS,2)+size(WSES,2)+.5 0 ym]);
-    title(strcat('Change-Point Detection vs. HMM:', CLASS_ALG_STRS{iclass}, METRICS(imet)));
+    subsubfig = num2str((iclass-1)*2 + imet);
+    title(strcat('Figure', SUB_FIG, '.', subsubfig, ':', CLASS_ALG_STRS{iclass}, METRICS(imet)));
     legend('OSU Hip', 'LiME Day 1', 'LiME Day 2');
     saveas(gcf, strcat(ROOT_OUTPUT_FOLDER, '/', CLASS_ALGS{iclass}, '_cpd_hmm_compare_', lower(METRICS{imet}(2:4)), '.eps'));
     hold off;

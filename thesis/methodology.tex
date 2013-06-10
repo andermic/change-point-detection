@@ -58,10 +58,10 @@ Each of the 91 time series contained a total of $6*120*30 = 21600$ data ticks.
 % \label{fig:osu_activities}
 %\end{figure}
 
-We determined that several of the activities were very similar and that
-it would be difficult to discriminate between them. As a result, we combined some of them together to
-create a 7 class version of the data.
-Our classes were lying down, sitting (hand-writing, computer game),
+We determined that several of the activities were very similar and that it would
+be difficult to discriminate between them. As a result, we combined some of them together to
+create a 7-class version of the data.
+The classes were lying down, sitting (hand-writing, computer game),
 standing (laundry, sweeping, and catch), walking (comfortable, brisk and treadmill walking),
 dancing, running, and basketball.
 
@@ -114,7 +114,7 @@ set was a large collection of statistics that have been shown to be discriminati
 for activity classification in previous research \cite{li09} \cite{rothney07}
 \cite{staudenmeyer09} \cite{zheng12}. In all we used 18 statistics that were
 uniaxial, i.e. were only a function of the data from a single axis of a given window,
-and one biaxial statistic.
+as well as one biaxial statistic.
 The uniaxial statistics were applied to data from each axis separately, and
 the biaxial statistic was applied to data from each of the $C_2^3=3$ possible pairs of
 axes, for a total of $18*3+3 = 57$ features.
@@ -175,7 +175,7 @@ rhythmic or staccato in intensity (high variance, etc.).
 Lag-one-autocorrelation [F12], skewness [F13], kurtosis [F14], and peak intensity [F17]
 were useful for discriminating between
 activities that tend to be similar in their overall intensity and variation in intensity,
-but that showed other types of difference in shape. Skewness indicates whether the data is
+but that yielded data with other types of difference in shape. Skewness indicates whether the data is
 more concentrated above or below its mean. Kurtosis indicates that the data is concentrated
 near its mean or conversely that it is fat-tailed. Lag-one-autocorrelation is a measure of
 the general relationship between data ticks and their immediate neighbors in time. Peak
@@ -189,11 +189,11 @@ are predictive of acceleration values in another axis, versus activities where t
 %TODO: Expand this section and/or include a picture.
 \section{Base Classifiers}
 
-We tested 3 types of classification models on the featurized versions of our data:
+We tested three classification models on the featurized versions of our data:
 decision trees, support vector machines, and neural networks. We used R for our
 experiments, and used the R libraries `rpart' \cite{rpart}, `e1071' \cite{svm},
 and `nnet' \cite{nnet} to build
-our decision tree, svm, and neural net models, respectively. Default rpart values
+our decision tree, SVM, and neural network models, respectively. Default rpart values
 were used for the decision tree experiments. The rpart package implements a
 procedure for automatically tuning how aggressively it prunes its decision tree
 models, and hence our validation set was not used to tune this parameter. 
@@ -204,13 +204,13 @@ weights was set to 1000000.
 For the OSU Hip experiments we tuned the
 cost parameter $C$ of the svm on the validation set with 6 values:
 $\{0.01,0.1,1,10,100,1000\}$. The single-layer feed-forward neural network took
-two tuning parameters, and we tuned with each element of the set $N \times W$,
+two tuning parameters, and we tuned with each 2-tuple from the set $N \times W$,
 where $N = \{1,2, \ldots, 30\}$ was the numbers of nodes in the hidden layer, and 
-$W = \{0,0.5,1\}$ was the weight decay parameters.
+$W = \{0,0.5,1\}$ was the weight decay parameter.
 
 Since the LiME datasets were an order of magnitude larger, we tuned them
 slightly differently because of time constraints. Setting the $C$ parameter to
-1000 proved to be very computationally expensive for the svm model; instead we tuned $C$
+1000 proved to be very computationally expensive for the SVM model; instead we tuned $C$
 from the values $\{0.01,0.1,1,10,100\}$. Running $30*3=90$ tuning experiments
 for the neural networks was also prohibitively expensive; instead we tuned using
 values from $N \times W = \{5,10,15\} \times \{0,0.5,1\}$.
@@ -223,9 +223,9 @@ values from $N \times W = \{5,10,15\} \times \{0,0.5,1\}$.
  \centering
  \includegraphics[scale=0.45]{performance.pdf}
  \caption{An example time series with 20 ticks of data, from a dataset with
-  three classes: A, B, and C. Four true class labels with
-  corresponding windows are shown above the x-axis, and four predicted class
-  labels with their corresponding windows are shown below the x-axis.}
+  three classes: A, B, and C. Four true class labels and their associated
+  windows are shown above the axis; four predicted class
+  labels and their associated windows are shown below the axis.}
  \label{fig:performance}
 \end{figure}
 

@@ -5,29 +5,29 @@ from make_path import make_path
 
 DATASET = 'OSU_HIP'
 #DATASET = 'UQ'
-ROOT_INPUT_FOLDER = 'results/cpd'
 ROOT_INPUT_FOLDER = '/nfs/guille/wong/users/andermic/my_exp/cpd'
-CLASS_ALGS = ['dt','nnet','svm']
+CLASS_ALGS = ['nnet','svm']
 DAY = 2
-ROOT_OUTPUT_FOLDER = 'results/aggregate/cpd'
+ROOT_OUTPUT_FOLDER = 'results/cpd'
 CPD_ALGS = ['cc','kliep']
+VALI_TRUE = '_vali_true'
 
 ACC = 'MeanAccuracy'
 SDA = 'SDAccuracy'
 DET = 'MeanDetectionTime'
 SDDET = 'SDDetectionTime'
 
-dataset_folder = 'OSU_YR4_Hip_30Hz.ws120.7cls' if DATASET == 'OSU_HIP' else ('uq_30Hz_day%d' % DAY)
+dataset_folder = ('OSU_YR4_Hip_30Hz.ws120.7cls' if DATASET == 'OSU_HIP' else ('uq_30Hz_day%d' % DAY)) + VALI_TRUE
 input_folder = '%s/%s' % (ROOT_INPUT_FOLDER, dataset_folder)
 output_folder = '%s/%s' % (ROOT_OUTPUT_FOLDER, dataset_folder)
 
 FPRS = [str(i*0.0001) for i in range(1,101)]
-FPRS = [0.0005,0.001,0.005,0.01]
+FPRS = ['0.0005','0.001','0.005','0.01']
 
 for cls_alg in CLASS_ALGS:
     for cpd_alg in CPD_ALGS:
         files = listdir('%s/%s' % (input_folder, cls_alg))
-        files = [file for file in files if cpd_alg in file and 'test.summary' in file]
+        files = [file for file in files if cpd_alg in file and 'test.summary' in file and ('0.' + file.split('.')[-4]) in FPRS]
         fprs = ['0.' + file.split('.')[-4] for file in files]
         print cls_alg, cpd_alg
         print fprs

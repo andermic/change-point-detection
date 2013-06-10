@@ -16,7 +16,7 @@ user-friendly. Accelerometers also gather data at a high frequency, and as such
 may be used to collect a sizeable amount of data in a relatively short amount
 of time.
 
-Whether or not an accelerometer will be discriminative for a
+Whether or not an accelerometer will yield data that is discriminative for a
 set of activity types depends partially on where the accelerometer is worn on
 a subject's body. For example, an accelerometer worn on the ankle will be
 more discriminative for the activity of cycling than it would be if it was worn
@@ -26,10 +26,11 @@ researchers have opted to use multiple accelerometer systems to capture
 movement information from different parts of the body \cite{bao04}
 \cite{devries11}. However, this approach can be cumbersome for the wearer, so a
 single accelerometer is preferred when it is reasonable to assume that it will
-be discriminative over the relevant set of activities. Further research has
-leveraged the accelerometers found in smart phones that subjects
-are likely to carry with them anyway as data collection devices
-\cite{bao04} \cite{choudhury08} \cite{kwapitz10}
+be discriminative for the relevant set of activities. Recent research has
+noticed that real subjects are likely to carry smartphones with built-in
+accelerometers, and has explored the possibility of collecting data from those
+accelerometers for activity detection purposes \cite{bao04} \cite{choudhury08}
+\cite{kwapitz10} \cite{rai12}.
 
 Activity sensor data tends to be noisy and not amenable to a
 deterministic or rule-based analysis, so activity types are typically modeled
@@ -39,12 +40,13 @@ familiar to the activity detection literature, though neural networks are
 especially popular, such as in \cite{aminian95} \cite{song07} \cite{staudenmeyer09}.
 More complicated metamodeling approaches have also been tried, such as
 plurality voting with bagged, boosted, and stacked classifiers \cite{ravi05};
-conditional random fields \cite{blanke10} \cite{gu09} \cite{vankasteren08} \cite{wu09}; and HMMs
-\cite{gu09} \cite{lester05} \cite{pober06} \cite{wu09}.
+conditional random fields \cite{blanke10} \cite{gu09} \cite{vankasteren08}
+\cite{wu09}; and HMMs \cite{gu09} \cite{lester05} \cite{pober06} \cite{wu09}.
 
-In the past few years researchers have started to focus on the feasibility of
-online activity detection \cite{keogh01} \cite{wu09}, and have started to
-recognize the need to test on realistic free-living data \cite{gu09} \cite{kwapitz10}
-\cite{strohrmann11}. Our contribution is to compare different change-point detection
-techniques for window segmentation with the state-of-the-art (in terms of
-accuracy) HMM approach on free-living data in an online setting.
+In the past few years researchers have begun to recognize the need to test on
+realistic free-living data \cite{gu09} \cite{kwapitz10} \cite{strohrmann11}
+\cite{wu09}. The time required to detect that a change in activity has occurred
+was considered in \cite{grauman12} \cite{song06}, but in the context of
+the very different problem of video activity recognition. Our work is the
+first to consider the feasibility of performing accelerometer activity in real
+time by using detection time as a performance metric.

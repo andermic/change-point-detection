@@ -1,10 +1,9 @@
 \chapter{Conclusion}
-The purpose of this work was to test the feasibility of using change-point
+The purpose of this work was to test the feasibility of classifying 
+accelerometer data in real time. We were also interested in using change-point
 detection techniques for deciding when one activity ended within a time series
-and the next began, and to contrast this technique with an HMM approach.
-The bottom-up approach clearly outperformed
-the top-down approach. We also showed that the performance of a change-point
-detection algorithm was highly dependent on how well the data fit the modeling
-assumption of the algorithm, so it is plausible that a change-point detection
-algorithm with a modeling assumption that is in accord with the given data will
-perform well.
+and the next began, and to contrast this methodology with an HMM approach.
+The bottom-up approach clearly outperformed the top-down approach in terms
+of both accuracy and detection time, because our change-point detection
+algorithms did a poor job of correctly classifying the data, and because the
+HMM temporal model is very well-suited to time series data. 

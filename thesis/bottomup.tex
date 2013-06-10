@@ -3,11 +3,10 @@
 
 \subsection{HMMs}
 
-An alternate technique to change-point detection is the Hidden Markov Model,
-which models the sequential nature of our data. An HMM is a temporal graphical
-model that contains a set of hidden states $H = \{H_0,H_1, \ldots, H_w\}$ as
-well as a set of
-observed states $O = \{O_1,O_2, \ldots, O_w\}$ (Figure \ref{fig:hmm}). The index
+An alternate technique to our change-point detection approach was based around
+the Hidden Markov Model (HMM). An HMM is a temporal graphical model that contains a set of hidden states
+$H = \{H_0,H_1, \ldots, H_w\}$ as well as a set of
+observed states $O = \{O_1,O_2, \ldots, O_w\}$ (see Figure \ref{fig:hmm}). The index
 of either type of state represents a point in time, such that if there exists
 two indices $i$ and $j$ where $i < j$, $i$ is thought of as having happened
 before $j$. Each hidden state in the model contains a value from the
@@ -16,10 +15,10 @@ observed state contains a value from the \emph{observation space}
 $V=\{V_1,V_2, \ldots, V_m\}$.
 The values of the hidden states are unknown, and the values of the observable
 states are known.
-It is also assumed that, as indicated by Figure \ref{fig:hmm}, the
-value of an observable state $O_i$ is dependent on the corresponding
+It is also assumed that, as indicated by Figure \ref{fig:hmm}, that the
+value of an observable state $O_i$ is dependent only the value of the corresponding
 hidden state $H_i$, and that the value of any hidden state $H_i$ is dependent only on
-its immediate predecessor $H_{i-1}$.
+the value of its immediate predecessor $H_{i-1}$.
 
 Furthermore, the dependencies between hidden states and their followers are
 assumed to be described by a stationary stochastic process known as the
@@ -30,7 +29,8 @@ of a separate but also stationary stochastic process known as the
 both models can be thought of as a function of two values, that output the
 probability of a change from the first value to the second via a dependency
 arc in the HMM. The usual approach to estimating $T$ and $S$ given only
-$O$ is a flavor of expectation maximation known as the Baum-Welch algorithm,
+$O$ is an application of expectation maximation known as the Baum-Welch algorithm
+\cite{baum70},
 which is useful for finding $\hat{T}$ and $\hat{S}$ that are locally maximally
 likely. However, suppose a \emph{training HMM} $\langle H_{tr},O_{tr} \rangle$
 with the same model parameters is given, and the values of all of its hidden states as well as its
@@ -68,11 +68,12 @@ the Viterbi algorithm. \cite{russell10}
  \label{fig:hmm_lifecycle}
 \end{figure}
 
-We began by splitting each time series into small non-overlapping windows;
-each window corresponded to a discrete time index in the HMM . Within a
+The data lifecycle for the HMM experiments is shown in Figure \ref{fig:hmm_lifecycle}.
+We began by partitioning each time series into small non-overlapping windows,
+where each window corresponded to a discrete time index in the HMM. Within a
 given experiment the window size was fixed, but across different experiments we
-tested window sizes of length $\{1,2, \ldots ,20\}$. Once the time series were
-split they were featurized. Classification models were built with training data,
+tested window sizes of length $\{10, 12, 14, 16, 18, 20\}$. After the time series were
+partitioned they were then featurized. Classification models were built with training data,
 and tuned (in the case of the svm and neural net models) using validation data,
 in the same way that has already been described previously in this chapter.
 
@@ -88,5 +89,4 @@ to calculate $\hat{T}$ and $\hat{S}$, and assumed that these estimates held for
 the testing set as well as the second training set. We then used the
 tuned base classifier to predict on the testing set, giving us $O$. Finally,
 we used $O$, $\hat{T}$, and $\hat{S}$ to run the Viterbi algorithm on the
-testing set and predict the ground truth activity classes $H$. The data
-lifecycle for the HMM experiments is shown in Figure \ref{fig:hmm_lifecycle} 
+testing set and predict the ground truth activity classes $H$.
