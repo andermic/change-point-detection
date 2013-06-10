@@ -414,7 +414,7 @@ mergeSplitShuffleCPD <- function(
 
 # Modified from ms.osu/common.R
 featureMatrixNoFFT <- function(data, formula) {
-	# Horrible hack to keep containSpecialCase check, while getting rid of FFT features
+	# Keeps containSpecialCase check, while getting rid of FFT features
 	data$DominantFrequency_Axis1 <- NULL
 	data$DominantFrequency_Axis2 <- NULL
 	data$DominantFrequency_Axis3 <- NULL
@@ -514,4 +514,97 @@ mergeDataUQ <- function(dataFileFolder, dataNameFilePath, dataFileExtension, sav
 	
 	mergeInfo <- data.frame(DataFolder=dataFileFolder, FileList=dataNameFilePath, FileExt=dataFileExtension)
 	write.csv(mergeInfo, paste(savePath, ".info.csv", sep=""), row.names=FALSE, quote=FALSE)
+}
+
+featurizeTiming <- function(numRuns, ticksPerWindow, min, max) {
+	for (i in 1:numRuns) {
+		data = data.frame(Axis1=matrix(runif(ticksPerWindow, min, max)), Axis2=matrix(runif(ticksPerWindow, min, max)), Axis3=matrix(runif(ticksPerWindow, min, max)), trialId=1, ActivityClass=1, ActivityRatio=1, LabVisit=1, SubjectID=1, File=1, DateTime=1)
+		featurizeWindowCPD(30, data);
+	}
+}
+
+predictTiming <- function(model, formula, scale, testData, predictionReportPath, bestModelInfo=NA) {
+	#real <- data.frame(ActivityClass=testData$ActivityClass, ActivityRatios=testData$ActivityRatio, Scale=testData$Scale)
+	print('predicting')
+	pred <- as.character(predict(model, data.frame(featureMatrixNoFFT(testData, formula)), type='class'))
+	print('predicted')
+
+	#if (!is.na(bestModelInfo[1])) {
+	#	accuracy <- classificationAccuracyCPD(real, pred)
+	#	stopifnot(abs(bestModelInfo$ValidateAccuracy-accuracy) < 0.01)
+	#}
+	#print(colnames(testData)[1:100])
+	#prediction <- testData[,c("SubjectID", "TrialID", "WindowId")]
+	#if ("SubseqId" %in% colnames(testData)) {
+	#	prediction <- cbind(prediction, data.frame(SubseqId=testData$SubseqId))
+	#}
+	#prediction <- cbind(prediction, data.frame(Scale=scale, Real=real, Predict=pred))
+	#colnames(prediction)[ncol(prediction)] <- "Predict"
+	#write.csv(prediction, predictionReportPath, row.names = FALSE)
+}
+
+testBestModelTiming <- function(
+		algorithm,
+		formula, formulaName, labels, 
+		split,
+		trainDataInfoPath, 
+		validateDataInfoPath, 
+		testDataInfoPath, 
+		labVisitFileFolder,
+        trainingLabVisitFileExt,
+		valiLabVisitFileExt=trainingLabVisitFileExt,
+		testLabVisitFileExt=trainingLabVisitFileExt,
+		kernal,
+		bestModelInfoSavePath,
+		bestModelSavePath,
+		trainReportPath, 
+		validateReportPath, 
+		testReportPath,
+		windowSize=NA,
+		validateSummaryFile=NA,
+		bestModelInfo=NA) {
+
+	if (!is.na(validateSummaryFile)) {
+		validateSummary <- read.csv(validateSummaryFile)
+		validateSummary <- df.match(validateSummary, data.frame(Split=split, Formula=formulaName, Scale=windowSize))
+		bestModelInfo <- validateSummary[which.max(validateSummary$ValidateAccuracy),]
+		#write.csv(bestModelInfo, bestModelInfoSavePath, row.names = FALSE)
+	}
+
+	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt)
+	print("Training data read")
+
+	if (algorithm == "svm") {
+		if (kernal=="radial") {
+			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, 
+					kernel=kernal, gamma=bestModelInfo$Gamma, cost=bestModelInfo$Cost)
+		} else if (kernal=="linear") {
+			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, 
+					kernel=kernal, cost=bestModelInfo$Cost)
+		} else {
+			stop(paste("Invalid kernal:", kernal))
+		}
+	}
+	else if (algorithm == "nnet") {
+		my_data <- data.frame(as.data.frame(featureMatrixNoFFT(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
+		model <- nnet(formula=ActivityClass~., data=my_data, maxit=100000, MaxNWts=1000000, size=bestModelInfo$NumHiddenUnits, decay=bestModelInfo$WeightDecay)
+	}
+	else if (algorithm == "dt") {
+		my_data <- data.frame(as.data.frame(featureMatrixNoFFT(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
+		model <- rpart(formula=ActivityClass~., data=my_data)
+	}
+	#else if (algorithm == "logr") {
+	#	model <- glmnet(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, family="multinomial", alpha=1)
+	#}
+	else {
+		stop('Bad algorithm')
+	}
+		
+	print("Model trained")
+	#save(model, file=bestModelSavePath)
+	
+	print("Test model on testing data")
+	predictTiming(model, formula, windowSize, 
+			readData(testDataInfoPath, labVisitFileFolder, testLabVisitFileExt), 
+			testReportPath)
 }
