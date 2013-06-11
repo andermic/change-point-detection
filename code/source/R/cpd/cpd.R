@@ -526,7 +526,7 @@ featurizeTiming <- function(numRuns, ticksPerWindow, min, max) {
 predictTiming <- function(model, formula, scale, testData, predictionReportPath, bestModelInfo=NA) {
 	#real <- data.frame(ActivityClass=testData$ActivityClass, ActivityRatios=testData$ActivityRatio, Scale=testData$Scale)
 	print('predicting')
-	pred <- as.character(predict(model, data.frame(featureMatrixNoFFT(testData, formula)), type='class'))
+	print(system.time(pred <- as.character(predict(model, data.frame(featureMatrixNoFFT(testData, formula)), type='class'))));
 	print('predicted')
 
 	#if (!is.na(bestModelInfo[1])) {
@@ -574,34 +574,14 @@ testBestModelTiming <- function(
 	training.data <- readData(trainDataInfoPath, labVisitFileFolder, trainingLabVisitFileExt)
 	print("Training data read")
 
-	if (algorithm == "svm") {
-		if (kernal=="radial") {
-			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, 
-					kernel=kernal, gamma=bestModelInfo$Gamma, cost=bestModelInfo$Cost)
-		} else if (kernal=="linear") {
-			model <- svm(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, 
-					kernel=kernal, cost=bestModelInfo$Cost)
-		} else {
-			stop(paste("Invalid kernal:", kernal))
-		}
-	}
-	else if (algorithm == "nnet") {
-		my_data <- data.frame(as.data.frame(featureMatrixNoFFT(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
-		model <- nnet(formula=ActivityClass~., data=my_data, maxit=100000, MaxNWts=1000000, size=bestModelInfo$NumHiddenUnits, decay=bestModelInfo$WeightDecay)
-	}
-	else if (algorithm == "dt") {
+	print("Model trained")
+	if (algorithm == "dt") {
 		my_data <- data.frame(as.data.frame(featureMatrixNoFFT(training.data, formula)),data.frame(ActivityClass=training.data$ActivityClass))
 		model <- rpart(formula=ActivityClass~., data=my_data)
 	}
-	#else if (algorithm == "logr") {
-	#	model <- glmnet(x=featureMatrixNoFFT(training.data, formula), y=training.data$ActivityClass, family="multinomial", alpha=1)
-	#}
 	else {
-		stop('Bad algorithm')
+		load(bestModelSavePath)
 	}
-		
-	print("Model trained")
-	#save(model, file=bestModelSavePath)
 	
 	print("Test model on testing data")
 	predictTiming(model, formula, windowSize, 

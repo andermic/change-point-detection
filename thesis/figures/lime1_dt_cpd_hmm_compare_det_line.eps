@@ -1,9 +1,10 @@
 %!PS-Adobe-2.0 EPSF-1.2
 %%Creator: MATLAB, The MathWorks, Inc. Version 7.13.0.564 (R2011b). Operating System: Linux 2.6.32-279.19.1.el6.x86_64 #1 SMP Wed Dec 19 07:05:20 UTC 2012 x86_64.
 %%Title: /nfs/guille/wong/users/andermic/cpd/thesis/figures/lime1_dt_cpd_hmm_compare_det_line.eps
-%%CreationDate: 06/09/2013  22:18:54
+%%CreationDate: 06/10/2013  17:35:38
 %%DocumentNeededFonts: Helvetica
 %%DocumentProcessColors: Cyan Magenta Yellow Black
+%%Extensions: CMYK
 %%Pages: 1
 %%BoundingBox:    55   199   546   602
 %%EndComments
@@ -135,12 +136,14 @@
   smat stri tri_to_matrix tmat2 concatmatrix } bdef
 /ds {stri astore pop} bdef
 /dt {dtri astore pop} bdef
-/db {2 copy /cols xdef /rows xdef mul dup string
+/db {2 copy /cols xdef /rows xdef mul dup 3 mul string
   currentfile exch readhexstring pop
-  /bmap xdef pop pop} bdef
+  dup 0 3 index getinterval /rbmap xdef
+  dup 2 index dup getinterval /gbmap xdef
+  1 index dup 2 mul exch getinterval /bbmap xdef pop pop}bdef
 /it {gs np dtri aload pop moveto lineto lineto cp c
   cols rows 8 compute_transform 
-  {bmap} image gr}bdef
+  rbmap gbmap bbmap true 3 colorimage gr}bdef
 /il {newpath moveto lineto stroke}bdef
 currentdict end def
 %%EndProlog
@@ -190,127 +193,162 @@ SO
 6 w
 0 sg
  899 4615 mt 6255 4615 L
+ 899  389 mt 6255  389 L
+ 899 4615 mt  899  389 L
+6255 4615 mt 6255  389 L
+ 899 4615 mt 6255 4615 L
  899 4615 mt  899  389 L
 1166 4615 mt 1166 4561 L
+1166  389 mt 1166  442 L
 %%IncludeResource: font Helvetica
 /Helvetica /ISOLatin1Encoding 120 FMSR
 
 1016 4760 mt 
 (0.005) s
 1702 4615 mt 1702 4561 L
+1702  389 mt 1702  442 L
 1586 4760 mt 
 (0.01) s
 2238 4615 mt 2238 4561 L
+2238  389 mt 2238  442 L
 2088 4760 mt 
 (0.019) s
 2773 4615 mt 2773 4561 L
+2773  389 mt 2773  442 L
 2623 4760 mt 
 (0.017) s
 3309 4615 mt 3309 4561 L
+3309  389 mt 3309  442 L
 3159 4760 mt 
 (0.021) s
 3844 4615 mt 3844 4561 L
+3844  389 mt 3844  442 L
 3694 4760 mt 
 (0.024) s
 4380 4615 mt 4380 4561 L
+4380  389 mt 4380  442 L
 4230 4760 mt 
 (0.028) s
 4916 4615 mt 4916 4561 L
+4916  389 mt 4916  442 L
 4766 4760 mt 
 (0.033) s
 5451 4615 mt 5451 4561 L
+5451  389 mt 5451  442 L
 5368 4760 mt 
 (0.1) s
 5987 4615 mt 5987 4561 L
+5987  389 mt 5987  442 L
 5871 4760 mt 
 (0.05) s
  899 4615 mt  952 4615 L
+6255 4615 mt 6201 4615 L
  798 4659 mt 
 (0) s
- 899 4181 mt  952 4181 L
- 731 4225 mt 
+ 899 4095 mt  952 4095 L
+6255 4095 mt 6201 4095 L
+ 731 4139 mt 
 (20) s
- 899 3748 mt  952 3748 L
- 731 3792 mt 
+ 899 3575 mt  952 3575 L
+6255 3575 mt 6201 3575 L
+ 731 3619 mt 
 (40) s
- 899 3315 mt  952 3315 L
- 731 3359 mt 
+ 899 3055 mt  952 3055 L
+6255 3055 mt 6201 3055 L
+ 731 3099 mt 
 (60) s
- 899 2881 mt  952 2881 L
- 731 2925 mt 
+ 899 2535 mt  952 2535 L
+6255 2535 mt 6201 2535 L
+ 731 2579 mt 
 (80) s
- 899 2448 mt  952 2448 L
- 664 2492 mt 
-(100) s
  899 2015 mt  952 2015 L
+6255 2015 mt 6201 2015 L
  664 2059 mt 
+(100) s
+ 899 1495 mt  952 1495 L
+6255 1495 mt 6201 1495 L
+ 664 1539 mt 
 (120) s
- 899 1582 mt  952 1582 L
- 664 1626 mt 
+ 899  975 mt  952  975 L
+6255  975 mt 6201  975 L
+ 664 1019 mt 
 (140) s
- 899 1148 mt  952 1148 L
- 664 1192 mt 
+ 899  455 mt  952  455 L
+6255  455 mt 6201  455 L
+ 664  499 mt 
 (160) s
- 899  715 mt  952  715 L
- 664  759 mt 
-(180) s
+ 899 4615 mt 6255 4615 L
+ 899  389 mt 6255  389 L
+ 899 4615 mt  899  389 L
+6255 4615 mt 6255  389 L
 gs 899 389 5357 4227 MR c np
-gs 1129 2256 4896 1285 MR c np
-  18   18 1166 2293 FO
-  18   18 1702 2948 FO
-  18   18 5451 3402 FO
-  18   18 5987 3503 FO
 gr
 
-gs 2201 2749 2753 116 MR c np
-  18   18 4916 2804 FO
-  18   18 4380 2804 FO
-  18   18 3844 2804 FO
-  18   18 3309 2805 FO
-  18   18 2773 2827 FO
-  18   18 2238 2786 FO
+/c8 { 0.000000 0.000000 1.000000 sr} bdef
+c8
+  18   18 1166 1828 FO
+  18   18 1702 2615 FO
+  18   18 5451 3160 FO
+  18   18 5987 3280 FO
+gs 899 389 5357 4227 MR c np
 gr
 
-536 101 3749 454 536 655 1166 2293 4 MP stroke
--535 -41 -536 22 -535 1 -536 0 -536 0 4916 2804 6 MP stroke
+/c9 { 1.000000 0.000000 0.000000 sr} bdef
+c9
+  18   18 4916 3559 FO
+  18   18 4380 3444 FO
+  18   18 3844 3223 FO
+  18   18 3309 3027 FO
+  18   18 2773 2703 FO
+  18   18 2238 2700 FO
+gs 899 389 5357 4227 MR c np
+c8
+536 120 3749 545 536 787 1166 1828 4 MP stroke
+c9
+-535 -3 -536 -324 -535 -196 -536 -221 -536 -115 4916 3559 6 MP stroke
 gr
 
+0 sg
  582 3007 mt  -90 rotate
 ( Detection Time \(s\)) s
 90 rotate
 gs 899 389 5357 4227 MR c np
-0 438 1166 2074 2 MP stroke
-97 0 1118 2074 2 MP stroke
-97 0 1118 2512 2 MP stroke
-0 314 1702 2791 2 MP stroke
-96 0 1654 2791 2 MP stroke
-96 0 1654 3105 2 MP stroke
-0 186 5451 3309 2 MP stroke
-96 0 5403 3309 2 MP stroke
-96 0 5403 3495 2 MP stroke
-0 185 5987 3410 2 MP stroke
-97 0 5938 3410 2 MP stroke
-97 0 5938 3595 2 MP stroke
-0 100 4916 2754 2 MP stroke
-53 0 4889 2754 2 MP stroke
-53 0 4889 2854 2 MP stroke
-0 66 4380 2771 2 MP stroke
-54 0 4353 2771 2 MP stroke
-54 0 4353 2837 2 MP stroke
-0 120 3844 2744 2 MP stroke
-53 0 3818 2744 2 MP stroke
-53 0 3818 2864 2 MP stroke
-0 139 3309 2736 2 MP stroke
-53 0 3282 2736 2 MP stroke
-53 0 3282 2875 2 MP stroke
-0 95 2773 2779 2 MP stroke
-54 0 2746 2779 2 MP stroke
-54 0 2746 2874 2 MP stroke
-0 117 2238 2727 2 MP stroke
-53 0 2211 2727 2 MP stroke
-53 0 2211 2844 2 MP stroke
+c8
+0 526 1166 1565 2 MP stroke
+97 0 1118 1565 2 MP stroke
+97 0 1118 2091 2 MP stroke
+0 376 1702 2427 2 MP stroke
+96 0 1654 2427 2 MP stroke
+96 0 1654 2803 2 MP stroke
+0 223 5451 3048 2 MP stroke
+96 0 5403 3048 2 MP stroke
+96 0 5403 3271 2 MP stroke
+0 221 5987 3170 2 MP stroke
+97 0 5938 3170 2 MP stroke
+97 0 5938 3391 2 MP stroke
+c9
+0 305 4916 3406 2 MP stroke
+53 0 4889 3406 2 MP stroke
+53 0 4889 3711 2 MP stroke
+0 334 4380 3277 2 MP stroke
+54 0 4353 3277 2 MP stroke
+54 0 4353 3611 2 MP stroke
+0 422 3844 3012 2 MP stroke
+53 0 3818 3012 2 MP stroke
+53 0 3818 3434 2 MP stroke
+0 580 3309 2737 2 MP stroke
+53 0 3282 2737 2 MP stroke
+53 0 3282 3317 2 MP stroke
+0 515 2773 2446 2 MP stroke
+54 0 2746 2446 2 MP stroke
+54 0 2746 2961 2 MP stroke
+0 546 2238 2427 2 MP stroke
+53 0 2211 2427 2 MP stroke
+53 0 2211 2973 2 MP stroke
 gr
 
+c9
+0 sg
 3100 4903 mt 
 (False Positives / s) s
 2635  294 mt 
@@ -342,20 +380,27 @@ SO
 (CPD) s
 gs 5403 449 793 335 MR c np
 gs 5609 504 75 75 MR c np
+c8
   18   18 5646  541 FO
 gr
 
+c8
 gr
 
+c8
+0 sg
 5855  733 mt 
 (HMM) s
 gs 5403 449 793 335 MR c np
 gs 5609 653 75 75 MR c np
+c9
   18   18 5646  690 FO
 gr
 
+c9
 gr
 
+c9
 
 end %%Color Dict
 

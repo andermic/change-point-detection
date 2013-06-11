@@ -96,11 +96,13 @@ for idata = 1:3
             ym = max(max(vals+stds*1.96));
         end
         axis([.5 size(FPRS,2)+size(WSES,2)+.5 0 ym]);
+        idata
         subfig = num2str(idata + 6);
         subsubfig = num2str((iclass - 1) * 2 + imet);
         title(strcat('4.', subfig, '.', subsubfig, ':', CLASS_ALG_STRS{iclass}, METRICS(imet)));
         legend('CPD', 'HMM');
-        %saveas(gcf, strcat(ROOT_OUTPUT_FOLDER, '/', DATASET_FILE_STRS{idata}, '_', CLASS_ALGS{iclass}, '_cpd_hmm_compare_', lower(METRICS{imet}(2:4)), '_line.eps'));
+        set(gca,'Box','on');
+        saveas(gcf, strcat(ROOT_OUTPUT_FOLDER, '/', DATASET_FILE_STRS{idata}, '_', CLASS_ALGS{iclass}, '_cpd_hmm_compare_', lower(METRICS{imet}(2:4)), '_line.eps'), 'epsc');
         hold off;
     end
   end
