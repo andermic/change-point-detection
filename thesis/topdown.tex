@@ -84,7 +84,7 @@ normal distribution, and that scores are calculated by the Mahalanobis distance
 of the target time tick from the estimated multivariate normal:
 
 \[
-s(i) = \sqrt{[\bar{X}_r(i) - X(i)]_T \; \frac{1}{S_r(i)} \; [\bar{X}_r(i) - X(i)]}
+s(i) = \sqrt{[\bar{X}_r(i) - X(i)]^T \; \frac{1}{S_r(i)} \; [\bar{X}_r(i) - X(i)]}
 \]
 
 where $\bar{X}_r(i)$ is the sample mean of the reference data, $S_r(i)$
@@ -94,7 +94,7 @@ the $i$th data point.
 We were also interested in testing the performance of a newer and more
 sophisticated change-point detection algorithm: the
 Kullback-Leibler Importance Estimation Procedure (KLIEP)
-\cite{sugiyama09} \cite{sugiyama08}.
+\cite{sugiyama09}, \cite{sugiyama08}.
 This approach generates scores using the Kullback-Leibler (KL)
 divergence between the reference data and the test data. One method of doing this
 is to estimate the density of the reference distribution and test distribution

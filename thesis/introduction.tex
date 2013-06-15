@@ -53,3 +53,7 @@ using a base classifier, treating that prediction as the observable
 state of an HMM, and then finally solving the HMM for its hidden states. We call
 this our bottom-up approach, because we begin with small windows of fixed-length,
 and use an HMM to smooth windows together into larger activity intervals.
+
+We found that the bottom-up approach outperformed the top-down approach in
+terms of both accuracy and detection time, for all of the datasets and base
+classifiers that we tried.

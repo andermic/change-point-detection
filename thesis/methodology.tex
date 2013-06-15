@@ -12,7 +12,7 @@ visit data together, while the second was real-world free-living data.
 \subsection{Synthetic Data (OSU Hip)}
 We generated a synthetic, free-living dataset using physical activity data
 collected by Stewart Trost of the Nutrition and Exercise Sciences department of
-Oregon State University \cite{trost12} \cite{zheng12}.
+Oregon State University \cite{trost12}, \cite{zheng12}.
 This dataset consisted of 91 time series collected over a 2-week period in a
 laboratory environment, from 50 children between the ages of 5 and 15. Subjects
 performed 12 different types of activities  over two separate lab visits, with
@@ -111,8 +111,8 @@ non-overlapping windows and represented each window as a feature vector.
 How we decided where one window ended (and where the next began) varied between
 experiments, and is described in sections \ref{sec:topdown} and \ref{sec:bottomup}. Our feature
 set was a large collection of statistics that have been shown to be discriminative
-for activity classification in previous research \cite{li09} \cite{rothney07}
-\cite{staudenmeyer09} \cite{zheng12}. In all we used 18 statistics that were
+for activity classification in previous research \cite{li09}, \cite{rothney07},
+\cite{staudenmeyer09}, \cite{zheng12}. In all we used 18 statistics that were
 uniaxial, i.e. were only a function of the data from a single axis of a given window,
 as well as one biaxial statistic.
 The uniaxial statistics were applied to data from each axis separately, and
@@ -127,7 +127,7 @@ axes, for a total of $18*3+3 = 57$ features.
 \begin{tabular}{|p{15cm}|}  \hline
 F1. Sum of values of a period of time: $\sum^T_{i=1} x(i)$.\\ [2ex]
 F2. Mean: $\mu_x = \frac{1}{T} \sum^T_{i=1} x(i)$.\\ [2ex]
-F3. Standard deviation: $\sigma_x = \sqrt{\frac{1}{T} \sum^T_{i=1} [x(i) - \mu_x]}$.\\ [2ex]
+F3. Standard deviation: $\sigma_x = \sqrt{\frac{1}{T} \sum^T_{i=1} [x(i) - \mu_x]^2}$.\\ [2ex]
 F4. Coefficients of variation: $\frac{\sigma_x}{\mu_x}$. \\ [2ex]
 F5. Peak-to-peak amplitude: $max \{x(1), ..., x(T)\} - min \{x(1), .., x(T)\}$.\\ [2ex]
 F6-10. Percentiles: $10^{th}, 25^{th}, 50^{th}, 75^{th}, 90^{th}$.\\ [2ex]
@@ -185,8 +185,6 @@ Finally we looked at a single bimodal statistic across each pair of axes, the co
 coefficient [F19], which discriminates between activities where acceleration values in one axis
 are predictive of acceleration values in another axis, versus activities where that is not the case.
 
-%TODO: Tie our choice of base classifiers into related work, if possible.
-%TODO: Expand this section and/or include a picture.
 \section{Base Classifiers}
 
 We tested three classification models on the featurized versions of our data:

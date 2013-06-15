@@ -23,7 +23,7 @@ Figures \ref{fig:osu_cpd}-\ref{fig:lime2_cpd}.
 The performance of the change-point detection algorithms
 depended heavily on the threshold level for change prediction. In our
 experiment we varied the threshold level, thus changing the false positive
-rate. A large number of false positive rates per
+rate. A large number of false positives per
 second were tested, but for the sake of brevity only a representative sample
 of $\{0.005, 0.01, 0.05, 0.1\}$ are shown here.
 
@@ -37,7 +37,7 @@ less discriminative than larger windows. This behavior is seen in the control ch
 accuracy results (grey bars in Figures 4.1.1, 4.1.3, 4.1.5), but not in the
 KLIEP accuracy results (white bars in Figures 4.1.1, 4.1.3, 4.1.5).
 Follow-up experiments showed that KLIEP peaks in accuracy for
-false positive rates between $0.2$ and $0.3$ for all three classifiers.
+false positives per second between $0.2$ and $0.3$ for all three classifiers.
 KlIEP seemed to perform best on this dataset when it was given many
 opportunities to predict changes.
 
@@ -223,8 +223,6 @@ for a temporal model. By contrast, the LiME datasets consisted of unsynthetic
 data gathered from a large set of unstructured and variable-length activities,
 so the activity transitions were not as predictable and are more indicative of
 an application of our techniques in the real world.
-
-%TODO (Compare LiME 1 with LiME 2 in this paragraph or the next one.)
 
 A final point of interest was that SVM (Figures 4.7.3, 4.7.4, 4.8.3, 4.8.4, 4.9.3, 4.9.4) clearly outperformed the other two
 base classifiers, and that the faster and simpler decision tree model (Figures 4.7.1, 4.7.2, 4.8.1, 4.8.2, 4.9.1, 4.9.2) matched up

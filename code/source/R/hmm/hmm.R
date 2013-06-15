@@ -23,15 +23,6 @@ trainSupervised <- function(stateAlphabet, emissionAlphabet, stateSample, emissi
 		
 		sourceCounts[source] <- sourceCounts[source] + 1
 	}
-	print("transProbs")
-	print(transProbs)
-	print("")
-	print("emissionProbs")
-	print(emissionProbs)
-	print("")
-	print("sourceCounts")
-	print(sourceCounts)
-	print("")
 	transProbs = transProbs/(sourceCounts + length(stateAlphabet))
 
 	source <- as.character(stateSample[length(stateSample)])
@@ -62,7 +53,6 @@ predictHMM <- function(
 	print('training hmm')	
 	training.data <- read.csv(trainHMMResultPath)
 	hmm <- trainSupervised(labels, labels, training.data$Real.ActivityClass, training.data$Predict)
-	print(hmm)
 	
 	print('predicting on the hmm testing data with the base classifier')
 	load(bestModelSavePath)
