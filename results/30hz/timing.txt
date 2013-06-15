@@ -1,0 +1,9 @@
+control_chart_timing(100,100) takes 0.3509s
+contol_chart_timing(10,100) takes 0.0497s
+control_chart_timing(1000,1000) takes 30.4366s
+kliep_timing(1000) takes 31.5757s
+featurize_timing(1000,3600,-5,5) takes 98.527s
+
+predict_timing for 60 runs on svm takes 0.368s per run
+predict_timing for 60 runs on nnet takes 0.369s per run
+predict_timing for 60 runs on nnet takes 0.372s per run

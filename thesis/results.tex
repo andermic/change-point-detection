@@ -204,17 +204,22 @@ best performing algorithm (highest in accuracy or lowest in detection time) is
 shown here, for each individual experiment.
 Our results show that the HMM approach outperformed the change-point
 detection approach, both in terms of accuracy
-and detection time, regardless of
-the dataset and base classifier.
+and detection time, regardless of the dataset and base classifier.
 
-HMMs likely did better because they segment data after being trained on labelled
-data. Change-point detection algorithms on the other hand are unaware of true
-activity labels---they merely signal a change when they detect a distance or
-dissimilarity between reference and test data. As such, change-point detection
-algorithms have trouble accurately segmenting free-living data, and noisy
-segmentation results in poor performance.
+The experiments so far shown did not isolate the reason for the difference in
+performance between the top-down and bottom-up approaches. Further
+experimentation was necessary to determine if the difference was caused by the
+use of change-point detection algorithms to segment the data as opposed to using
+fixed length windows, or if the difference was caused by the ability of the HMM
+to smooth predictions made on temporal data. A side-by-side comparison of the
+same fixed window length classification experiments performed with and without HMM smoothing
+(see Figures \ref{fig:osu_compare_nohmm}, \ref{fig:lime1_compare_nohmm}, and
+\ref{fig:lime2_compare_nohmm}) suggested that the smoothing effect of the HMM
+did not explain most of the performance difference, and that the performance difference between the top-down
+and bottom-up approaches was mostly due to noisy segmentation by the change-point
+detection algorithms.
 
-A contributing factor to the particularly high accuracy and low detection time
+Nonetheless, a contributing factor to the particularly high accuracy and low detection time
 results generally attained for the OSU Hip experiments was that the data
 consisted of activities that were synthetically glued together. The same group
 of activities were performed in the same order by each of the 50 subjects in
@@ -282,6 +287,52 @@ problem has used neural networks exclusively.
   \{0.017, 0.019, 0.021, 0.024, 0.028, 0.033\} are HMM experiments. Error bars
   show a 95\% confidence interval.}
  \label{fig:lime2_compare_cpd_hmm}
+\end{figure}
+
+
+\begin{figure}[h]
+ \centering
+ %\includegraphics[scale=0.3]{vspace.png}
+ \includegraphics[scale=0.4]{osu_dt_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{osu_dt_hmm_nohmm_compare_det.pdf} 
+ \includegraphics[scale=0.4]{osu_svm_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{osu_svm_hmm_nohmm_compare_det.pdf}
+ \includegraphics[scale=0.4]{osu_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
+ \includegraphics[scale=0.4]{osu_nnet_hmm_nohmm_compare_det.pdf}
+ \caption{Comparison of base classifier performance with and without HMM
+  smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
+  classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
+ \label{fig:osu_compare_nohmm}
+\end{figure}
+
+\begin{figure}[h]
+ \centering
+ %\includegraphics[scale=0.3]{vspace.png}
+ \includegraphics[scale=0.4]{lime1_dt_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{lime1_dt_hmm_nohmm_compare_det.pdf} 
+ \includegraphics[scale=0.4]{lime1_svm_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{lime1_svm_hmm_nohmm_compare_det.pdf}
+ \includegraphics[scale=0.4]{lime1_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
+ \includegraphics[scale=0.4]{lime1_nnet_hmm_nohmm_compare_det.pdf}
+ \caption{Comparison of base classifier performance with and without HMM
+  smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
+  classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
+ \label{fig:lime1_compare_nohmm}
+\end{figure}
+
+\begin{figure}[h]
+ \centering
+ %\includegraphics[scale=0.3]{vspace.png}
+ \includegraphics[scale=0.4]{lime2_dt_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{lime2_dt_hmm_nohmm_compare_det.pdf} 
+ \includegraphics[scale=0.4]{lime2_svm_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{lime2_svm_hmm_nohmm_compare_det.pdf}
+ \includegraphics[scale=0.4]{lime2_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
+ \includegraphics[scale=0.4]{lime2_nnet_hmm_nohmm_compare_det.pdf}
+ \caption{Comparison of base classifier performance with and without HMM
+  smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
+  classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
+ \label{fig:lime2_compare_nohmm}
 \end{figure}
 
 \section{Timing}

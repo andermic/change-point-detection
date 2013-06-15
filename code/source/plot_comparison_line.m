@@ -17,7 +17,7 @@ TEST_WINDOW_SIZE = 1;
 MARKERSIZE = 3;
 
 addpath(ROOT_INPUT_FOLDER);
-for idata = 1:1
+for idata = 1:3
   for iclass=1:3
     input_file = strcat(ROOT_INPUT_FOLDER, '/cpd/', DATASETS{1}{idata}, '/', CLASS_ALGS{iclass}, '_cc_results.csv');
     cc = csvread(input_file, 1);
