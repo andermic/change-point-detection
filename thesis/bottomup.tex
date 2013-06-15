@@ -74,7 +74,7 @@ where each window corresponded to a discrete time index in the HMM. Within a
 given experiment the window size was fixed, but across different experiments we
 tested window sizes of length $\{10, 12, 14, 16, 18, 20\}$. After the time series were
 partitioned they were then featurized. Classification models were built with training data,
-and tuned (in the case of the svm and neural net models) using validation data,
+and tuned (in the case of the SVM and neural net models) using validation data,
 in the same way that has already been described previously in this chapter.
 
 Unlike the change-point detection experiments, this experiment required
@@ -84,7 +84,7 @@ Here we formulated the problem of making predictions on the testing set in terms
 of an HMM by treating the second training set as a training HMM. In our datasets
 we let $H$ be the ground truth activity classes of the windows, and $O$ be the
 predicted activity classes of the windows, where the predictions were made by
-the classifiers trained on the first training set. We used the precedure above
+the classifiers trained on the first training set. We used the procedure above
 to calculate $\hat{T}$ and $\hat{S}$, and assumed that these estimates held for
 the testing set as well as the second training set. We then used the
 tuned base classifier to predict on the testing set, giving us $O$. Finally,

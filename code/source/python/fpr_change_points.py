@@ -23,6 +23,7 @@ def binary_search(list_, val, start, end):
         exit()
 
 FPR_LIST = [0.0005, 0.001, 0.005, 0.01]
+FPR_LIST = [0.0024, 0.0028, 0.0033]
 DATASET = 'uq'
 KPRE = 300
 GRANULARITY = 3

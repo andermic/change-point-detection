@@ -258,8 +258,8 @@ public class FeaturizeDataCPD extends TaskDef {
 		// This is where the action happens
 		featurizeGroundTruth(expPath, clusterJobNum, useCluster, featurizeFunctionScriptPath, clusterWorkspace, truncatedFileNames, duplicatesFileNames, eventsFileNames, frequency, featurePath, subjectIDs, day, featurizeDataPath, callingScriptPath);
 		featurizeValidateTest(clusterJobNum, useCluster, cpdAlgorithms, cpdFPR, featurizeFunctionScriptPath, callingScriptPathCPD, featurizeDataPathCPD, clusterWorkspace, truncatedFileNames, duplicatesFileNames, frequency, eventsFileNames, predictedCpFileNames, subjectIDs, day);
-		splitData(tvtDataAssignmentPath, splitId, numSplits, subjectIDs);
-		mergeGroundTruth(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath);
+		//splitData(tvtDataAssignmentPath, splitId, numSplits, subjectIDs);
+		//mergeGroundTruth(clusterJobNum, useCluster, dataSets, splitId, tvtDataPath, tvtDataAssignmentPath, clusterWorkspace, featurePath);
 		mergeValidateTest(clusterJobNum, useCluster, cpdAlgorithms, cpdFPR, tvtDataPath, tvtDataAssignmentPath, dataSets, splitId, clusterWorkspace, featurePath);
 	}
 	
@@ -280,6 +280,7 @@ public class FeaturizeDataCPD extends TaskDef {
 		Array subjectIDs = array(Arrays.asList("1", "2", "3", "4", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "18", "19", "20", "21", "22", "23", "24", "25"));
 		Array cpdAlgorithms = array(Arrays.asList("cc", "kliep"));
 		Array cpdFPR = array(Arrays.asList("0.0005", "0.001", "0.005", "0.01"));
+		cpdFPR = array(Arrays.asList("0.0017", "0.0019", "0.0021", "0.0024", "0.0028", "0.0033"));
 		Array kpres = array(Arrays.asList("300"));
 		
 		featurizeData(expRootPath, datasetStr, frequencyStr,

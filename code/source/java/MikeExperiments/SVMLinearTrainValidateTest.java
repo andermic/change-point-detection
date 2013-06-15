@@ -299,8 +299,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 			List<String> formulaList, List<String> formulaNameList,
 			String clusterWorkspace, String jobId, Array cpdAlgorithm,
 			Array cpdFPR, Integer clusterJobNum, Boolean useCluster,
-			Array labels, Boolean validate_on_true_windows, String ground_str)
-			throws Exception {
+			Array labels, String ground_str) throws Exception {
 
 		Var dataset = var(datasetStr);
 		Array trialGroupIds = array(trialGroupIdList);
@@ -311,17 +310,9 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 				.cat(iterationId);
 
 		Var trainDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-				.fileSep().cat("train.").cat(ground_str).cat(".data.csv");
-		Var validateDataInfoPath;
-		if (validate_on_true_windows) {
-			validateDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-					.fileSep().cat("validate.").cat(cpdAlgorithm).dot().cat(cpdFPR)
-					.cat(".data.csv");
-		}
-		else {
-			validateDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
-					.fileSep().cat("validate.").cat(ground_str).cat(".data.csv");
-		}
+			.fileSep().cat("train.").cat(ground_str).cat(".data.csv");
+		Var validateDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
+			.fileSep().cat("validate.").cat(ground_str).cat(".data.csv");
 		Var testDataInfoPath = var(tvtDataPath).fileSep().cat(iterationId)
 				.fileSep().cat("test.").cat(cpdAlgorithm).dot().cat(cpdFPR)
 				.cat(".data.csv");
@@ -373,12 +364,8 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 
 		List<String> trialGroupIdList = Arrays.asList(".7cls");
 
-		Boolean validate_on_true_windows = true;
 		String tvtDataPath = expRootPath + "/OSU_YR4_Hip_30Hz.ws120.7cls";
 		String labVisitFileFolder = tvtDataPath + "/features";
-		if (validate_on_true_windows) {
-			tvtDataPath += "_vali_true";
-		}
 		
 		Array labels = array(Arrays.asList("lying_down", "sitting",
 				"standing_household", "walking", "running",
@@ -396,7 +383,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 
 		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
 		Array cpdFPR = array(Arrays.asList("0.0001", "0.0002", "0.0003", "0.0004", "0.0005", "0.0006", "0.0007", "0.0008", "0.0009", "0.001", "0.0011", "0.0012", "0.0013", "0.0014", "0.0015", "0.0016", "0.0017", "0.0018", "0.0019", "0.002", "0.0021", "0.0022", "0.0023", "0.0024", "0.0025", "0.0026", "0.0027", "0.0028", "0.0029", "0.003", "0.0031", "0.0032", "0.0033", "0.0034", "0.0035", "0.0036", "0.0037", "0.0038", "0.0039", "0.004", "0.0041", "0.0042", "0.0043", "0.0044", "0.0045", "0.0046", "0.0047", "0.0048", "0.0049", "0.005", "0.0051", "0.0052", "0.0053", "0.0054", "0.0055", "0.0056", "0.0057", "0.0058", "0.0059", "0.006", "0.0061", "0.0062", "0.0063", "0.0064", "0.0065", "0.0066", "0.0067", "0.0068", "0.0069", "0.007", "0.0071", "0.0072", "0.0073", "0.0074", "0.0075", "0.0076", "0.0077", "0.0078", "0.0079", "0.008", "0.0081", "0.0082", "0.0083", "0.0084", "0.0085", "0.0086", "0.0087", "0.0088", "0.0089", "0.009", "0.0091", "0.0092", "0.0093", "0.0094", "0.0095", "0.0096", "0.0097", "0.0098", "0.0099", "0.01"));
-		cpdFPR = array(Arrays.asList("0.0005", "0.001", "0.005", "0.01"));
+		cpdFPR = array(Arrays.asList("0.0017", "0.0019", "0.0021", "0.0024", "0.0028", "0.0033"));
 		String trainingLabVisitFileExt = ("PureTrial.featurized.120.csv");
 		Var valiLabVisitFileExt = var("PureTrial.featurized.120.csv");
 		Var testLabVisitFileExt = var("PureTrial.featurized.").cat(cpdAlgorithm).dot().cat(cpdFPR).cat(".csv");
@@ -407,7 +394,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 				valiLabVisitFileExt, testLabVisitFileExt, trialGroupIdList, costExp,
 				formulaList, formulaNameList, clusterWorkspace, "single",
 				cpdAlgorithm, cpdFPR, clusterJobNum, useCluster, labels,
-				validate_on_true_windows, ground_str);
+				ground_str);
 	}
 	
 	private void UQ_30Hz() throws Exception {
@@ -417,12 +404,8 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 		
 		List<String> trialGroupIdList = Arrays.asList("");
 
-		Boolean validate_on_true_windows = true;
 		String tvtDataPath = expRootPath + "/" + datasetStr;
 		String labVisitFileFolder = tvtDataPath + "/features";
-		if (validate_on_true_windows) {
-			tvtDataPath += "_vali_true";
-		}
 		Array labels = array(Arrays.asList("0","1","2"));
 		
 		List<String> formulaList = Arrays.asList(Formula.FORMULA_ALL_WO_FFT
@@ -431,11 +414,12 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 
 	
 		String clusterWorkspace = tvtDataPath + "/svm/cluster";
-		Integer clusterJobNum = 25;
+		Integer clusterJobNum = 200;
 		Boolean useCluster = true;
 		
 		Array cpdAlgorithm = array(Arrays.asList("cc", "kliep"));
 		Array cpdFPR = array(Arrays.asList("0.0005", "0.001", "0.005", "0.01"));
+		cpdFPR = array(Arrays.asList("0.0017", "0.0019", "0.0021", "0.0024", "0.0028", "0.0033"));
 		String costExp = "[0.01,0.1,1,10,100]";
 		
 		String trainingLabVisitFileExt = (".featurized.ground.csv");
@@ -448,7 +432,7 @@ public class SVMLinearTrainValidateTest extends TaskDef {
 				testLabVisitFileExt, 
 				trialGroupIdList, costExp, formulaList, formulaNameList,
 				clusterWorkspace, "single", cpdAlgorithm, cpdFPR, clusterJobNum,
-				useCluster, labels, validate_on_true_windows, ground_str);
+				useCluster, labels, ground_str);
 	}
 	
 	public static void main(String[] args) {

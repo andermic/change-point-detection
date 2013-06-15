@@ -20,10 +20,10 @@
 
 Results for our change-point detection experiments are given in
 Figures \ref{fig:osu_cpd}-\ref{fig:lime2_cpd}.
-We hypothesized that the performance of the change-point detection algorithms
-would depend heavily on the threshold level for change prediction. This was
-tested by varying the average number of times per second that the algorithms
-falsely predicted a change. A large number of such false positive rates per
+The performance of the change-point detection algorithms
+depended heavily on the threshold level for change prediction. In our
+experiment we varied the threshold level, thus changing the false positive
+rate. A large number of false positive rates per
 second were tested, but for the sake of brevity only a representative sample
 of $\{0.005, 0.01, 0.05, 0.1\}$ are shown here.
 
@@ -131,7 +131,7 @@ OSU Hip dataset showed that the accuracy and detection time of our HMM approach
 tends to be poor for very small window sizes, but that it stabilizes with window sizes
 that are greater than roughly 5 seconds. This gives a strong indication that
 5 seconds is the amount of information necessary for the classifiers to become as
-discriminative as they can be, at least on that dataset.
+discriminative as they can be on the datasets in our work.
  
 \begin{figure}[H]
  \centering
@@ -185,18 +185,22 @@ discriminative as they can be, at least on that dataset.
 
 \section{Discussion}
 
-For a given false positive rate, change-point
+We found it difficult to directly compare the performance between the change-
+point detection and HMM approaches, because we
+varied false positives per second in the change-point detection experiments,
+and varied the fixed-length window size in the HMM experiments.
+However, for a given false positive rate change-point
 detection algorithms split a time series into windows of a certain average size,
-which decreases as the false positive rate increases. From this it is possible
-to relate false positive rates from the change-point detection experiments to the window sizes of
-the HMM experiments. HMM false positive rates per second of
+which generally decreases as the false positive rate increases. From this it is possible
+to relate false positive rates from the change-point detection experiments to
+the window sizes of the HMM experiments. HMM false positive rates per second of
 \{0.033, 0.028, 0.024, 0.021, 0.019, 0.017\} correspond to average
 window sizes of \{10, 12, 14, 16, 18, 20\}. Figures \ref{fig:osu_compare_cpd_hmm},
 \ref{fig:lime1_compare_cpd_hmm}, and \ref{fig:lime2_compare_cpd_hmm}
 show a side-by-side comparison of the top-down and bottom-up approaches, using
 this conversion. As seen in Section \ref{sec:cpd_results}, two algorithms 
 were tested for each of the change-point detection experiments, but only the
-most performant algorithm (highest in accuracy or lowest in detection time) is 
+best performing algorithm (highest in accuracy or lowest in detection time) is 
 shown here, for each individual experiment.
 Our results show that the HMM approach outperformed the change-point
 detection approach, both in terms of accuracy
@@ -281,3 +285,45 @@ problem has used neural networks exclusively.
   show a 95\% confidence interval.}
  \label{fig:lime2_compare_cpd_hmm}
 \end{figure}
+
+\section{Timing}
+
+Since we are interested in the feasibility of performing activity detection on
+accelerometer data in real time, we tested how long it would require our
+approaches to segment and classify a time series in a streaming, online fashion.
+Experiments were performed using an Intel(R) Core(TM) 2 Quad Processor Q9550.
+
+There are three different computations that a device must perform to do
+activity recognition in real time. The first (when using the top-down approach)
+is to calculate a change-point
+detection score for an individual time tick. When the device obtains a new tick of
+accelerometer data, it must generate a change-point detection score and compare
+it to the score threshold to decide whether or not to predict an activity
+change. We estimated the amount of time required to determine whether an
+activity change should be predicted by choosing 1000 random ticks from our data,
+and running our two change-point detection algorithms on the reference and test
+data corresponding to each tick. We found that on average the control chart algorithm
+took 0.050ms per tick, and that the KLIEP algorithm took 31.4ms per tick. If no change
+was predicted, then the device needs to take no further action for this tick.
+
+If a change was predicted in the first step, then the second step is to
+featurize the window of data corresponding to the activity that just ended.
+The amount of time required to featurize an activity window increases with the
+length of the window. The OSU Hip dataset contained 120 second long activities,
+and the median length of the LiME activities was considerably smaller than that,
+therefore we fixed the window length at 120 seconds for this experiment. The
+amount of time required to featurize these windows, again averaged over 1000 runs,
+was 98.5ms.
+
+Once the data from an activity window is featurized, the activity must be
+predicted using a base classifier. We assume that the classifier has already
+been trained and validated previously. We averaged the activity prediction time
+over 60 runs on each of our base classifiers, with featurized windows and models
+built during our change-point detection experiments. We found that the average
+time required to predict an activity with decision trees was 372ms, with
+SVMs was 368ms, and with neural networks was 369ms.
+
+These experiments show that the amount of time required to process an activity
+tick when a change is predicted is in the worst case
+31.4ms + 98.5ms + 372ms = 501ms, which is a very reasonable amount of time
+for an online application.

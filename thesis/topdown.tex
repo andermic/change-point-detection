@@ -4,8 +4,8 @@
 \label{sec:topdown}
 
 \subsection{Change-Point Detection}
-For this approach, the data was split into non-overlapping segments for
-featurization using techniques from the statistical field of change-point
+For this approach, the data was split into non-overlapping segments
+using techniques from the statistical field of change-point
 detection. Change-point detection has found application in many problem domains
 that require analysis of time series data from dynamic systems, including
 failure detection \cite{bae13}, quick detection of attacks on computer networks
@@ -93,8 +93,8 @@ the $i$th data point.
 
 We were also interested in testing the performance of a newer and more
 sophisticated change-point detection algorithm: the
-Kullback-Leibler Importance Estimation Procedure (KLIEP),
-introduced by Kawahara and Sugiyama \cite{sugiyama09} \cite{sugiyama08}.
+Kullback-Leibler Importance Estimation Procedure (KLIEP)
+\cite{sugiyama09} \cite{sugiyama08}.
 This approach generates scores using the Kullback-Leibler (KL)
 divergence between the reference data and the test data. One method of doing this
 is to estimate the density of the reference distribution and test distribution
@@ -109,6 +109,7 @@ Let the estimate of the importance $\hat{R}$ be represented by this model:
 \]
 
 Where $p_r$ and is the probability density of the reference data,
+$hat{p}_r$ is the estimate of $p_r$,
 $p_t$ is the probability density of the test
 data, $T_t$ is the number of ticks in the test window, $\alpha$ is a
 vector of model parameters to solve for, $X_{rt}$ is the concatenation of the reference and the
@@ -136,7 +137,9 @@ solution to the complex optimization problem, i.e. $s(i) = \hat{R}(i)$.
 
 Since this approach uses a Gaussian kernel, it requires the selection of
 a kernel width $\sigma$ for each time tick. We used an implementation of
-KLIEP that is available at Sugiyama's website, which included a cross-validation
+KLIEP that is available at Sugiyama's website
+(http://sugiyama-www.cs.titech.ac.jp/~sugi/software/KLIEP/),
+which included a cross-validation
 procedure for the value of $\sigma$. The CV procedure chooses a number of disjoint
 splits of the test data along with a number of different candidate $\sigma$'s, and runs
 KLIEP with each combination of split and candidate $\sigma$. Then it chooses the candidate $\sigma$
