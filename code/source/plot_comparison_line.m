@@ -90,7 +90,7 @@ for idata = 1:3
         plot(best_cpd(:,1), best_cpd(:,2), 'o', 'markersize', MARKERSIZE);
         plot(hmm(:,1), hmm(:,2), 'o', 'color', 'r', 'markersize', MARKERSIZE);
         plot(nohmm(:,1), nohmm(:,2), 'o', 'color', 'g', 'markersize', MARKERSIZE);
-        set(gca, 'fontsize', 14);
+        %set(gca, 'fontsize', 14);
         %line(best_cpd(:,1), best_cpd(:,2));
         %line(hmm(:,1), hmm(:,2), 'color', 'r');
         
