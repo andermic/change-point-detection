@@ -137,10 +137,10 @@ Using the HMM tended to give a slight boost in accuracy to the base classifiers,
 but at the expense of increased detection time. It is likely that the increase
 in accuracy was due to the smoothing of false base classifier predictions that
 were sandwiched in time between true base classifier predictions, and that the increase in
-detection time was due to the general stickyness of activities. Once the
+detection time was due to the general stickiness of activities. Once the
 subject started performing an activity the probability of the subject stopping
 that activity to start a new one was recognized to be low, which meant that a true change in
-activities would be unlikely to be recognized by the smoothing algorithm
+activity would be less likely to be confirmed by the smoothing algorithm
 immediately.
 
 The experiments also show the reason for the difference in
@@ -155,7 +155,6 @@ does not explain most of the performance difference, and that the performance di
 and bottom-up approaches was mostly due to noisy segmentation by the change-point
 detection algorithms.
 
- 
 \begin{figure}[H]
  \centering
  %\includegraphics[scale=0.3]{vspace.png}
@@ -391,4 +390,4 @@ than linear time.
 
 These experiments show that the amount of time required to process an activity
 tick is in the worst case only 98.5ms + 372ms + 928ms = 1.40s, which is a very reasonable amount of delay
-for an online application.
+for online applications.
