@@ -132,6 +132,19 @@ tends to be poor for very small window sizes, but that it stabilizes with window
 that are greater than roughly 5 seconds. This gives a strong indication that
 5 seconds is the amount of information necessary for the classifiers to become as
 discriminative as they can be on the datasets in our work.
+
+The experiments further show the reason for the difference in
+performance between the top-down and bottom-up approaches. 
+The difference could have been caused by the
+use of change-point detection algorithms to segment the data as opposed to using
+fixed length windows, or the ability of the HMM
+to smooth predictions made on temporal data. The side-by-side comparison of the
+same fixed window length classification experiments performed with and without HMM smoothing
+suggests that the smoothing effect of the HMM
+does not explain most of the performance difference, and that the performance difference between the top-down
+and bottom-up approaches was mostly due to noisy segmentation by the change-point
+detection algorithms.
+
  
 \begin{figure}[H]
  \centering
@@ -142,10 +155,10 @@ discriminative as they can be on the datasets in our work.
  \includegraphics[scale=0.4]{osu_svm_hmm_nohmm_compare_det.pdf}
  \includegraphics[scale=0.4]{osu_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
  \includegraphics[scale=0.4]{osu_nnet_hmm_nohmm_compare_det.pdf}
- \caption{Comparison of base classifier performance with and without HMM
+ \caption{OSU Hip Results. Comparison of base classifier performance with and without HMM
   smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
   classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
- \label{fig:osu_compare_nohmm}
+ \label{fig:osu_hmm}
 \end{figure}
 
 \begin{figure}[H]
@@ -157,10 +170,10 @@ discriminative as they can be on the datasets in our work.
  \includegraphics[scale=0.4]{lime1_svm_hmm_nohmm_compare_det.pdf}
  \includegraphics[scale=0.4]{lime1_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
  \includegraphics[scale=0.4]{lime1_nnet_hmm_nohmm_compare_det.pdf}
- \caption{Comparison of base classifier performance with and without HMM
+ \caption{LiME Day 1 Results. Comparison of base classifier performance with and without HMM
   smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
   classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
- \label{fig:lime1_compare_nohmm}
+ \label{fig:lime1_hmm}
 \end{figure}
 
 \begin{figure}[H]
@@ -172,10 +185,10 @@ discriminative as they can be on the datasets in our work.
  \includegraphics[scale=0.4]{lime2_svm_hmm_nohmm_compare_det.pdf}
  \includegraphics[scale=0.4]{lime2_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
  \includegraphics[scale=0.4]{lime2_nnet_hmm_nohmm_compare_det.pdf}
- \caption{Comparison of base classifier performance with and without HMM
+ \caption{LiME Day 2 Results. Comparison of base classifier performance with and without HMM
   smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
   classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
- \label{fig:lime2_compare_nohmm}
+ \label{fig:lime2_hmm}
 \end{figure}
 
 %\begin{figure}[H]
@@ -251,20 +264,7 @@ Our results show that the HMM approach outperformed the change-point
 detection approach, both in terms of accuracy
 and detection time, regardless of the dataset and base classifier.
 
-The experiments so far shown did not isolate the reason for the difference in
-performance between the top-down and bottom-up approaches. Further
-experimentation was necessary to determine if the difference was caused by the
-use of change-point detection algorithms to segment the data as opposed to using
-fixed length windows, or if the difference was caused by the ability of the HMM
-to smooth predictions made on temporal data. A side-by-side comparison of the
-same fixed window length classification experiments performed with and without HMM smoothing
-(see Figures \ref{fig:osu_compare_nohmm}, \ref{fig:lime1_compare_nohmm}, and
-\ref{fig:lime2_compare_nohmm}) suggested that the smoothing effect of the HMM
-did not explain most of the performance difference, and that the performance difference between the top-down
-and bottom-up approaches was mostly due to noisy segmentation by the change-point
-detection algorithms.
-
-Nonetheless, a contributing factor to the particularly high accuracy and low detection time
+A contributing factor to the particularly high accuracy and low detection time
 results generally attained for the OSU Hip experiments was that the data
 consisted of activities that were synthetically glued together. The same group
 of activities were performed in the same order by each of the 50 subjects in
@@ -289,12 +289,11 @@ problem has used neural networks exclusively.
  \includegraphics[scale=0.4]{osu_svm_cpd_hmm_compare_det_line.pdf}
  \includegraphics[scale=0.4]{osu_nnet_cpd_hmm_compare_acc_line.pdf} \hspace{1em}
  \includegraphics[scale=0.4]{osu_nnet_cpd_hmm_compare_det_line.pdf}
- \caption{Comparison of change-point detection and HMM results for OSU Hip.
+ \caption{Comparison of top-down and bottom-up results for OSU Hip.
   Graphs are organized into rows by base classifier, and columns by evaluation
-  metric. Results for false positives per second of \{0.005, 0.01, 0.05, 0.1\} are change-point
+  metric. Results for false positives per second of \{0.005, 0.01, 0.017, 0.019, 0.021, 0.024, 0.028, 0.033, 0.05, 0.1\} are change-point
   detection experiments, while results for false positives per second of
-  \{0.017, 0.019, 0.021, 0.024, 0.028, 0.033\} are HMM experiments. Error bars
-  show a 95\% confidence interval.}
+  \{0.017, 0.019, 0.021, 0.024, 0.028, 0.033\} are bottom-up experiments.}
  \label{fig:osu_compare_cpd_hmm}
 \end{figure}
 
@@ -307,12 +306,11 @@ problem has used neural networks exclusively.
  \includegraphics[scale=0.4]{lime1_svm_cpd_hmm_compare_det_line.pdf}
  \includegraphics[scale=0.4]{lime1_nnet_cpd_hmm_compare_acc_line.pdf} \hspace{1em}
  \includegraphics[scale=0.4]{lime1_nnet_cpd_hmm_compare_det_line.pdf}
- \caption{Comparison of change-point detection and HMM results for LiME Day 1.
+ \caption{Comparison of top-down and bottom-up results for LiME Day 1.
   Graphs are organized into rows by base classifier, and columns by evaluation
   metric. Results for false positives per second of \{0.005, 0.01, 0.05, 0.1\} are change-point
   detection experiments, while results for false positives per second of
-  \{0.017, 0.019, 0.021, 0.024, 0.028, 0.033\} are HMM experiments. Error bars
-  show a 95\% confidence interval.}
+  \{0.017, 0.019, 0.021, 0.024, 0.028, 0.033\} are bottom-up experiments.}
  \label{fig:lime1_compare_cpd_hmm}
 \end{figure}
 
@@ -325,12 +323,11 @@ problem has used neural networks exclusively.
  \includegraphics[scale=0.4]{lime2_svm_cpd_hmm_compare_det_line.pdf}
  \includegraphics[scale=0.4]{lime2_nnet_cpd_hmm_compare_acc_line.pdf} \hspace{1em}
  \includegraphics[scale=0.4]{lime2_nnet_cpd_hmm_compare_det_line.pdf}
- \caption{Comparison of change-point detection and HMM results for LiME Day 2.
+ \caption{Comparison of top-down and bottom-up results for LiME Day 2.
   Graphs are organized into rows by base classifier, and columns by evaluation
   metric. Results for false positives per second of \{0.005, 0.01, 0.05, 0.1\} are change-point
   detection experiments, while results for false positives per second of
-  \{0.017, 0.019, 0.021, 0.024, 0.028, 0.033\} are HMM experiments. Error bars
-  show a 95\% confidence interval.}
+  \{0.017, 0.019, 0.021, 0.024, 0.028, 0.033\} are bottom-up experiments.}
  \label{fig:lime2_compare_cpd_hmm}
 \end{figure}
 
