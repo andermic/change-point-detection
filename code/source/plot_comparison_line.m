@@ -118,7 +118,7 @@ for idata = 1:3
         subsubfig = num2str((iclass - 1) * 2 + imet);
         %title(strcat(DATASET_STRS{idata}, ':', CLASS_ALG_STRS{iclass}, METRICS(imet)));
         title(strcat('Figure 4.', subfig, '.', subsubfig, ':', CLASS_ALG_STRS{iclass}, METRICS(imet)));
-        legend('Top-Down', 'Bottom-Up', 'Bottom-Up without HMM');
+        legend('Top-Down', 'Bottom-Up', 'Bottom-Up no HMM');
         set(gca,'Box','on');
 
         %print(gcf, '-djpeg', '-r100', strcat(ROOT_OUTPUT_FOLDER, '/', DATASET_FILE_STRS{idata}, '_', CLASS_ALGS{iclass}, '_cpd_hmm_compare_', lower(METRICS{imet}(2:4)), '_line.jpg'));
