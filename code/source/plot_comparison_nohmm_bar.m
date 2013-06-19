@@ -71,7 +71,6 @@ for iclass=1:3
     data(:,(size(FPRS,2)+1):(size(FPRS,2)+size(WSES,2)),3) = data(:,(size(FPRS,2)+1):(size(FPRS,2)+size(WSES,2)),3) / sqrt(10);
     lbls = data(:,:,1)';
     vals = data(:,:,2)';
-    size(vals);
     vals = sortrows([lbls(:,1), vals, (1:(size(FPRS,2)+size(WSES,2)))']);
     indices = vals(:,5);
     vals = vals(:,2:4);
