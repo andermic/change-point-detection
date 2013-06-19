@@ -78,14 +78,14 @@ for idata = 1:3
             ym = max(max(vals+stds*1.96));
         end
         %axis([0 .105 0 ym]);
-        subfig = num2str(idata + 9);
+        subfig = num2str(idata + 3);
         subsubfig = num2str((iclass - 1) * 2 + imet);
         if imet == 1
             a = axis();
             axis([a(1:3), 100]);
         end
         title(strcat('Figure 4.', subfig, '.', subsubfig, ':', CLASS_ALG_STRS{iclass}, METRICS(imet)));
-        legend('HMM', 'No HMM', 'Location', 'SouthEast');
+        legend('Bottom-up', 'Bottom-up without HMM', 'Location', 'SouthEast');
         set(gca,'Box','on');
 
         %print(gcf, '-djpeg', '-r100', strcat(ROOT_OUTPUT_FOLDER, '/', DATASET_FILE_STRS{idata}, '_', CLASS_ALGS{iclass}, '_cpd_hmm_compare_', lower(METRICS{imet}(2:4)), '_line.jpg'));

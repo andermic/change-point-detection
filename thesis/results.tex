@@ -113,10 +113,10 @@ time were small and within confidence bounds.
 \end{figure}
 
 
-\section{HMM}
+\section{Bottom-Up}
 
-Results for our HMM experiments are given in
-Figures \ref{fig:osu_hmm}-\ref{fig:lime2_hmm}. Each HMM experiment was
+Results for our bottom-up experiments are given in
+Figures \ref{fig:osu_hmm}-\ref{fig:lime2_hmm}. Each experiment was
 performed by splitting each time series into windows of fixed length
 corresponding to discrete time ``ticks'' in an HMM,
 and results for windows of length $\{10, 12, 14, 16, 18, 20\}$
@@ -135,51 +135,96 @@ discriminative as they can be on the datasets in our work.
  
 \begin{figure}[H]
  \centering
- \includegraphics[scale=0.4]{osu_hmm_dt_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{osu_hmm_dt_det.pdf}
- \includegraphics[scale=0.4]{osu_hmm_svm_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{osu_hmm_svm_det.pdf}
- \includegraphics[scale=0.4]{osu_hmm_nnet_acc.pdf} \hspace{1em}
- \includegraphics[scale=0.4]{osu_hmm_nnet_det.pdf}
- \caption{OSU Hip HMM Results.
-  Graphs are organized into rows by base classifier, and columns by evaluation
-  metric. HMM results were averaged over 10 splits into training
-  (base classifier), validation, training (HMM), and testing datasets. Error
-  bars show a 95\% confidence interval around the average.}
- \label{fig:osu_hmm}
+ %\includegraphics[scale=0.3]{vspace.png}
+ \includegraphics[scale=0.4]{osu_dt_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{osu_dt_hmm_nohmm_compare_det.pdf} 
+ \includegraphics[scale=0.4]{osu_svm_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{osu_svm_hmm_nohmm_compare_det.pdf}
+ \includegraphics[scale=0.4]{osu_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
+ \includegraphics[scale=0.4]{osu_nnet_hmm_nohmm_compare_det.pdf}
+ \caption{Comparison of base classifier performance with and without HMM
+  smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
+  classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
+ \label{fig:osu_compare_nohmm}
 \end{figure}
 
 \begin{figure}[H]
  \centering
- \includegraphics[scale=0.4]{lime1_hmm_dt_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{lime1_hmm_dt_det.pdf} 
- \includegraphics[scale=0.4]{lime1_hmm_svm_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{lime1_hmm_svm_det.pdf} 
- \includegraphics[scale=0.4]{lime1_hmm_nnet_acc.pdf} \hspace{1em}
- \includegraphics[scale=0.4]{lime1_hmm_nnet_det.pdf} 
- \caption{LiME Day 1 HMM Results.
-  Graphs are organized into rows by base classifier, and columns by evaluation
-  metric. HMM results were averaged over 10 splits into training
-  (base classifier), validation, training (HMM), and testing datasets. Error
-  bars show a 95\% confidence interval around the average.}
- \label{fig:lime1_hmm}
+ %\includegraphics[scale=0.3]{vspace.png}
+ \includegraphics[scale=0.4]{lime1_dt_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{lime1_dt_hmm_nohmm_compare_det.pdf} 
+ \includegraphics[scale=0.4]{lime1_svm_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{lime1_svm_hmm_nohmm_compare_det.pdf}
+ \includegraphics[scale=0.4]{lime1_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
+ \includegraphics[scale=0.4]{lime1_nnet_hmm_nohmm_compare_det.pdf}
+ \caption{Comparison of base classifier performance with and without HMM
+  smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
+  classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
+ \label{fig:lime1_compare_nohmm}
 \end{figure}
 
 \begin{figure}[H]
  \centering
- \includegraphics[scale=0.4]{lime2_hmm_dt_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{lime2_hmm_dt_det.pdf}
- \includegraphics[scale=0.4]{lime2_hmm_svm_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{lime2_hmm_svm_det.pdf}
- \includegraphics[scale=0.4]{lime2_hmm_nnet_acc.pdf} \hspace{1em}
- \includegraphics[scale=0.4]{lime2_hmm_nnet_det.pdf}
- \caption{LiME Day 2 HMM Results.
-  Graphs are organized into rows by base classifier, and columns by evaluation
-  metric. HMM results were averaged over 10 splits into training
-  (base classifier), validation, training (HMM), and testing datasets. Error
-  bars show a 95\% confidence interval around the average.}
- \label{fig:lime2_hmm}
+ %\includegraphics[scale=0.3]{vspace.png}
+ \includegraphics[scale=0.4]{lime2_dt_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{lime2_dt_hmm_nohmm_compare_det.pdf} 
+ \includegraphics[scale=0.4]{lime2_svm_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
+ \includegraphics[scale=0.4]{lime2_svm_hmm_nohmm_compare_det.pdf}
+ \includegraphics[scale=0.4]{lime2_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
+ \includegraphics[scale=0.4]{lime2_nnet_hmm_nohmm_compare_det.pdf}
+ \caption{Comparison of base classifier performance with and without HMM
+  smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
+  classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
+ \label{fig:lime2_compare_nohmm}
 \end{figure}
+
+%\begin{figure}[H]
+% \centering
+% \includegraphics[scale=0.4]{osu_hmm_dt_acc.pdf} \hspace{1em}\vspace{1em}
+% \includegraphics[scale=0.4]{osu_hmm_dt_det.pdf}
+% \includegraphics[scale=0.4]{osu_hmm_svm_acc.pdf} \hspace{1em}\vspace{1em}
+% \includegraphics[scale=0.4]{osu_hmm_svm_det.pdf}
+% \includegraphics[scale=0.4]{osu_hmm_nnet_acc.pdf} \hspace{1em}
+% \includegraphics[scale=0.4]{osu_hmm_nnet_det.pdf}
+% \caption{OSU Hip HMM Results.
+%  Graphs are organized into rows by base classifier, and columns by evaluation
+%  metric. HMM results were averaged over 10 splits into training
+%  (base classifier), validation, training (HMM), and testing datasets. Error
+%  bars show a 95\% confidence interval around the average.}
+% \label{fig:osu_hmm}
+%\end{figure}
+
+%\begin{figure}[H]
+% \centering
+% \includegraphics[scale=0.4]{lime1_hmm_dt_acc.pdf} \hspace{1em}\vspace{1em}
+% \includegraphics[scale=0.4]{lime1_hmm_dt_det.pdf} 
+% \includegraphics[scale=0.4]{lime1_hmm_svm_acc.pdf} \hspace{1em}\vspace{1em}
+% \includegraphics[scale=0.4]{lime1_hmm_svm_det.pdf} 
+% \includegraphics[scale=0.4]{lime1_hmm_nnet_acc.pdf} \hspace{1em}
+% \includegraphics[scale=0.4]{lime1_hmm_nnet_det.pdf} 
+% \caption{LiME Day 1 HMM Results.
+%  Graphs are organized into rows by base classifier, and columns by evaluation
+%  metric. HMM results were averaged over 10 splits into training
+%  (base classifier), validation, training (HMM), and testing datasets. Error
+%  bars show a 95\% confidence interval around the average.}
+% \label{fig:lime1_hmm}
+%\end{figure}
+
+%\begin{figure}[H]
+% \centering
+% \includegraphics[scale=0.4]{lime2_hmm_dt_acc.pdf} \hspace{1em}\vspace{1em}
+% \includegraphics[scale=0.4]{lime2_hmm_dt_det.pdf}
+% \includegraphics[scale=0.4]{lime2_hmm_svm_acc.pdf} \hspace{1em}\vspace{1em}
+% \includegraphics[scale=0.4]{lime2_hmm_svm_det.pdf}
+% \includegraphics[scale=0.4]{lime2_hmm_nnet_acc.pdf} \hspace{1em}
+% \includegraphics[scale=0.4]{lime2_hmm_nnet_det.pdf}
+% \caption{LiME Day 2 HMM Results.
+%  Graphs are organized into rows by base classifier, and columns by evaluation
+%  metric. HMM results were averaged over 10 splits into training
+%  (base classifier), validation, training (HMM), and testing datasets. Error
+%  bars show a 95\% confidence interval around the average.}
+% \label{fig:lime2_hmm}
+%\end{figure}
 
 \newpage
 
@@ -287,52 +332,6 @@ problem has used neural networks exclusively.
   \{0.017, 0.019, 0.021, 0.024, 0.028, 0.033\} are HMM experiments. Error bars
   show a 95\% confidence interval.}
  \label{fig:lime2_compare_cpd_hmm}
-\end{figure}
-
-
-\begin{figure}[h]
- \centering
- %\includegraphics[scale=0.3]{vspace.png}
- \includegraphics[scale=0.4]{osu_dt_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{osu_dt_hmm_nohmm_compare_det.pdf} 
- \includegraphics[scale=0.4]{osu_svm_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{osu_svm_hmm_nohmm_compare_det.pdf}
- \includegraphics[scale=0.4]{osu_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
- \includegraphics[scale=0.4]{osu_nnet_hmm_nohmm_compare_det.pdf}
- \caption{Comparison of base classifier performance with and without HMM
-  smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
-  classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
- \label{fig:osu_compare_nohmm}
-\end{figure}
-
-\begin{figure}[h]
- \centering
- %\includegraphics[scale=0.3]{vspace.png}
- \includegraphics[scale=0.4]{lime1_dt_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{lime1_dt_hmm_nohmm_compare_det.pdf} 
- \includegraphics[scale=0.4]{lime1_svm_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{lime1_svm_hmm_nohmm_compare_det.pdf}
- \includegraphics[scale=0.4]{lime1_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
- \includegraphics[scale=0.4]{lime1_nnet_hmm_nohmm_compare_det.pdf}
- \caption{Comparison of base classifier performance with and without HMM
-  smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
-  classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
- \label{fig:lime1_compare_nohmm}
-\end{figure}
-
-\begin{figure}[h]
- \centering
- %\includegraphics[scale=0.3]{vspace.png}
- \includegraphics[scale=0.4]{lime2_dt_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{lime2_dt_hmm_nohmm_compare_det.pdf} 
- \includegraphics[scale=0.4]{lime2_svm_hmm_nohmm_compare_acc.pdf} \hspace{1em}\vspace{1em}
- \includegraphics[scale=0.4]{lime2_svm_hmm_nohmm_compare_det.pdf}
- \includegraphics[scale=0.4]{lime2_nnet_hmm_nohmm_compare_acc.pdf} \hspace{1em}
- \includegraphics[scale=0.4]{lime2_nnet_hmm_nohmm_compare_det.pdf}
- \caption{Comparison of base classifier performance with and without HMM
-  smoothing layer, with test data split into fixed window sizes. Graphs are organized into rows by base
-  classifier, and columns by evaluation metric. Error bars show a 95\% confidence interval.}
- \label{fig:lime2_compare_nohmm}
 \end{figure}
 
 \section{Timing}
