@@ -58,6 +58,7 @@ for idata = 1:3
 
     cc(:,2:3) = cc(:,2:3) * 100;
     kliep(:,2:3) = kliep(:,2:3) * 100;
+    hmm(:,2:3) = hmm(:,2:3) * 100;
     nohmm(:,2:3) = nohmm(:,2:3) * 100;
 
     for imet = 1:2
