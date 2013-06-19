@@ -50,19 +50,19 @@ predictHMM <- function(
 		pctConsufionMatrixPath,
 		summaryPath) {
 
-	summarizeCPD(labels, trainHMMResultPath, confusionMatrixPath, pctConsufionMatrixPath, summaryPath)
-
-	#print('training hmm')	
-	#training.data <- read.csv(trainHMMResultPath)
-	#hmm <- trainSupervised(labels, labels, training.data$Real.ActivityClass, training.data$Predict)
+	print('training hmm')	
+	training.data <- read.csv(trainHMMResultPath)
+	hmm <- trainSupervised(labels, labels, training.data$Real.ActivityClass, training.data$Predict)
 	
 	#print('predicting on the hmm testing data with the base classifier')
 	#load(bestModelSavePath)
 	#summarizeModelCPD(model, formula, windowSize, readData(testHMMDataInfoPath, labVisitFileFolder, labVisitFileExt), predictBasePath)
 
-	#print('predicting with the hmm')
-	#testing.data <- read.csv(predictBasePath)
-	#testing.data$Predict <- viterbi(hmm, as.character(testing.data$Predict))
+	print('predicting with the hmm')
+	testing.data <- read.csv(predictBasePath)
+    print(system.time(for (i in 1:1000) {
+    	testing.data$Predict <- viterbi(hmm, as.character(testing.data$Predict))
+    }))
 	#write.csv(testing.data, predictHMMPath)
 	
 	#print('summarizing results')

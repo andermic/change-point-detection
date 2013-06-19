@@ -378,7 +378,17 @@ built during our change-point detection experiments. We found that the average
 time required to predict an activity with decision trees was 372ms, with
 SVMs was 368ms, and with neural networks was 369ms.
 
+Alternatively, the bottom-up approach does not include the computation of a
+change-point detection score, but does include as a final step the computation
+(via the Viterbi algorithm) of the set of hidden states in an HMM that are most
+likely to correspond with classifier predictions on the windows in the test data. The Viterbi algorithm is an offline
+algorithm that considers all of the windows in the time series rather than just
+the latest window, but it nonetheless runs quickly. The amount of time required to perform this
+calculation on an OSU Hip time series, averaged over 1000 runs, was 928ms. An
+online implementation of this algorithm would be faster still, running
+in constant time with respect to the number of windows rather
+than linear time.
+
 These experiments show that the amount of time required to process an activity
-tick when a change is predicted is in the worst case
-31.4ms + 98.5ms + 372ms = 501ms, which is a very reasonable amount of time
+tick is in the worst case only 98.5ms + 372ms + 928ms = 1.40s, which is a very reasonable amount of delay
 for an online application.
