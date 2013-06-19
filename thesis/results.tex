@@ -133,7 +133,15 @@ that are greater than roughly 5 seconds. This gives a strong indication that
 5 seconds is the amount of information necessary for the classifiers to become as
 discriminative as they can be on the datasets in our work.
 
-TODO: Detection time and accuracy differences
+Using the HMM tended to give a slight boost in accuracy to the base classifiers,
+but at the expense of increased detection time. It is likely that the increase
+in accuracy was due to the smoothing of false base classifier predictions that
+were sandwiched in time between true base classifier predictions, and that the increase in
+detection time was due to the general stickyness of activities. Once the
+subject started performing an activity the probability of the subject stopping
+that activity to start a new one was recognized to be low, which meant that a true change in
+activities would be unlikely to be recognized by the smoothing algorithm
+immediately.
 
 The experiments also show the reason for the difference in
 performance between the top-down and bottom-up approaches. 
