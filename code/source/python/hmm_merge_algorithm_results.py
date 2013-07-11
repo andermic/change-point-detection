@@ -1,5 +1,8 @@
 #! /usr/bin/python
 
+# Merges results from different HMM experiments with different window sizes
+# into a single .csv file.
+
 from make_path import make_path
 
 #DATASET = 'OSU_HIP'

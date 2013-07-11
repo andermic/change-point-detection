@@ -1,5 +1,9 @@
 #! /usr/bin/python
 
+# Monitors the number and type of jobs that the user is running on the cluster.
+# Used to see when jobs stop running or go into an error state without having
+# to continually type qstat.
+
 from os import system
 from time import sleep
 from sys import argv

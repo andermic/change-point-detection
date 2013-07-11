@@ -1,5 +1,8 @@
 #! /usr/bin/python
 
+# Displays some information about the time required for R jobs to run, after
+# running them inside Eclipse.
+
 import re
 from os import system
 

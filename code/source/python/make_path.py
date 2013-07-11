@@ -1,5 +1,7 @@
 from os import mkdir, listdir
 
+# A simple function for recursively creating a filepath
+
 def make_path(path):
     folders = path.split('/')[:-1]  
     if path[0] != '/':

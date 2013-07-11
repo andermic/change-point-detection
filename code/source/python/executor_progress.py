@@ -1,5 +1,8 @@
 #! /usr/bin/python
 
+# A simple script that monitors the number of jobs that have executed when
+# calling R scripts from inside Eclipse. 
+
 import re
 
 log = open('/nfs/guille/wong/users/andermic/scratch/workspace/GeneralExperimentFramework/gef.log', 'r').readlines()

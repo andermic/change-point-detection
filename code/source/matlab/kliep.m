@@ -1,5 +1,6 @@
+% Generate KLIEP scores for given data.
+
 function [ scores ] = kliep( data, kref, ktest, kernel_width )
-% Generate KLIEP LR scores for given data.
 
 addpath('../lib');
 

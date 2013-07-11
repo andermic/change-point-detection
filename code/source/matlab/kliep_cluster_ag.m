@@ -1,3 +1,5 @@
+% Aggregate results from kliep cluster experiments
+
 function [ fprs, ag_ars, ag_dts, ars_01, ars_05, ars_1, dts_01, dts_05, dts_1 ] = kliep_cluster_ag(kpre)
 % Get scores, generate data for amot and roc curves
 

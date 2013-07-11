@@ -1,5 +1,7 @@
 #! /usr/bin/python
 
+# Some preprocessing for the OSU_HIP dataset
+
 from os import listdir
 
 # Get the names of all of the files in the current directory, excepting this code file.

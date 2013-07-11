@@ -1,6 +1,7 @@
 function [false_positive_rates, accuracy_rates, detection_times, predictions] = amot_roc(scores, true_changes, kpre, fpr_split)
-% Generate false positives, accuracy rates, and detection times so that 
-% they may be plotted for both amot and roc curves.
+% Generate false positives, accuracy rates, and detection times for change-
+% point detection algorithms so that they may be plotted for both amot and roc
+% curves.
 
 sc = scores';
 assert(size(sc,1) == 1);

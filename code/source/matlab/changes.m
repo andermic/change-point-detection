@@ -1,5 +1,7 @@
-function [ res ] = changes( data )
+% Helper function for cc_aggregate
 % Find the true changes in a given data instance
+
+function [ res ] = changes( data )
 
 res = [];
 for i = 1:(size(data,1)-1)

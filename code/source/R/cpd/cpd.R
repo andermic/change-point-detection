@@ -4,8 +4,6 @@ source("/nfs/guille/wong/users/andermic/scratch/workspace/ObesityExperimentRScri
 library('e1071', lib.loc='/nfs/stak/students/a/andermic/Windows.Documents/Desktop/change-point-detection/code/lib/')
 library(nnet)
 library(rpart)
-#library(glmnet)
-
 
 # Modified from featurizeMstmData in mstm/mstm.featurize.data.R
 featurizeCPD <- function(rawDataFilePath, frequency, savePath, changePointsPath=NA, windowSize=NA, hmm='false') {
@@ -523,6 +521,7 @@ featurizeTiming <- function(numRuns, ticksPerWindow, min, max) {
 	}
 }
 
+# For timing experiments
 predictTiming <- function(model, formula, scale, testData, predictionReportPath, bestModelInfo=NA) {
 	#real <- data.frame(ActivityClass=testData$ActivityClass, ActivityRatios=testData$ActivityRatio, Scale=testData$Scale)
 	print('predicting')
@@ -543,6 +542,7 @@ predictTiming <- function(model, formula, scale, testData, predictionReportPath,
 	#write.csv(prediction, predictionReportPath, row.names = FALSE)
 }
 
+# For timing experiments
 testBestModelTiming <- function(
 		algorithm,
 		formula, formulaName, labels, 

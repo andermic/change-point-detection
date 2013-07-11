@@ -1,3 +1,5 @@
+% Conduct KLIEP timing experiments.
+
 function [time_elapsed] = kliep_timing(num_runs)
 
 KREF = 300;

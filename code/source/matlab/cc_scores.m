@@ -1,3 +1,5 @@
+% Calculate control chart scores for each tick of each time series in NAMES_FILE
+
 NAMES_FILE = 'uq_file_names';
 KPRE = 30;
 OUTPUT = '/nfs/guille/wong/users/andermic/Desktop/cpd/uq_30hz';

@@ -1,5 +1,7 @@
 #! /usr/bin/python
 
+# Some code for generating results tables in LaTex
+
 ROOT_INPUT_FOLDER = '/nfs/guille/wong/users/andermic/cpd/results/30hz'
 OUTPUT_FOLDER = '/nfs/guille/wong/users/andermic/cpd/thesis'
 METRICS = ['Accuracy', 'Detection Time']

@@ -1,5 +1,9 @@
 #! /usr/bin/python
 
+# Merges results from CPD experiments with different false positive rates into a
+# single .csv file.
+
+
 from os import listdir
 from make_path import make_path
 

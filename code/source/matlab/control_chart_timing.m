@@ -1,3 +1,5 @@
+% Conduct timing experiments for the control chart algorithm
+
 function[time_elapsed] = control_chart_timing(kpre, data, num_ticks, runs_per_tick)
 
 n = size(data,1);

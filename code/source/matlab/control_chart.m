@@ -1,3 +1,5 @@
+% Calculate control chart scores for each tick in the time series.
+
 function[sigma_scores] = control_chart(kpre, data)
 
 n = size(data,1);
